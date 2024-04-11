@@ -1,6 +1,18 @@
 import { ShippingMethodEntity } from "./shipping_method";
 import { StoreEntity } from "./store";
 
+enum OrderStatus {
+  draft = "draft",
+  pending = "pending",
+  processing = "processing",
+  shipped = "shipped",
+  delivering = "delivering",
+  delivered = "delivered",
+  cancelled = "cancelled",
+  returned = "returned",
+  refunded = "refunded",
+}
+
 export interface OrderEntity {
   id: string;
   customerName: string | null;
@@ -29,19 +41,8 @@ export interface OrderEntity {
 }
 export interface OrderItem {
   productId: string;
+  productName?: string | null;
   variantPath?: string;
   quantity: number;
   price: number;
-}
-
-export enum OrderStatus {
-  draft = "draft",
-  pending = "pending",
-  processing = "processing",
-  shipped = "shipped",
-  delivering = "delivering",
-  delivered = "delivered",
-  cancelled = "cancelled",
-  returned = "returned",
-  refunded = "refunded",
 }

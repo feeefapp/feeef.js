@@ -1,8 +1,8 @@
 import { EmbaddedAddress } from "../embadded/address.js";
 import { EmbaddedCategory } from "../embadded/category.js";
 import { EmbaddedContact } from "../embadded/contact.js";
-import { OrderEntity } from "./order.js";
-import { ShippingMethodEntity } from "./shipping_method.js";
+// import { OrderEntity } from "./order.js";
+// import { ShippingMethodEntity } from "./shipping_method.js";
 import { UserEntity } from "./user.js";
 
 export interface StoreEntity {
@@ -31,6 +31,8 @@ export interface StoreEntity {
   user: UserEntity;
   // orders: OrderEntity[];
   // shippingMethods: ShippingMethodEntity[];
+  defaultShippingRates: ((number | null)[] | null)[] | null
+
 }
 
 export interface StoreDomain {
@@ -45,6 +47,9 @@ export interface StoreBanner {
 
 export interface StoreDecoration {
   primaryColor: number;
+  showStoreLogoInHeader?: boolean;
+  logoFullHeight?: boolean;
+  showStoreNameInHeader?: boolean;
   metadata?: Record<string, any>;
 }
 
