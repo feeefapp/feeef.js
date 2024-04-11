@@ -19,6 +19,18 @@ import {
 } from "../core/core";
 // import Emittery from 'emittery';
 
+// class ListResponse<T> {
+//   final List<T> data;
+//   final int? total;
+//   final int? page;
+//   final int? limit;
+export interface ListResponse<T> {
+  data: T[];
+  total?: number;
+  page?: number;
+  limit?: number;
+}
+
 abstract class ModelRepository<T, C, U> {
   resource: string;
   // client
@@ -40,12 +52,24 @@ abstract class ModelRepository<T, C, U> {
     return res.data;
   }
 
-  async list(options: ModelListOptions): Promise<T[]> {
-    const { page, offset, limit, params } = options;
+  async list(options?: ModelListOptions): Promise<ListResponse<T>> {
+    const { page, offset, limit, params } = options || {};
     const res = await this.client.get(`/${this.resource}`, {
       params: { page, offset, limit, ...params },
     });
-    return res.data;
+    // if res.data is an array then create ListResponse
+    if (Array.isArray(res.data)) {
+      return {
+        data: res.data,
+      };
+    } else {
+      return {
+        data: res.data.data,
+        total: res.data.meta.total,
+        page: res.data.meta.currentPage,
+        limit: res.data.meta.perPage,
+      };
+    }
   }
 
   async create(options: ModelCreateOptions<C>): Promise<T> {
@@ -201,21 +225,26 @@ export class OrderRepository extends ModelRepository<
   }
 }
 
-// singleton
+export interface FeeeFConfig {
+  apiKey: string;
+  client?: AxiosInstance;
+}
 export class FeeeF {
   apiKey: string;
   client: AxiosInstance;
-  store: StoreRepository;
-  product: ProductRepository;
-  user: UserRepository;
-  order: OrderRepository;
+  stores: StoreRepository;
+  products: ProductRepository;
+  users: UserRepository;
+  orders: OrderRepository;
 
-  constructor(apiKey: string, client?: AxiosInstance) {
+  constructor({ apiKey, client }: FeeeFConfig) {
     this.apiKey = apiKey;
     this.client = client || axios;
-    this.store = new StoreRepository(this.client);
-    this.product = new ProductRepository(this.client);
-    this.user = new UserRepository(this.client);
-    this.order = new OrderRepository(this.client);
+    // set base url
+    this.client.defaults.baseURL = "http://localhost:3333/api/v1";
+    this.stores = new StoreRepository(this.client);
+    this.products = new ProductRepository(this.client);
+    this.users = new UserRepository(this.client);
+    this.orders = new OrderRepository(this.client);
   }
 }

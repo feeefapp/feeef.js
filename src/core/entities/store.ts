@@ -12,7 +12,7 @@ export interface StoreEntity {
   action: StoreAction | null
   domain: StoreDomain | null
   decoration: StoreDecoration | null
-  name: string | null
+  name: string
   logoUrl: string | null
   ondarkLogoUrl: string | null
   userId: string
@@ -31,6 +31,7 @@ export interface StoreEntity {
   user: UserEntity
   // orders: OrderEntity[];
   // shippingMethods: ShippingMethodEntity[];
+  defaultShippingRates: (number | null)[][] | null
 }
 
 export interface StoreDomain {

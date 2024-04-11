@@ -47,7 +47,6 @@ export const UpdateUserSchema = vine.object({
     .optional(),
   phone: vine
     .string()
-    // .regex(/^\d{10}$/)
     // must start with 0 then if secend is (5|6|7) then 8 digits and if secend is (2) then 7 digits
     .regex(/^0(5|6|7)\d{8}$|^0(2)\d{7}$/)
     .optional(),
