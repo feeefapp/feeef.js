@@ -42,10 +42,13 @@ export interface StoreDomain {
 export interface StoreBanner {
   title: string
   url?: string | null
+  enabled: boolean
+  metadata: Record<string, any>
 }
 
 export interface StoreDecoration {
-  primaryColor: number
+  primary: number
+  onPrimary?: number
   showStoreLogoInHeader?: boolean
   logoFullHeight?: boolean
   showStoreNameInHeader?: boolean

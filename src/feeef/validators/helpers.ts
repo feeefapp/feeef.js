@@ -1,12 +1,12 @@
-import vine from '@vinejs/vine'
+import vine from "@vinejs/vine";
 
-export const AvatarFileSchema = vine.any()
+export const AvatarFileSchema = vine.any();
 // .file({
 //   size: '1mb',
 //   extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
 // })
 
-export const ImageFileSchema = vine.any()
+export const ImageFileSchema = vine.any();
 // .file({
 //   size: '1mb',
 //   extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
@@ -16,16 +16,17 @@ export const DomainSchema = vine.object({
   name: vine.string().minLength(3).maxLength(32),
   verifiedAt: vine.date().optional(),
   metadata: vine.object({}).optional(),
-})
+});
 
 // decoration
 export const StoreDecorationSchema = vine.object({
-  primaryColor: vine.number().min(0x0).max(0xffffffff),
+  primary: vine.number().min(0x0).max(0xffffffff),
+  onPrimary: vine.number().min(0x0).max(0xffffffff),
   showStoreLogoInHeader: vine.boolean().optional(),
   logoFullHeight: vine.boolean().optional(),
   showStoreNameInHeader: vine.boolean().optional(),
   metadata: vine.any().optional(),
-})
+});
 
 // export const EmbaddedImageSchema = vine.object({
 //   url: vine.string().url(),
@@ -42,7 +43,7 @@ export const EmbaddedCategorySchema = vine.object({
   photoFile: AvatarFileSchema.optional(),
   ondarkPhotoFile: AvatarFileSchema.optional(),
   metadata: vine.object({}).optional(),
-})
+});
 
 export const EmbaddedAddressSchema = vine.object({
   country: vine.string().minLength(2).maxLength(32).optional(),
@@ -51,16 +52,24 @@ export const EmbaddedAddressSchema = vine.object({
   street: vine.string().minLength(2).maxLength(32).optional(),
   zip: vine.string().minLength(2).maxLength(32).optional(),
   metadata: vine.object({}).optional().optional(),
-})
+});
 
 export const EmbaddedContactSchema = vine.object({
   type: vine.string().minLength(2).maxLength(32),
   value: vine.string().minLength(2).maxLength(255),
   metadata: vine.object({}).optional(),
-})
+});
 
 export const ContactSchema = vine.object({
   type: vine.string().minLength(2).maxLength(32),
   value: vine.string().minLength(2).maxLength(255),
   metadata: vine.object({}).optional(),
-})
+});
+
+// StoreBunner
+export const StoreBunner = vine.object({
+  url: vine.string().url().optional(),
+  title: vine.string(),
+  enabled: vine.boolean().optional(),
+  metadata: vine.object({}).optional(),
+});

@@ -71,11 +71,19 @@ export class FeeeF {
    */
   constructor({ apiKey, client, cache }: FeeeFConfig) {
     this.apiKey = apiKey;
-    this.client = setupCache(client || axios, {
-      ttl: cache === false ? 5 : Math.max(cache!, 5) || 10 * 60 * 1000, // 10 minutes by default
-      // for persistent cache use buildWebStorage
-      storage: buildWebStorage(localStorage, "ff:"),
-    });
+    // get th "cache" search param
+    const urlParams = new URLSearchParams(window.location.search);
+    const cacheParam = urlParams.get("cache");
+    // if is 0 or false, disable cache
+    if (cacheParam == '0') {
+      this.client = client || axios;
+    } else {
+      this.client = setupCache(client || axios, {
+        ttl: cache === false ? 5 : Math.max(cache!, 5) || 1 * 60 * 1000, // 1 minute by default
+        // for persistent cache use buildWebStorage
+        storage: buildWebStorage(localStorage, "ff:"),
+      });
+    }
     // set base url
     this.client.defaults.baseURL = "http://localhost:3333/api/v1";
     this.stores = new StoreRepository(this.client);
