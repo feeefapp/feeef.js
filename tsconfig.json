@@ -1,30 +1,36 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "types": ["@types/node"],
+    "module": "NodeNext",
+    "lib": ["ESNext"],
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "include": ["src/**/*"],
-  
-    /* Truncated compiler options to list only relevant options */
-    "declaration": true, 
-    "declarationMap": true,
-    "rootDir": ".",   
-    "composite": true,     
+    "isolatedModules": true,
+    "removeComments": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "skipLibCheck": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "strict": false,
+    "target": "es2017",
+    "esModuleInterop": true,
+    "rootDir": "./",
+    "outDir": "./build",
+    "moduleResolution": "NodeNext",
   },
-  "references": []  // * Any project that is referenced must itself have a `references` array (which may be empty).
+  "ts-node": {
+    "swc": true,
+    "skipIgnore": true,
+  },
+  "include": ["./**/*.ts"],
 }
