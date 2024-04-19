@@ -17,8 +17,14 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "include": ["src/**/*"],
+  
+    /* Truncated compiler options to list only relevant options */
+    "declaration": true, 
+    "declarationMap": true,
+    "rootDir": ".",   
+    "composite": true,     
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": []  // * Any project that is referenced must itself have a `references` array (which may be empty).
 }
