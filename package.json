@@ -1,9 +1,18 @@
 {
   "name": "feeef",
   "description": "FeeeF sdk",
-  "main": "src/index.ts",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "type": "module",
+  "main": "build/index.js",
+  "files": [
+    "build",
+    "!build/bin",
+    "!build/tests",
+    "!build/factories"
+  ],
+  "exports": {
+    ".": "./build/index.js"
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
@@ -25,5 +34,16 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
+  },
+  "tsup": {
+    "entry": [
+      "./index.ts"
+    ],
+    "outDir": "./build",
+    "clean": true,
+    "format": "esm",
+    "dts": false,
+    "sourcemap": true,
+    "target": "esnext"
   }
 }
