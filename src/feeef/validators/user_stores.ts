@@ -5,7 +5,7 @@ import {
   DomainSchema,
   EmbaddedAddressSchema,
   EmbaddedCategorySchema,
-  StoreBunner,
+  StoreBunnerSchema,
   StoreDecorationSchema,
 } from "./helpers.js";
 // "defaultShippingRates.1"
@@ -15,6 +15,7 @@ export const DefaultShippingRatesSchema = vine.array(
 
 export const CreateUserStoreSchema = vine.object({
   name: vine.string().minLength(2).maxLength(32),
+  banner: StoreBunnerSchema.optional(),
   slug: vine
     .string()
     .regex(/^[a-z0-9-]+$/)
@@ -35,7 +36,6 @@ export const CreateUserStoreSchema = vine.object({
     })
     .optional(),
 
-  banner: StoreBunner.optional(),
   logoUrl: vine.string().optional(),
   ondarkLogoUrl: vine.string().optional(),
   logoFile: AvatarFileSchema.optional(),
@@ -73,7 +73,7 @@ export const UpdateUserStoreSchema = vine.object({
     .optional(),
   domain: DomainSchema.optional(),
   decoration: StoreDecorationSchema.optional(),
-  banner: StoreBunner.optional(),
+  banner: StoreBunnerSchema.optional(),
   logoUrl: vine.string().nullable().optional(),
   ondarkLogoUrl: vine.string().nullable().optional(),
   logoFile: AvatarFileSchema.optional(),

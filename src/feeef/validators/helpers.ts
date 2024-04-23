@@ -66,10 +66,11 @@ export const ContactSchema = vine.object({
   metadata: vine.object({}).optional(),
 });
 
+
 // StoreBunner
-export const StoreBunner = vine.object({
+export const StoreBunnerSchema = vine.object({
   url: vine.string().url().optional(),
   title: vine.string(),
   enabled: vine.boolean().optional(),
   metadata: vine.object({}).optional(),
-});
+})

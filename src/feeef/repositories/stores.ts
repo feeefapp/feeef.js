@@ -2,7 +2,6 @@ import vine from "@vinejs/vine";
 import { InferInput } from "@vinejs/vine/types";
 import { AxiosInstance } from "axios";
 import { StoreEntity } from "../../core/core";
-import { CreateStoreSchema } from "../validators/stores";
 import {
   CreateUserStoreSchema,
   UpdateUserStoreSchema,
@@ -31,9 +30,9 @@ export class StoreRepository extends ModelRepository<
    * @returns A Promise that resolves to the created Store entity.
    */
   async create(
-    options: ModelCreateOptions<InferInput<typeof CreateStoreSchema>>
+    options: ModelCreateOptions<InferInput<typeof CreateUserStoreSchema>>
   ): Promise<StoreEntity> {
-    const validator = vine.compile(CreateStoreSchema);
+    const validator = vine.compile(CreateUserStoreSchema);
     const output = await validator.validate(options.data);
     return super.create({ ...options, data: output });
   }

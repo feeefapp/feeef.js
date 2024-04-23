@@ -26,6 +26,11 @@ export interface FeeeFConfig {
    * cannot be less than 5 seconds
    */
   cache?: false | number;
+
+  /**
+   * The base URL for the API.
+   */
+  baseURL?: string;
 }
 
 /**
@@ -69,7 +74,7 @@ export class FeeeF {
    * @param {AxiosInstance} config.client - The Axios instance used for making HTTP requests.
    * @param {boolean | number} config.cache - The caching configuration. Set to `false` to disable caching, or provide a number to set the cache TTL in milliseconds.
    */
-  constructor({ apiKey, client, cache }: FeeeFConfig) {
+  constructor({ apiKey, client, cache, baseURL =  "http://localhost:3333/api/v1"}: FeeeFConfig) {
     this.apiKey = apiKey;
     // get th "cache" search param
     const urlParams = new URLSearchParams(window.location.search);
@@ -85,7 +90,7 @@ export class FeeeF {
       });
     }
     // set base url
-    this.client.defaults.baseURL = "http://localhost:3333/api/v1";
+    this.client.defaults.baseURL = baseURL;
     this.stores = new StoreRepository(this.client);
     this.products = new ProductRepository(this.client);
     this.users = new UserRepository(this.client);
