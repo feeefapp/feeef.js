@@ -30,12 +30,7 @@ export const CreateUserStoreSchema = vine.object({
       name: vine.string().minLength(2).maxLength(32),
     })
     .optional(),
-  decoration: vine
-    .object({
-      primaryColor: vine.number().min(0x0).max(0xffffffff),
-    })
-    .optional(),
-
+  decoration: StoreDecorationSchema.optional(),
   logoUrl: vine.string().optional(),
   ondarkLogoUrl: vine.string().optional(),
   logoFile: AvatarFileSchema.optional(),
