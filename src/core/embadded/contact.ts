@@ -20,5 +20,6 @@ export enum EmbaddedContactType {
 export interface EmbaddedContact {
   type: EmbaddedContactType
   value: string
+  name?: string
   metadata?: Record<string, any>
 }

@@ -57,15 +57,16 @@ export interface StoreDecoration {
 }
 
 export interface StoreIntegration {
-  type: StoreIntegrations;
+  service: StoreIntegrations;
   // any
   [key: string]: any;
   metadata: Record<string, any>;
+  public: Record<string, any>;
 }
 
 export enum StoreIntegrations {
   telegram = "telegram",
-  facebookPixel = "facebook_pixel",
+  metaPixel = "meta_pixel",
   googleAnalytics = "google_analytics",
   googleSheet = "google_sheet",
   sms = "sms",

@@ -1,21 +1,20 @@
-import vine from "@vinejs/vine";
+import vine from '@vinejs/vine'
 import {
   AvatarFileSchema,
-  ContactSchema,
+  EmbaddedContactSchema,
   DomainSchema,
   EmbaddedAddressSchema,
   EmbaddedCategorySchema,
-  StoreBunnerSchema,
+  StoreBunner,
   StoreDecorationSchema,
-} from "./helpers.js";
+} from './helpers.js'
 // "defaultShippingRates.1"
 export const DefaultShippingRatesSchema = vine.array(
-  vine.array(vine.number().min(0).max(10000).nullable()).nullable()
-);
+  vine.array(vine.number().min(0).max(100000).nullable()).nullable()
+)
 
 export const CreateUserStoreSchema = vine.object({
   name: vine.string().minLength(2).maxLength(32),
-  banner: StoreBunnerSchema.optional(),
   slug: vine
     .string()
     .regex(/^[a-z0-9-]+$/)
@@ -31,6 +30,8 @@ export const CreateUserStoreSchema = vine.object({
     })
     .optional(),
   decoration: StoreDecorationSchema.optional(),
+
+  banner: StoreBunner.optional(),
   logoUrl: vine.string().optional(),
   ondarkLogoUrl: vine.string().optional(),
   logoFile: AvatarFileSchema.optional(),
@@ -51,7 +52,7 @@ export const CreateUserStoreSchema = vine.object({
     .optional(),
   defaultShippingRates: DefaultShippingRatesSchema.optional(),
   integrations: vine.array(vine.any()).optional(),
-});
+})
 
 // UpdateStoreSchema
 export const UpdateUserStoreSchema = vine.object({
@@ -68,7 +69,7 @@ export const UpdateUserStoreSchema = vine.object({
     .optional(),
   domain: DomainSchema.optional(),
   decoration: StoreDecorationSchema.optional(),
-  banner: StoreBunnerSchema.optional(),
+  banner: StoreBunner.optional(),
   logoUrl: vine.string().nullable().optional(),
   ondarkLogoUrl: vine.string().nullable().optional(),
   logoFile: AvatarFileSchema.optional(),
@@ -78,7 +79,7 @@ export const UpdateUserStoreSchema = vine.object({
   description: vine.string().minLength(2).maxLength(255).optional(),
   addresses: vine.array(EmbaddedAddressSchema).optional(),
   metadata: vine.object({}).optional(),
-  contacts: vine.array(ContactSchema).optional(),
+  contacts: vine.array(EmbaddedContactSchema).optional(),
   defaultShippingRates: DefaultShippingRatesSchema.optional(),
   integrations: vine.array(vine.any()).optional(),
-});
+})

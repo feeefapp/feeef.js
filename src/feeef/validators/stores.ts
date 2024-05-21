@@ -1,13 +1,13 @@
-import vine from "@vinejs/vine";
+import vine from '@vinejs/vine'
 import {
   AvatarFileSchema,
-  ContactSchema,
+  EmbaddedContactSchema,
   DomainSchema,
   EmbaddedAddressSchema,
   EmbaddedCategorySchema,
   StoreDecorationSchema,
-} from "./helpers.js";
-import { DefaultShippingRatesSchema } from "./user_stores.js";
+} from './helpers.js'
+import { DefaultShippingRatesSchema } from './user_stores.js'
 
 export const CreateStoreSchema = vine.object({
   name: vine.string().minLength(2).maxLength(32),
@@ -51,15 +51,13 @@ export const CreateStoreSchema = vine.object({
       })
     )
     .optional(),
-  shippingRates: vine
-    .array(vine.string().minLength(2).maxLength(48))
-    .optional(),
+  shippingRates: vine.array(vine.string().minLength(2).maxLength(48)).optional(),
   verifiedAt: vine.date().optional(),
   blockedAt: vine.date().optional(),
   integrations: vine.array(vine.any()).optional(),
   // default_shipping_rates
   defaultShippingRates: DefaultShippingRatesSchema.optional(),
-});
+})
 
 // UpdateStoreSchema
 export const UpdateStoreSchema = vine.object({
@@ -92,14 +90,12 @@ export const UpdateStoreSchema = vine.object({
   description: vine.string().minLength(2).maxLength(255).optional(),
   addresses: vine.array(EmbaddedAddressSchema).optional(),
   metadata: vine.object({}).optional(),
-  contacts: vine.array(ContactSchema).optional(),
-  shippingRates: vine
-    .array(vine.string().minLength(2).maxLength(48))
-    .optional(),
+  contacts: vine.array(EmbaddedContactSchema).optional(),
+  shippingRates: vine.array(vine.string().minLength(2).maxLength(48)).optional(),
   verifiedAt: vine.date().optional(),
   blockedAt: vine.date().optional(),
   // integrations
   integrations: vine.array(vine.any()).optional(),
   // default_shipping_rates
   defaultShippingRates: DefaultShippingRatesSchema.optional(),
-});
+})

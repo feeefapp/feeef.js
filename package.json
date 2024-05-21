@@ -1,9 +1,9 @@
 {
   "name": "feeef",
-  "description": "A new project",
+  "description": "feeef sdk for the web",
   "main": "src/index.ts",
   "private": false,
-  "version": "0.0.13",
+  "version": "0.0.18",
   "type": "module",
   "scripts": {
     "dev": "vite --host",

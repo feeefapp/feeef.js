@@ -1,4 +1,6 @@
 import { EmbaddedCategory } from "../embadded/category.js";
+import { ShippingMethodEntity } from "./shipping_method.js";
+import { StoreEntity } from "./store.js";
 
 export interface ProductEntity {
   id: string;
@@ -14,6 +16,8 @@ export interface ProductEntity {
   media: string[];
 
   storeId: string;
+
+  shippingMethodId?: string | null;
 
   category: EmbaddedCategory;
 
@@ -55,6 +59,10 @@ export interface ProductEntity {
   createdAt: any;
 
   updatedAt: any;
+
+  // relations
+  store?: StoreEntity;
+  shippingMethod?: ShippingMethodEntity;
 }
 
 export enum ProductStatus {
@@ -84,6 +92,7 @@ export interface ProductVariantOption {
   child?: ProductVariant | null;
   mediaIndex?: number | null;
   hint?: string | null;
+  value?: any;
 }
 
 export enum VariantOptionType {
