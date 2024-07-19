@@ -3,7 +3,7 @@
   "description": "feeef sdk for the web",
   "main": "src/index.ts",
   "private": false,
-  "version": "0.0.18",
+  "version": "0.0.19",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
