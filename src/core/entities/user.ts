@@ -12,6 +12,12 @@ export interface UserEntity {
   createdAt: any
   updatedAt: any | null
   metadata: Record<string, any>
+  wallet: EmbaddedWallet
+}
+
+export interface EmbaddedWallet {
+  currency: 'DZD' | 'USD' | 'EUR'
+  balance: number
 }
 
 export interface AuthToken {

@@ -1,5 +1,9 @@
 import axios, { AxiosInstance } from "axios";
-import { buildWebStorage, setupCache } from "axios-cache-interceptor";
+import {
+  buildMemoryStorage,
+  buildWebStorage,
+  setupCache,
+} from "axios-cache-interceptor";
 import { OrderRepository } from "./repositories/orders";
 import { ProductRepository } from "./repositories/products";
 import { StoreRepository } from "./repositories/stores";
@@ -74,19 +78,26 @@ export class FeeeF {
    * @param {AxiosInstance} config.client - The Axios instance used for making HTTP requests.
    * @param {boolean | number} config.cache - The caching configuration. Set to `false` to disable caching, or provide a number to set the cache TTL in milliseconds.
    */
-  constructor({ apiKey, client, cache, baseURL =  "http://localhost:3333/api/v1"}: FeeeFConfig) {
+  constructor({
+    apiKey,
+    client,
+    cache,
+    baseURL = "http://localhost:3333/api/v1",
+  }: FeeeFConfig) {
     this.apiKey = apiKey;
     // get th "cache" search param
-    const urlParams = new URLSearchParams(window.location.search);
-    const cacheParam = urlParams.get("cache");
     // if is 0 or false, disable cache
-    if (cacheParam == '0') {
+    if (cache === false) {
       this.client = client || axios;
     } else {
+      const isInBrowser =
+        typeof window !== "undefined" && typeof localStorage !== "undefined";
       this.client = setupCache(client || axios, {
-        ttl: cache === false ? 5 : Math.max(cache!, 5) || 1 * 60 * 1000, // 1 minute by default
+        ttl: cache === undefined ? 1000 * 60 * 5 : Math.max(cache!, 1000), //|| 1 * 60 * 1000, // 1 minute by default
         // for persistent cache use buildWebStorage
-        storage: buildWebStorage(localStorage, "ff:"),
+        storage: isInBrowser
+          ? buildWebStorage(localStorage, "ff:")
+          : buildMemoryStorage(),
       });
     }
     // set base url

@@ -4,6 +4,7 @@ import { EmbaddedContact } from '../embadded/contact.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
 import { UserEntity } from './user.js'
+import { DateTime } from 'luxon'
 
 export interface StoreEntity {
   id: string
@@ -32,6 +33,25 @@ export interface StoreEntity {
   // orders: OrderEntity[];
   // shippingMethods: ShippingMethodEntity[];
   defaultShippingRates: (number | null)[][] | null
+
+  // subscription
+  subscriptio?: any
+  due?: number
+
+  // StoreConfigs
+  configs?: StoreConfigs
+}
+
+export interface StoreConfigs {
+  currencies: StoreCurrencyConfig[]
+  defaultCurrency: number
+}
+
+export interface StoreCurrencyConfig {
+  code: string
+  symbol: string
+  precision: number
+  rate: number
 }
 
 export interface StoreDomain {
@@ -80,4 +100,39 @@ export interface StoreIntegrations {
   yalidine?: any
   maystroDelivery?: any
   echotrak?: any
+  procolis?: any
+  noest?: any
+}
+
+export enum StoreSubscriptionStatus {
+  active = 'active',
+  inactive = 'inactive',
+}
+
+export enum StoreSubscriptionType {
+  free = 'free',
+  quota = 'quota',
+  percentage = 'percentage',
+}
+
+export interface StoreSubscription {
+  type: StoreSubscriptionType
+  status: StoreSubscriptionStatus
+  startedAt: DateTime
+  expiresAt: DateTime | null
+  metadata: Record<string, any>
+}
+
+export interface StoreFreeSubscription extends StoreSubscription {
+  type: StoreSubscriptionType.free
+}
+
+export interface StoreQuotaSubscription extends StoreSubscription {
+  type: StoreSubscriptionType.quota
+  quota: number
+}
+// another way is by taking percentage of the sales
+export interface StorePercentageSubscription extends StoreSubscription {
+  type: StoreSubscriptionType.percentage
+  percentage: number
 }

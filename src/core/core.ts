@@ -8,3 +8,5 @@ export * from "./entities/shipping_method.js";
 export * from "./embadded/address.js";
 export * from "./embadded/category.js";
 export * from "./embadded/contact.js";
+
+export type { StoreIntegrations } from "./entities/store.js"; // or wherever StoreIntegrations is defined

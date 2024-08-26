@@ -1,6 +1,7 @@
 export enum OrderStatus {
   draft = 'draft',
   pending = 'pending',
+  accepted = 'accepted',
   processing = 'processing',
   completed = 'completed',
   cancelled = 'cancelled',
@@ -49,4 +50,30 @@ export interface OrderItem {
   variantPath?: string
   quantity: number
   price: number
+}
+
+// order track entity
+export interface OrderTrackEntity {
+  id: string
+  customerName?: string | null
+  customerPhone: string
+  customerIp?: string | null
+  shippingAddress?: string | null
+  shippingCity?: string | null
+  shippingState?: string | null
+  shippingMethodId?: string | null
+  paymentMethodId?: string | null
+  items: OrderItem[]
+  subtotal: number
+  shippingPrice: number
+  total: number
+  discount: number
+  coupon?: string | null
+  storeId: string
+  metadata: any
+  status: OrderStatus
+  paymentStatus: PaymentStatus
+  deliveryStatus: DeliveryStatus
+  createdAt: any
+  updatedAt: any
 }
