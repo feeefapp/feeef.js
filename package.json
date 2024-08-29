@@ -3,7 +3,7 @@
   "description": "feeef sdk for the web",
   "main": "src/index.ts",
   "private": false,
-  "version": "0.0.25",
+  "version": "0.0.26",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -14,9 +14,11 @@
   "dependencies": {
     "@vinejs/vine": "^2.0.0",
     "axios": "^1.6.8",
-    "axios-cache-interceptor": "^1.5.1"
+    "axios-cache-interceptor": "^1.5.1",
+    "luxon": "^3.5.0"
   },
   "devDependencies": {
+    "@types/luxon": "^3.4.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react-swc": "^3.3.2",
