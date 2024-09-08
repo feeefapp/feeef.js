@@ -1,7 +1,7 @@
 // import { ProductStatus } from '#models/product'
-import vine from "@vinejs/vine";
-import { EmbaddedCategorySchema, ImageFileSchema } from "./helpers.js";
-import { ProductStatus } from "../../core/core.js";
+import vine from '@vinejs/vine'
+import { EmbaddedCategorySchema, ImageFileSchema } from './helpers.js'
+import { ProductStatus } from '../../core/entities/product.js'
 // import Store from '#models/store'
 
 export const ProductVariantOptionSchema = vine.object({
@@ -12,14 +12,14 @@ export const ProductVariantOptionSchema = vine.object({
   stock: vine.number().min(0).max(1000000).optional().nullable(),
   sold: vine.number().min(0).max(1000000).optional().nullable(),
   child: vine.any().optional().nullable(),
-});
+})
 
 export const ProductVariantSchema = vine
   .object({
     name: vine.string().minLength(1).maxLength(32),
     options: vine.array(ProductVariantOptionSchema),
   })
-  .optional();
+  .optional()
 export const CreateProductSchema = vine.object({
   slug: vine
     .string()
@@ -51,10 +51,10 @@ export const CreateProductSchema = vine.object({
   stock: vine.number().min(0).max(1000000).optional(),
   variant: ProductVariantSchema,
   metadata: vine.object({}).optional(),
-  status: vine.enum(ProductStatus),
+  status: vine.enum(Object.values(ProductStatus)),
   verifiedAt: vine.date().optional(),
   blockedAt: vine.date().optional(),
-});
+})
 
 export const UpdateProductSchema = vine.object({
   slug: vine
@@ -89,7 +89,7 @@ export const UpdateProductSchema = vine.object({
   stock: vine.number().min(0).max(1000000).optional(),
   variant: ProductVariantSchema,
   metadata: vine.object({}).optional(),
-  status: vine.enum(ProductStatus).optional(),
+  status: vine.enum(Object.values(ProductStatus)),
   verifiedAt: vine.date().optional(),
   blockedAt: vine.date().optional(),
-});
+})

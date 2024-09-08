@@ -1,6 +1,7 @@
 export enum OrderStatus {
   draft = 'draft',
   pending = 'pending',
+  review = 'review',
   accepted = 'accepted',
   processing = 'processing',
   completed = 'completed',
@@ -47,6 +48,7 @@ export interface OrderEntity {
 export interface OrderItem {
   productId: string
   productName: string
+  productPhotoUrl?: string | null
   variantPath?: string
   quantity: number
   price: number

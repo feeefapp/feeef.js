@@ -5,18 +5,17 @@ export const PhoneShema = vine.string().regex(/^0(5|6|7)\d{8}$|^0(2)\d{7}$/)
 
 export const SignupSchema = vine.object({
   name: vine.string().minLength(2).maxLength(32),
-  email: vine.string()
+  email: vine.string(),
   // .unique(async (db, value, field) => {
   //   const user = await db.from('users').where('email', value).first()
   //   return !user
   // })
-  ,
   phone: PhoneShema
-  // .unique(async (db, value, field) => {
-  //   const user = await db.from('users').where('phone', value).first()
-  //   return !user
-  // })
-  .optional(),
+    // .unique(async (db, value, field) => {
+    //   const user = await db.from('users').where('phone', value).first()
+    //   return !user
+    // })
+    .optional(),
   photoFile: ImageFileSchema.optional(),
   photoUrl: vine.string().optional(),
   password: vine.string().minLength(8).maxLength(32),

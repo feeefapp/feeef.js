@@ -1,6 +1,6 @@
-import vine from "@vinejs/vine";
-import { ImageFileSchema } from "./helpers.js";
-import { ShippingMethodPolicy, ShippingMethodStatus } from "../../core/core.js";
+import vine from '@vinejs/vine'
+import { ImageFileSchema } from './helpers.js'
+import { ShippingMethodStatus, ShippingMethodPolicy } from '../../core/entities/shipping_method.js'
 // import { ShippingMethodPolicy, ShippingMethodStatus } from '#models/shipping_method'
 
 export const CreateShippingMethodSchema = vine.object({
@@ -15,10 +15,10 @@ export const CreateShippingMethodSchema = vine.object({
   //   sourceId: vine.string(),
   storeId: vine.string(),
   rates: vine.array(vine.number().optional()),
-  status: vine.enum(ShippingMethodStatus),
-  policy: vine.enum(ShippingMethodPolicy),
+  status: vine.enum(Object.values(ShippingMethodStatus)),
+  policy: vine.enum(Object.values(ShippingMethodPolicy)),
   //   verifiedAt: vine.date(),
-});
+})
 
 export const UpdateShippingMethodSchema = vine.object({
   name: vine.string().optional(),
@@ -32,13 +32,13 @@ export const UpdateShippingMethodSchema = vine.object({
   //   sourceId: vine.string().optional(),
   storeId: vine.string().optional(),
   rates: vine.array(vine.number().optional()).optional(),
-  status: vine.enum(ShippingMethodStatus).optional(),
-  policy: vine.enum(ShippingMethodPolicy).optional(),
+  status: vine.enum(Object.values(ShippingMethodStatus)).optional(),
+  policy: vine.enum(Object.values(ShippingMethodPolicy)).optional(),
   //   verifiedAt: vine.date().optional(),
-});
+})
 
 // ForkShippingMethodSchema
 export const ForkShippingMethodSchema = vine.object({
   sourceId: vine.string(),
   storeId: vine.string(),
-});
+})

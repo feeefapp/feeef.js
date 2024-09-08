@@ -1,108 +1,109 @@
-import { EmbaddedCategory } from "../embadded/category.js";
-import { ShippingMethodEntity } from "./shipping_method.js";
-import { StoreEntity } from "./store.js";
+import { EmbaddedCategory } from '../embadded/category.js'
+import { ShippingMethodEntity } from './shipping_method.js'
+import { StoreEntity } from './store.js'
 
 export interface ProductEntity {
-  id: string;
+  id: string
 
-  slug: string;
+  slug: string
 
-  decoration: ProductDecoration | null;
+  decoration: ProductDecoration | null
 
-  name: string | null;
+  name: string | null
 
-  photoUrl: string | null;
+  photoUrl: string | null
 
-  media: string[];
+  media: string[]
 
-  storeId: string;
+  storeId: string
 
-  shippingMethodId?: string | null;
+  shippingMethodId?: string | null
 
-  category: EmbaddedCategory;
+  category: EmbaddedCategory
 
-  title: string | null;
+  title: string | null
 
-  description: string | null;
+  description: string | null
 
-  body: string | null;
+  body: string | null
 
   // sku
-  sku: string | null;
+  sku: string | null
 
-  price: number;
+  price: number
 
-  discount: number | null;
+  cost: number | null
 
-  stock: number;
+  discount: number | null
 
-  sold: number;
+  stock: number
 
-  views: number;
+  sold: number
 
-  likes: number;
+  views: number
 
-  dislikes: number;
+  likes: number
 
-  variant?: ProductVariant | null;
+  dislikes: number
 
-  metadata: Record<string, any>;
+  variant?: ProductVariant | null
 
-  status: ProductStatus;
+  metadata: Record<string, any>
 
-  type: ProductType;
+  status: ProductStatus
 
-  verifiedAt: any | null;
+  type: ProductType
 
-  blockedAt: any | null;
+  verifiedAt: any | null
 
-  createdAt: any;
+  blockedAt: any | null
 
-  updatedAt: any;
+  createdAt: any
+
+  updatedAt: any
 
   // relations
-  store?: StoreEntity;
-  shippingMethod?: ShippingMethodEntity;
+  store?: StoreEntity
+  shippingMethod?: ShippingMethodEntity
 }
 
 export enum ProductStatus {
-  draft = "draft",
-  published = "published",
-  archived = "archived",
-  deleted = "deleted",
+  draft = 'draft',
+  published = 'published',
+  archived = 'archived',
+  deleted = 'deleted',
 }
 
 export interface ProductDecoration {
-  metadata: Record<string, any>;
+  metadata: Record<string, any>
 }
 
 export interface ProductVariant {
-  name: string;
-  options: ProductVariantOption[];
+  name: string
+  options: ProductVariantOption[]
 }
 
 export interface ProductVariantOption {
-  name: string;
-  sku?: string | null;
-  price?: number | null;
-  discount?: number | null;
-  stock?: number | null;
-  sold?: number | null;
-  type?: VariantOptionType;
-  child?: ProductVariant | null;
-  mediaIndex?: number | null;
-  hint?: string | null;
-  value?: any;
+  name: string
+  sku?: string | null
+  price?: number | null
+  discount?: number | null
+  stock?: number | null
+  sold?: number | null
+  type?: VariantOptionType
+  child?: ProductVariant | null
+  mediaIndex?: number | null
+  hint?: string | null
 }
 
 export enum VariantOptionType {
-  color = "color",
-  image = "image",
-  text = "text",
+  color = 'color',
+  image = 'image',
+  text = 'text',
 }
 
 export enum ProductType {
-  physical = "physical",
-  digital = "digital",
-  service = "service",
+  physical = 'physical',
+  digital = 'digital',
+  service = 'service',
 }

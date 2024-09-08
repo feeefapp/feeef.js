@@ -1,7 +1,7 @@
 // import { OrderStatus } from '#core/core'
-import vine from "@vinejs/vine";
-import { PhoneShema } from "./auth.js";
-import { OrderStatus } from "../../core/core.js";
+import vine from '@vinejs/vine'
+import { PhoneShema } from './auth.js'
+import { OrderStatus } from '../../core/entities/order.js'
 
 export const OrderItemSchema = vine.object({
   productId: vine.string(),
@@ -13,13 +13,13 @@ export const OrderItemSchema = vine.object({
   variant: vine.any().optional(),
   quantity: vine.number(),
   price: vine.number().optional(),
-});
+})
 
 export const GuestOrderItemSchema = vine.object({
   productId: vine.string(),
   variantPath: vine.string().optional(),
   quantity: vine.number(),
-});
+})
 
 export const SendOrderSchema = vine.object({
   id: vine.string().optional(),
@@ -37,11 +37,11 @@ export const SendOrderSchema = vine.object({
   //   total: vine.number().optional(),
   //   discount: vine.number().optional(),
   coupon: vine.string().optional(),
-  status: vine.enum(["pending", "draft"]),
+  status: vine.enum(['pending', 'draft']),
   // TODO: validate storeId is exists and not blocked
   storeId: vine.string(),
   metadata: vine.any().optional(),
-});
+})
 
 /// store owner section
 // CreateOrderSchema
@@ -61,10 +61,10 @@ export const CreateOrderSchema = vine.object({
   total: vine.number().optional(),
   discount: vine.number().optional(),
   coupon: vine.string().optional(),
-  status: vine.enum(OrderStatus),
+  status: vine.enum(Object.values(OrderStatus)).optional(),
   storeId: vine.string(),
   metadata: vine.any().optional(),
-});
+})
 
 // UpdateOrderSchema
 export const UpdateOrderSchema = vine.object({
@@ -83,7 +83,7 @@ export const UpdateOrderSchema = vine.object({
   total: vine.number().optional(),
   discount: vine.number().optional(),
   coupon: vine.string().optional(),
-  status: vine.enum(OrderStatus).optional(),
+  status: vine.enum(Object.values(OrderStatus)).optional(),
   storeId: vine.string(),
   metadata: vine.any().optional(),
-});
+})

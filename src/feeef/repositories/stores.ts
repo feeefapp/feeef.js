@@ -1,12 +1,9 @@
-import vine from "@vinejs/vine";
-import { InferInput } from "@vinejs/vine/types";
-import { AxiosInstance } from "axios";
-import { StoreEntity } from "../../core/core";
-import {
-  CreateUserStoreSchema,
-  UpdateUserStoreSchema,
-} from "../validators/user_stores";
-import { ModelRepository, ModelCreateOptions } from "./repository";
+import vine from '@vinejs/vine'
+import { InferInput } from '@vinejs/vine/types'
+import { AxiosInstance } from 'axios'
+import { CreateUserStoreSchema, UpdateUserStoreSchema } from '../validators/user_stores.js'
+import { ModelRepository, ModelCreateOptions } from './repository.js'
+import { StoreEntity } from '../../core/entities/store.js'
 
 /**
  * Repository for managing Store entities.
@@ -21,7 +18,7 @@ export class StoreRepository extends ModelRepository<
    * @param client The AxiosInstance used for making HTTP requests.
    */
   constructor(client: AxiosInstance) {
-    super("stores", client);
+    super('stores', client)
   }
 
   /**
@@ -32,8 +29,8 @@ export class StoreRepository extends ModelRepository<
   async create(
     options: ModelCreateOptions<InferInput<typeof CreateUserStoreSchema>>
   ): Promise<StoreEntity> {
-    const validator = vine.compile(CreateUserStoreSchema);
-    const output = await validator.validate(options.data);
-    return super.create({ ...options, data: output });
+    const validator = vine.compile(CreateUserStoreSchema)
+    const output = await validator.validate(options.data)
+    return super.create({ ...options, data: output })
   }
 }
