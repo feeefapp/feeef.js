@@ -1,4 +1,4 @@
-import vine from "@vinejs/vine";
+import vine from '@vinejs/vine'
 
 // User Schemas
 //CreateUserSchema
@@ -33,7 +33,7 @@ export const CreateUserSchema = vine.object({
   phoneVerifiedAt: vine.date().optional(),
   verifiedAt: vine.date().optional(),
   blockedAt: vine.date().optional(),
-});
+})
 
 //UpdateUserSchema
 export const UpdateUserSchema = vine.object({
@@ -66,4 +66,4 @@ export const UpdateUserSchema = vine.object({
   phoneVerifiedAt: vine.date().optional(),
   verifiedAt: vine.string().optional(),
   blockedAt: vine.date().optional(),
-});
+})

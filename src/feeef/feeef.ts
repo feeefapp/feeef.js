@@ -1,13 +1,9 @@
-import axios, { AxiosInstance } from "axios";
-import {
-  buildMemoryStorage,
-  buildWebStorage,
-  setupCache,
-} from "axios-cache-interceptor";
-import { OrderRepository } from "./repositories/orders";
-import { ProductRepository } from "./repositories/products";
-import { StoreRepository } from "./repositories/stores";
-import { UserRepository } from "./repositories/users";
+import axios, { AxiosInstance } from 'axios'
+// import { buildMemoryStorage, buildWebStorage, setupCache } from 'axios-cache-interceptor'
+import { OrderRepository } from './repositories/orders.js'
+import { ProductRepository } from './repositories/products.js'
+import { StoreRepository } from './repositories/stores.js'
+import { UserRepository } from './repositories/users.js'
 
 /**
  * Configuration options for the FeeeF module.
@@ -16,12 +12,12 @@ export interface FeeeFConfig {
   /**
    * The API key to be used for authentication.
    */
-  apiKey: string;
+  apiKey: string
 
   /**
    * An optional Axios instance to be used for making HTTP requests.
    */
-  client?: AxiosInstance;
+  client?: AxiosInstance
 
   /**
    * Specifies whether caching should be enabled or disabled.
@@ -29,12 +25,12 @@ export interface FeeeFConfig {
    * If set to `false`, caching will be disabled (5s).
    * cannot be less than 5 seconds
    */
-  cache?: false | number;
+  cache?: false | number
 
   /**
    * The base URL for the API.
    */
-  baseURL?: string;
+  baseURL?: string
 }
 
 /**
@@ -44,32 +40,32 @@ export class FeeeF {
   /**
    * The API key used for authentication.
    */
-  apiKey: string;
+  apiKey: string
 
   /**
    * The Axios instance used for making HTTP requests.
    */
-  client: AxiosInstance;
+  client: AxiosInstance
 
   /**
    * The repository for managing stores.
    */
-  stores: StoreRepository;
+  stores: StoreRepository
 
   /**
    * The repository for managing products.
    */
-  products: ProductRepository;
+  products: ProductRepository
 
   /**
    * The repository for managing users.
    */
-  users: UserRepository;
+  users: UserRepository
 
   /**
    * The repository for managing orders.
    */
-  orders: OrderRepository;
+  orders: OrderRepository
 
   /**
    * Constructs a new instance of the FeeeF class.
@@ -78,33 +74,27 @@ export class FeeeF {
    * @param {AxiosInstance} config.client - The Axios instance used for making HTTP requests.
    * @param {boolean | number} config.cache - The caching configuration. Set to `false` to disable caching, or provide a number to set the cache TTL in milliseconds.
    */
-  constructor({
-    apiKey,
-    client,
-    cache,
-    baseURL = "http://localhost:3333/api/v1",
-  }: FeeeFConfig) {
-    this.apiKey = apiKey;
+  //
+  constructor({ apiKey, client, cache, baseURL = 'http://localhost:3333/api/v1' }: FeeeFConfig) {
+    console.log(cache)
+    this.apiKey = apiKey
     // get th "cache" search param
     // if is 0 or false, disable cache
-    if (cache === false) {
-      this.client = client || axios;
-    } else {
-      const isInBrowser =
-        typeof window !== "undefined" && typeof localStorage !== "undefined";
-      this.client = setupCache(client || axios, {
-        ttl: cache === undefined ? 1000 * 60 * 5 : Math.max(cache!, 1000), //|| 1 * 60 * 1000, // 1 minute by default
-        // for persistent cache use buildWebStorage
-        storage: isInBrowser
-          ? buildWebStorage(localStorage, "ff:")
-          : buildMemoryStorage(),
-      });
-    }
+    // if (cache === false) {
+    this.client = client || axios
+    // } else {
+    //   const isInBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+    //   this.client = setupCache(client || axios, {
+    //     ttl: cache === undefined ? 1000 * 60 * 5 : Math.max(cache!, 1000), //|| 1 * 60 * 1000, // 1 minute by default
+    //     // for persistent cache use buildWebStorage
+    //     storage: isInBrowser ? buildWebStorage(localStorage, 'ff:') : buildMemoryStorage(),
+    //   })
+    // }
     // set base url
-    this.client.defaults.baseURL = baseURL;
-    this.stores = new StoreRepository(this.client);
-    this.products = new ProductRepository(this.client);
-    this.users = new UserRepository(this.client);
-    this.orders = new OrderRepository(this.client);
+    this.client.defaults.baseURL = baseURL
+    this.stores = new StoreRepository(this.client)
+    this.products = new ProductRepository(this.client)
+    this.users = new UserRepository(this.client)
+    this.orders = new OrderRepository(this.client)
   }
 }

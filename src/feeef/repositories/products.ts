@@ -1,11 +1,8 @@
-import { InferInput } from "@vinejs/vine/types";
-import { AxiosInstance } from "axios";
-import { ProductEntity } from "../../core/core";
-import {
-  CreateProductSchema,
-  UpdateProductSchema,
-} from "../validators/product";
-import { ModelRepository } from "./repository";
+import { InferInput } from '@vinejs/vine/types'
+import { AxiosInstance } from 'axios'
+import { ProductEntity } from '../../core/core.js'
+import { CreateProductSchema, UpdateProductSchema } from '../validators/product.js'
+import { ModelRepository } from './repository.js'
 
 /**
  * Represents a repository for managing products.
@@ -20,6 +17,6 @@ export class ProductRepository extends ModelRepository<
    * @param client - The AxiosInstance used for making HTTP requests.
    */
   constructor(client: AxiosInstance) {
-    super("products", client);
+    super('products', client)
   }
 }
