@@ -32,6 +32,8 @@ export interface ProductEntity {
 
   price: number
 
+  cost: number | null
+
   discount: number | null
 
   stock: number

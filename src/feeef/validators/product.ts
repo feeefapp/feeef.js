@@ -1,7 +1,7 @@
 // import { ProductStatus } from '#models/product'
 import vine from '@vinejs/vine'
 import { EmbaddedCategorySchema, ImageFileSchema } from './helpers.js'
-import { ProductStatus } from '../../core/core.js'
+import { ProductStatus } from '../../core/entities/product.js'
 // import Store from '#models/store'
 
 export const ProductVariantOptionSchema = vine.object({

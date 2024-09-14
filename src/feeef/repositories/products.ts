@@ -1,8 +1,8 @@
 import { InferInput } from '@vinejs/vine/types'
 import { AxiosInstance } from 'axios'
-import { ProductEntity } from '../../core/core.js'
 import { CreateProductSchema, UpdateProductSchema } from '../validators/product.js'
 import { ModelRepository } from './repository.js'
+import { ProductEntity } from '../../core/entities/product.js'
 
 /**
  * Represents a repository for managing products.

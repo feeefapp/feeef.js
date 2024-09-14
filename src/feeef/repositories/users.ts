@@ -1,10 +1,10 @@
 import vine from '@vinejs/vine'
 import { InferInput } from '@vinejs/vine/types'
 import { AxiosInstance } from 'axios'
-import { AuthToken, UserEntity } from '../../core/core.js'
 import { SigninSchema, AuthUpdateUserSchema } from '../validators/auth.js'
 import { CreateUserSchema, UpdateUserSchema } from '../validators/users.js'
 import { ModelRepository } from './repository.js'
+import { AuthToken, UserEntity } from '../../core/entities/user.js'
 
 /**
  * Represents the response returned by the authentication process.

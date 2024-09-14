@@ -12,11 +12,7 @@
     "!build/tests"
   ],
   "exports": {
-    ".": "./build/index.js",
-    "./defaults": "./build/src/defaults.js",
-    "./factories": "./build/factories/main.js",
-    "./types": "./build/src/types.js",
-    "./schema/base/*": "./build/src/schema/base/*.js"
+    ".": "./build/index.js"
   },
   "scripts": {
     "pretest": "npm run lint",
@@ -111,10 +107,7 @@
       "html"
     ],
     "exclude": [
-      "tests/**",
-      "factories/**",
-      "bin/**",
-      "benchmarks/**"
+      "tests/**"
     ]
   },
   "directories": {
@@ -122,14 +115,7 @@
   },
   "tsup": {
     "entry": [
-      "./index.ts",
-      "./src/defaults.ts",
-      "./factories/main.ts",
-      "./src/types.ts",
-      "./benchmarks/flat_object.ts",
-      "./benchmarks/nested_object.ts",
-      "./benchmarks/array.ts",
-      "./benchmarks/union.ts"
+      "./index.ts"
     ],
     "outDir": "./build",
     "clean": true,

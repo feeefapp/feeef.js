@@ -1,9 +1,9 @@
 import vine from '@vinejs/vine'
 import { InferInput } from '@vinejs/vine/types'
 import { AxiosInstance } from 'axios'
-import { StoreEntity } from '../../core/core.js'
 import { CreateUserStoreSchema, UpdateUserStoreSchema } from '../validators/user_stores.js'
 import { ModelRepository, ModelCreateOptions } from './repository.js'
+import { StoreEntity } from '../../core/entities/store.js'
 
 /**
  * Repository for managing Store entities.

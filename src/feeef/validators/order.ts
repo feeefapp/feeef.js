@@ -1,7 +1,7 @@
 // import { OrderStatus } from '#core/core'
 import vine from '@vinejs/vine'
 import { PhoneShema } from './auth.js'
-import { OrderStatus } from '../../core/core.js'
+import { OrderStatus } from '../../core/entities/order.js'
 
 export const OrderItemSchema = vine.object({
   productId: vine.string(),

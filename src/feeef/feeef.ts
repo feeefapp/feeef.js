@@ -79,15 +79,16 @@ export class FeeeF {
     console.log(cache)
     this.apiKey = apiKey
     // get th "cache" search param
+    // const urlParams = new URLSearchParams(window.location.search)
+    // const cacheParam = urlParams.get('cache')
     // if is 0 or false, disable cache
-    // if (cache === false) {
+    // if (cacheParam == '0') {
     this.client = client || axios
     // } else {
-    //   const isInBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined'
     //   this.client = setupCache(client || axios, {
-    //     ttl: cache === undefined ? 1000 * 60 * 5 : Math.max(cache!, 1000), //|| 1 * 60 * 1000, // 1 minute by default
+    //     ttl: cache === false ? 5 : Math.max(cache!, 5) || 1 * 60 * 1000, // 1 minute by default
     //     // for persistent cache use buildWebStorage
-    //     storage: isInBrowser ? buildWebStorage(localStorage, 'ff:') : buildMemoryStorage(),
+    //     storage: buildWebStorage(localStorage, 'ff:'),
     //   })
     // }
     // set base url

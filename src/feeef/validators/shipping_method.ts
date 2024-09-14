@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 import { ImageFileSchema } from './helpers.js'
-import { ShippingMethodPolicy, ShippingMethodStatus } from '../../core/core.js'
+import { ShippingMethodStatus, ShippingMethodPolicy } from '../../core/entities/shipping_method.js'
 // import { ShippingMethodPolicy, ShippingMethodStatus } from '#models/shipping_method'
 
 export const CreateShippingMethodSchema = vine.object({
