@@ -65,7 +65,7 @@
     "@types/luxon": "^3.4.2"
   },
   "dependencies": {
-    "@vinejs/vine": "^2.0.0",
+    "@vinejs/vine": "^2.1.0",
     "axios": "^1.6.8",
     "axios-cache-interceptor": "^1.5.1",
     "luxon": "^3.5.0"
