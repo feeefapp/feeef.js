@@ -1,6 +1,5 @@
 import vine from '@vinejs/vine'
 import { PhoneShema } from './auth.js'
-import { OrderStatus } from 'feeef'
 import { CustomOrderTagSchema } from './helpers.js'
 
 export const OrderItemSchema = vine.object({

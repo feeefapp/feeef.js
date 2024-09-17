@@ -21,6 +21,12 @@ export enum DeliveryStatus {
   returned = 'returned',
 }
 
+export enum ShippingType {
+  home = 'home',
+  pickup = 'pickup',
+  store = 'store',
+}
+
 export interface OrderEntity {
   id: string
   customerName?: string | null
