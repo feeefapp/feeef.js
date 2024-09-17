@@ -7,7 +7,7 @@ export const AvatarFileSchema = vine.any()
 // })
 
 export const ImageFileSchema = vine.any()
-// .file({
+// file({
 //   size: '1mb',
 //   extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
 // })
@@ -26,6 +26,11 @@ export const StoreDecorationSchema = vine.object({
   logoFullHeight: vine.boolean().optional(),
   showStoreNameInHeader: vine.boolean().optional(),
   metadata: vine.any().optional(),
+})
+
+export const CustomOrderTagSchema = vine.object({
+  name: vine.string().minLength(1).maxLength(20),
+  color: vine.number().min(0x0).max(0xffffffff),
 })
 
 // export const EmbaddedImageSchema = vine.object({
@@ -57,11 +62,12 @@ export const EmbaddedAddressSchema = vine.object({
 export const EmbaddedContactSchema = vine.object({
   type: vine.string().minLength(2).maxLength(32),
   value: vine.string().minLength(2).maxLength(255),
+  name: vine.string().minLength(2).maxLength(32).optional(),
   metadata: vine.object({}).optional(),
 })
 
-// StoreBunner
-export const StoreBunner = vine.object({
+// StoreBanner
+export const StoreBannerSchema = vine.object({
   url: vine.string().url().optional(),
   title: vine.string(),
   enabled: vine.boolean().optional(),

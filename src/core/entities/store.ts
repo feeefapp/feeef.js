@@ -21,6 +21,7 @@ export interface StoreEntity {
   title: string | null
   description: string | null
   addresses: EmbaddedAddress[]
+  address: EmbaddedAddress | null
   metadata: Record<string, any>
   contacts: EmbaddedContact[]
   integrations: StoreIntegrations

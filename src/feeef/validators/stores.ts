@@ -1,13 +1,13 @@
 import vine from '@vinejs/vine'
 import {
   AvatarFileSchema,
-  EmbaddedContactSchema,
   DomainSchema,
   EmbaddedAddressSchema,
   EmbaddedCategorySchema,
+  EmbaddedContactSchema,
   StoreDecorationSchema,
 } from './helpers.js'
-import { DefaultShippingRatesSchema } from './user_stores.js'
+import { DefaultShippingRatesSchema, StoreIntegrationsSchema } from './user_stores.js'
 
 export const CreateStoreSchema = vine.object({
   name: vine.string().minLength(2).maxLength(32),
@@ -19,7 +19,7 @@ export const CreateStoreSchema = vine.object({
   // .unique(async (db, value, field) => {
   //   const store = await db.from('stores').where('slug', value).first()
   //   return !store
-  // })
+  // }),
   domain: vine
     .object({
       name: vine.string().minLength(2).maxLength(32),
@@ -36,11 +36,12 @@ export const CreateStoreSchema = vine.object({
   // .exists(async (db, value, field) => {
   //   const user = await db.from('users').where('id', value).first()
   //   return !!user
-  // })
+  // }),
   categories: vine.array(EmbaddedCategorySchema).optional(),
   title: vine.string().minLength(2).maxLength(255).optional(),
   description: vine.string().minLength(2).maxLength(255).optional(),
   addresses: vine.array(EmbaddedAddressSchema).optional(),
+  address: EmbaddedAddressSchema.optional().nullable(),
   metadata: vine.object({}).optional(),
   contacts: vine
     .array(
@@ -51,10 +52,9 @@ export const CreateStoreSchema = vine.object({
       })
     )
     .optional(),
-  shippingRates: vine.array(vine.string().minLength(2).maxLength(48)).optional(),
   verifiedAt: vine.date().optional(),
   blockedAt: vine.date().optional(),
-  integrations: vine.array(vine.any()).optional(),
+  integrations: StoreIntegrationsSchema.optional(),
   // default_shipping_rates
   defaultShippingRates: DefaultShippingRatesSchema.optional(),
 })
@@ -67,7 +67,7 @@ export const UpdateStoreSchema = vine.object({
     .regex(/^[a-z0-9-]+$/)
     .minLength(2)
     .maxLength(32)
-    // .unique(async (db, value, field) => {
+    // .unique(async (db, value, _) => {
     //   const store = await db.from('stores').where('slug', value).first()
     //   return !store
     // })
@@ -80,7 +80,7 @@ export const UpdateStoreSchema = vine.object({
   ondarkLogoFile: AvatarFileSchema.optional(),
   userId: vine
     .string()
-    // .exists(async (db, value, field) => {
+    // .exists(async (db, value, _) => {
     //   const user = await db.from('users').where('id', value).first()
     //   return !!user
     // })
@@ -89,13 +89,13 @@ export const UpdateStoreSchema = vine.object({
   title: vine.string().minLength(2).maxLength(255).optional(),
   description: vine.string().minLength(2).maxLength(255).optional(),
   addresses: vine.array(EmbaddedAddressSchema).optional(),
+  address: EmbaddedAddressSchema.optional().nullable(),
   metadata: vine.object({}).optional(),
   contacts: vine.array(EmbaddedContactSchema).optional(),
-  shippingRates: vine.array(vine.string().minLength(2).maxLength(48)).optional(),
   verifiedAt: vine.date().optional(),
   blockedAt: vine.date().optional(),
   // integrations
-  integrations: vine.array(vine.any()).optional(),
+  integrations: StoreIntegrationsSchema.optional(),
   // default_shipping_rates
   defaultShippingRates: DefaultShippingRatesSchema.optional(),
 })

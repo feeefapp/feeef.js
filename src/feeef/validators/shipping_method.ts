@@ -1,7 +1,7 @@
 import vine from '@vinejs/vine'
 import { ImageFileSchema } from './helpers.js'
-import { ShippingMethodStatus, ShippingMethodPolicy } from '../../core/entities/shipping_method.js'
-// import { ShippingMethodPolicy, ShippingMethodStatus } from '#models/shipping_method'
+import { DefaultShippingRatesSchema } from './user_stores.js'
+import { ShippingMethodPolicy, ShippingMethodStatus } from '../../core/entities/shipping_method.js'
 
 export const CreateShippingMethodSchema = vine.object({
   name: vine.string(),
@@ -14,7 +14,7 @@ export const CreateShippingMethodSchema = vine.object({
   //   forks: vine.number(),
   //   sourceId: vine.string(),
   storeId: vine.string(),
-  rates: vine.array(vine.number().optional()),
+  rates: DefaultShippingRatesSchema.optional(),
   status: vine.enum(Object.values(ShippingMethodStatus)),
   policy: vine.enum(Object.values(ShippingMethodPolicy)),
   //   verifiedAt: vine.date(),
@@ -31,7 +31,7 @@ export const UpdateShippingMethodSchema = vine.object({
   //   forks: vine.number().optional(),
   //   sourceId: vine.string().optional(),
   storeId: vine.string().optional(),
-  rates: vine.array(vine.number().optional()).optional(),
+  rates: DefaultShippingRatesSchema.optional().optional(),
   status: vine.enum(Object.values(ShippingMethodStatus)).optional(),
   policy: vine.enum(Object.values(ShippingMethodPolicy)).optional(),
   //   verifiedAt: vine.date().optional(),

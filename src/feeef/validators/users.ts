@@ -19,12 +19,13 @@ export const CreateUserSchema = vine.object({
     .optional(),
   password: vine.string().minLength(8).maxLength(32),
   // for upload file
-  photoFile: vine.any(),
-  // .file({
-  //   size: '1mb',
-  //   extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-  // })
-  // .optional(),
+  photoFile: vine
+    .any()
+    // .file({
+    //   size: '1mb',
+    //   extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    // })
+    .optional(),
   photoUrl: vine.string().optional(),
   // metadata (any object)
   metadata: vine.object({}).optional(),
@@ -47,17 +48,19 @@ export const UpdateUserSchema = vine.object({
     .optional(),
   phone: vine
     .string()
+    // .regex(/^\d{10}$/)
     // must start with 0 then if secend is (5|6|7) then 8 digits and if secend is (2) then 7 digits
     .regex(/^0(5|6|7)\d{8}$|^0(2)\d{7}$/)
     .optional(),
   password: vine.string().minLength(8).maxLength(32).confirmed().optional(),
   // for upload file
   photoFile: vine
+    .any()
     // .file({
     //   size: '1mb',
     //   extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     // })
-    .any(),
+    .optional(),
   photoUrl: vine.string().optional(),
   // metadata (any object)
   metadata: vine.object({}).optional(),
