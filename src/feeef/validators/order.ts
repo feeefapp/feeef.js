@@ -114,7 +114,15 @@ export const UpdateOrderSchema = vine.object({
   // calculatedTotal: vine.number().optional(),
   discount: vine.number().optional(),
   coupon: vine.string().optional(),
-  status: vine.enum(Object.values(OrderStatus)).optional(),
+  status: vine.enum([
+    'draft',
+    'pending',
+    'review',
+    'accepted',
+    'processing',
+    'completed',
+    'cancelled',
+  ]),
   storeId: vine.string(),
   metadata: vine.any().optional(),
 })
