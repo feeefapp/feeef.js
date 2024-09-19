@@ -1,10 +1,7 @@
 {
   "name": "feeef",
   "description": "feeef sdk for javascript",
-  "version": "0.1.7",
-  "engines": {
-    "node": ">=18.16.0"
-  },
+  "version": "0.1.8",
   "main": "build/index.js",
   "type": "module",
   "files": [
