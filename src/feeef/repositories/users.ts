@@ -1,8 +1,6 @@
 import vine from '@vinejs/vine'
 import { InferInput } from '@vinejs/vine/types'
 import { AxiosInstance } from 'axios'
-import { SigninSchema, AuthUpdateUserSchema } from '../validators/auth.js'
-import { CreateUserSchema, UpdateUserSchema } from '../validators/users.js'
 import { ModelRepository } from './repository.js'
 import { AuthToken, UserEntity } from '../../core/entities/user.js'
 
@@ -18,11 +16,7 @@ export interface AuthResponse {
  * Represents a repository for managing user data.
  * Extends the ModelRepository class.
  */
-export class UserRepository extends ModelRepository<
-  UserEntity,
-  InferInput<typeof CreateUserSchema>,
-  InferInput<typeof UpdateUserSchema>
-> {
+export class UserRepository extends ModelRepository<UserEntity, any, any> {
   /**
    * Represents the authentication response.
    */
@@ -41,10 +35,9 @@ export class UserRepository extends ModelRepository<
    * @param credentials - The user credentials.
    * @returns A promise that resolves to the authentication response.
    */
-  async signin(credentials: InferInput<typeof SigninSchema>): Promise<AuthResponse> {
+  async signin(credentials: any): Promise<AuthResponse> {
     // validate the input
-    const validator = vine.compile(SigninSchema)
-    const output = await validator.validate(credentials)
+    const output = credentials
     const res = await this.client.post(`/${this.resource}/auth/signin`, output)
     this.auth = res.data
     return res.data
@@ -55,10 +48,9 @@ export class UserRepository extends ModelRepository<
    * @param credentials - The user credentials.
    * @returns A promise that resolves to the authentication response.
    */
-  async signup(credentials: InferInput<typeof CreateUserSchema>): Promise<AuthResponse> {
+  async signup(credentials: any): Promise<AuthResponse> {
     // validate the input
-    const validator = vine.compile(CreateUserSchema)
-    const output = await validator.validate(credentials)
+    const output = credentials
     const res = await this.client.post(`/${this.resource}/auth/signup`, output)
     this.auth = res.data
     return res.data
@@ -77,9 +69,8 @@ export class UserRepository extends ModelRepository<
    * @param data - The updated user data.
    * @returns A promise that resolves to the updated user entity.
    */
-  async updateMe(data: InferInput<typeof AuthUpdateUserSchema>): Promise<UserEntity> {
-    const validator = vine.compile(AuthUpdateUserSchema)
-    const output = await validator.validate(data)
+  async updateMe(data: any): Promise<UserEntity> {
+    const output = data
     const res = await this.client.put(`/${this.resource}/auth`, output)
     return res.data
   }

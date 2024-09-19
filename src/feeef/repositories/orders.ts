@@ -1,7 +1,4 @@
-import vine from '@vinejs/vine'
-import { InferInput } from '@vinejs/vine/types'
 import { AxiosInstance } from 'axios'
-import { CreateOrderSchema, SendOrderSchema } from '../validators/order.js'
 import { ModelRepository } from './repository.js'
 import { OrderEntity } from '../../core/entities/order.js'
 /**
@@ -14,11 +11,7 @@ export interface OrderModelTrackOptions {
 /**
  * Represents a repository for managing orders.
  */
-export class OrderRepository extends ModelRepository<
-  OrderEntity,
-  InferInput<typeof CreateOrderSchema>,
-  InferInput<typeof CreateOrderSchema>
-> {
+export class OrderRepository extends ModelRepository<OrderEntity, any, any> {
   /**
    * Constructs a new OrderRepository instance.
    * @param client - The AxiosInstance used for making HTTP requests.
@@ -32,9 +25,8 @@ export class OrderRepository extends ModelRepository<
    * @param data - The data representing the order to be sent.
    * @returns A Promise that resolves to the sent OrderEntity.
    */
-  async send(data: InferInput<typeof SendOrderSchema>): Promise<OrderEntity> {
-    const validator = vine.compile(SendOrderSchema)
-    const output = await validator.validate(data)
+  async send(data: any): Promise<OrderEntity> {
+    const output = data
     const res = await this.client.post(`/${this.resource}/send`, output)
 
     // Return the sent OrderEntity

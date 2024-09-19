@@ -27,8 +27,7 @@
     "version": "npm run build",
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext=.ts",
-    "format": "prettier --write .",
-    "sync-labels": "github-label-sync --labels .github/labels.json vinejs/vine"
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@adonisjs/eslint-config": "^1.3.0",
@@ -59,7 +58,6 @@
     "@types/luxon": "^3.4.2"
   },
   "dependencies": {
-    "@vinejs/vine": "^2.1.0",
     "axios": "^1.6.8",
     "axios-cache-interceptor": "^1.5.1",
     "luxon": "^3.5.0"
