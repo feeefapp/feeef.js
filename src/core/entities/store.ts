@@ -57,6 +57,7 @@ export enum StoreMemberRole {
 
 export interface StoreMember {
   name: string
+  userId: string
   role: StoreMemberRole
   acceptedAt: any | null
   expiredAt: any | null
