@@ -44,6 +44,23 @@ export interface StoreEntity {
 
   // metaPixelIds
   metaPixelIds?: string[]
+
+  // members
+  members?: Record<string, StoreMember>
+}
+
+export enum StoreMemberRole {
+  editor = 'editor',
+  viewer = 'viewer',
+  confermer = 'confermer',
+}
+
+export interface StoreMember {
+  role: StoreMemberRole
+  acceptedAt: any | null
+  expiredAt: any | null
+  createdAt: any
+  active: boolean
 }
 
 export interface StoreConfigs {
