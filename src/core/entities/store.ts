@@ -129,28 +129,19 @@ export enum StoreSubscriptionStatus {
 
 export enum StoreSubscriptionType {
   free = 'free',
-  quota = 'quota',
-  percentage = 'percentage',
+  premium = 'premium',
+  vip = 'vip',
+  custom = 'custom',
 }
 
 export interface StoreSubscription {
   type: StoreSubscriptionType
+  name: string
   status: StoreSubscriptionStatus
   startedAt: DateTime
   expiresAt: DateTime | null
-  metadata: Record<string, any>
-}
-
-export interface StoreFreeSubscription extends StoreSubscription {
-  type: StoreSubscriptionType.free
-}
-
-export interface StoreQuotaSubscription extends StoreSubscription {
-  type: StoreSubscriptionType.quota
   quota: number
-}
-// another way is by taking percentage of the sales
-export interface StorePercentageSubscription extends StoreSubscription {
-  type: StoreSubscriptionType.percentage
-  percentage: number
+  consumed: number
+  remaining: number
+  metadata: Record<string, any>
 }

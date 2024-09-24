@@ -1,5 +1,3 @@
-import vine from '@vinejs/vine'
-import { InferInput } from '@vinejs/vine/types'
 import { AxiosInstance } from 'axios'
 import { ModelRepository } from './repository.js'
 import { AuthToken, UserEntity } from '../../core/entities/user.js'
