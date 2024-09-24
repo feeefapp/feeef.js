@@ -61,6 +61,7 @@ export interface StoreMember {
   expiredAt: any | null
   createdAt: any
   active: boolean
+  metadata: Record<string, any>
 }
 
 export interface StoreConfigs {
