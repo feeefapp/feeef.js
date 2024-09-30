@@ -122,6 +122,14 @@ export interface MetaPixelIntegration {
   metadata: Record<string, any>
 }
 
+export interface GoogleSheetsIntegration {
+  id: string
+  name: string
+  active: boolean
+  oauth2?: Record<string, any>
+  metadata: Record<string, any>
+}
+
 export interface StoreIntegrations {
   [key: string]: any
   metadata?: Record<string, any>
@@ -132,7 +140,8 @@ export interface StoreIntegrations {
   // @Default({}) Map<String, dynamic> metadata,
   metaPixel?: MetaPixelIntegration
   googleAnalytics?: any
-  googleSheet?: any
+  googleSheet?: GoogleSheetsIntegration
+
   sms?: any
   telegram?: any
   yalidine?: any
