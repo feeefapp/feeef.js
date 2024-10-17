@@ -1,6 +1,7 @@
 import { EmbaddedAddress } from '../embadded/address.js'
 import { EmbaddedCategory } from '../embadded/category.js'
 import { EmbaddedContact } from '../embadded/contact.js'
+import { OrderEntity } from './order.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
 import { UserEntity } from './user.js'
@@ -121,13 +122,26 @@ export interface MetaPixelIntegration {
   active: boolean
   metadata: Record<string, any>
 }
-
+// export enum GoogleSheetsColumnType {
+//   string = 'string',
+//   number = 'number',
+//   boolean = 'boolean',
+//   date = 'date',
+// }
+export interface GoogleSheetsColumn<T> {
+  field: keyof OrderEntity | null
+  name: string
+  enabled: boolean
+  defaultValue?: T
+  // type:
+}
 export interface GoogleSheetsIntegration {
   id: string
   name: string
   active: boolean
   oauth2?: Record<string, any>
   metadata: Record<string, any>
+  columns?: GoogleSheetsColumn<any>[]
 }
 
 export interface StoreIntegrations {

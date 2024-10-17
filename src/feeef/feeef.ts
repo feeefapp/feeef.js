@@ -4,6 +4,7 @@ import { OrderRepository } from './repositories/orders.js'
 import { ProductRepository } from './repositories/products.js'
 import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
+import { CartService } from './services/cart.js'
 
 /**
  * Configuration options for the FeeeF module.
@@ -68,6 +69,11 @@ export class FeeeF {
   orders: OrderRepository
 
   /**
+   * The cart service for managing the cart.
+   */
+  cart: CartService
+
+  /**
    * Constructs a new instance of the FeeeF class.
    * @param {FeeeFConfig} config - The configuration object.
    * @param {string} config.apiKey - The API key used for authentication.
@@ -97,5 +103,8 @@ export class FeeeF {
     this.products = new ProductRepository(this.client)
     this.users = new UserRepository(this.client)
     this.orders = new OrderRepository(this.client)
+
+    // cart
+    this.cart = new CartService()
   }
 }
