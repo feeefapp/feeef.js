@@ -11,4 +11,10 @@ export * from './core/embadded/address.js'
 export * from './core/embadded/category.js'
 export * from './core/embadded/contact.js'
 
+// services
+export * from './feeef/services/cart.js'
+
+// utils
+export * from './utils.js'
+
 export type { StoreIntegrations } from './core/entities/store.js' // or wherever StoreIntegrations is defined

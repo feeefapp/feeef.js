@@ -20,6 +20,8 @@ interface CartItem {
  * Interface for a shipping address.
  */
 export interface CartShippingAddress {
+  name: string | null
+  phone: string | null
   city: string | null
   state: string | null
   country: 'dz'
@@ -33,6 +35,8 @@ export class CartService extends NotifiableService {
   private items: Map<string, CartItem> = new Map() // Fast lookup of cart items
   private shippingMethod: ShippingMethodEntity | null = null
   private shippingAddress: CartShippingAddress = {
+    name: null,
+    phone: null,
     city: null,
     state: null,
     country: 'dz',
@@ -47,6 +51,65 @@ export class CartService extends NotifiableService {
    */
   setCurrentItem(item: CartItem): void {
     this.currentItem = item
+
+    if (this.has(this.currentItem.product.id)) {
+      this.items.set(this.currentItem.product.id, this.currentItem)
+    }
+    this.cachedSubtotal = null
+    this.notify()
+  }
+
+  /**
+   * Update item by id.
+   * @param id - The id of the item to update.
+   * @param item - a partial item to update.
+   */
+  updateItem(id: string, item: Partial<CartItem>): void {
+    const currentItem = this.items.get(id)
+
+    if (currentItem) {
+      this.items.set(id, { ...currentItem, ...item })
+      this.cachedSubtotal = null
+      this.notify()
+    }
+  }
+
+  /**
+   * Update current item.
+   * @param item - a partial item to update.
+   */
+  updateCurrentItem(item: Partial<CartItem>): void {
+    if (!this.currentItem) return
+
+    this.currentItem = { ...this.currentItem, ...item }
+
+    if (this.has(this.currentItem.product.id)) {
+      this.items.set(this.currentItem.product.id, this.currentItem)
+    }
+
+    this.cachedSubtotal = null
+    this.notify()
+  }
+
+  /**
+   * Update shipping address.
+   * @param address - a partial address to update.
+   */
+  updateShippingAddress(address: Partial<CartShippingAddress>): void {
+    this.shippingAddress = { ...this.shippingAddress, ...address }
+    this.cachedSubtotal = null
+    this.notify()
+  }
+
+  /**
+   * Update shipping method.
+   * @param method - a partial shipping method to update.
+   */
+  updateShippingMethod(method: Partial<ShippingMethodEntity>): void {
+    if (!this.shippingMethod) return
+
+    this.shippingMethod = { ...this.shippingMethod, ...method }
+    this.cachedSubtotal = null
     this.notify()
   }
 
@@ -72,6 +135,7 @@ export class CartService extends NotifiableService {
   addCurrentItemToCart(): void {
     if (!this.currentItem || this.isCurrentItemInCart()) return
     this.add(this.currentItem)
+    this.cachedSubtotal = null
   }
 
   /**
@@ -108,6 +172,15 @@ export class CartService extends NotifiableService {
   }
 
   /**
+   * Checks if an item exists in the cart by product ID.
+   * @param itemId - The ID of the item to check.
+   * @returns True if the item exists in the cart, false otherwise.
+   */
+  has(itemId: string): boolean {
+    return this.items.has(itemId)
+  }
+
+  /**
    * Removes an item from the cart by product ID.
    * @param itemId - The ID of the item to remove.
    */
@@ -141,7 +214,7 @@ export class CartService extends NotifiableService {
       }, 0)
     }
 
-    if (withCurrentItem && this.currentItem) {
+    if (withCurrentItem && this.currentItem && !this.has(this.currentItem.product.id)) {
       return this.cachedSubtotal + this.getItemTotal(this.currentItem)
     }
 
