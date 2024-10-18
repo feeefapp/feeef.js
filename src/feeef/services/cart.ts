@@ -10,7 +10,7 @@ import { NotifiableService } from './service.js'
 /**
  * Represents an item in the cart.
  */
-interface CartItem {
+export interface CartItem {
   product: ProductEntity
   quantity: number
   variant?: string
