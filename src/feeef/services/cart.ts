@@ -17,6 +17,14 @@ export interface CartItem {
 }
 
 /**
+ * Cart shipping types.
+ * - `pickup`: The user will pick up the order from the closest desk.
+ * - `home`: The order will be delivered to the user's home.
+ * - `store`: The order will be delivered to the store.
+ */
+export type CartShippingTypes = 'pickup' | 'home' | 'store'
+
+/**
  * Interface for a shipping address.
  */
 export interface CartShippingAddress {
@@ -24,8 +32,9 @@ export interface CartShippingAddress {
   phone: string | null
   city: string | null
   state: string | null
+  street: string | null
   country: 'dz'
-  type: 'pickup' | 'home' | 'store'
+  type: CartShippingTypes
 }
 
 /**
@@ -39,6 +48,7 @@ export class CartService extends NotifiableService {
     phone: null,
     city: null,
     state: null,
+    street: null,
     country: 'dz',
     type: 'pickup',
   }
@@ -285,6 +295,33 @@ export class CartService extends NotifiableService {
     } else {
       throw new Error('Invalid shipping method')
     }
+  }
+
+  // getAvailableShippingTypes
+  /**
+   * Retrieves the available shipping types for the current shipping method.
+   *
+   *   rates is a 2D array for example `[[10, 20, 30], [5, 10, 15]]`
+   *   where the first array is for `home` fees and the second is for `pickup` fees, and the third is for `store` fees
+   *   if the fee value is 0, then it's free shipping, and if it's null, then it's not available
+   *
+   * @returns An array of available shipping types.
+   */
+  getAvailableShippingTypes(): CartShippingTypes[] {
+    if (!this.shippingMethod?.rates) return []
+
+    var state = Number.parseInt(this.shippingAddress.state!)
+    var stateRates = this.shippingMethod.rates[state - 1]
+
+    if (!stateRates) return []
+
+    var availableTypes: CartShippingTypes[] = []
+
+    if (stateRates[0] !== null) availableTypes.push('home')
+    if (stateRates[1] !== null) availableTypes.push('pickup')
+    if (stateRates[2] !== null) availableTypes.push('store')
+
+    return availableTypes
   }
 
   /**
