@@ -317,9 +317,9 @@ export class CartService extends NotifiableService {
 
     var availableTypes: CartShippingTypes[] = []
 
-    if (stateRates[0] !== null) availableTypes.push('home')
-    if (stateRates[1] !== null) availableTypes.push('pickup')
-    if (stateRates[2] !== null) availableTypes.push('store')
+    if (stateRates[0] || stateRates[0] === 0) availableTypes.push('pickup')
+    if (stateRates[1] || stateRates[1] === 0) availableTypes.push('home')
+    if (stateRates[2] || stateRates[2] === 0) availableTypes.push('store')
 
     return availableTypes
   }
