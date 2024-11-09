@@ -59,14 +59,16 @@ export class CartService extends NotifiableService {
    * Sets the current item to be managed in the cart.
    * @param item - The item to be set as current.
    */
-  setCurrentItem(item: CartItem): void {
+  setCurrentItem(item: CartItem, notify = true): void {
     this.currentItem = item
 
     if (this.has(this.currentItem.product.id)) {
       this.items.set(this.currentItem.product.id, this.currentItem)
     }
     this.cachedSubtotal = null
-    this.notify()
+    if (notify) {
+      this.notify()
+    }
   }
 
   /**
@@ -74,13 +76,15 @@ export class CartService extends NotifiableService {
    * @param id - The id of the item to update.
    * @param item - a partial item to update.
    */
-  updateItem(id: string, item: Partial<CartItem>): void {
+  updateItem(id: string, item: Partial<CartItem>, notify = true): void {
     const currentItem = this.items.get(id)
 
     if (currentItem) {
       this.items.set(id, { ...currentItem, ...item })
       this.cachedSubtotal = null
-      this.notify()
+      if (notify) {
+        this.notify()
+      }
     }
   }
 
@@ -88,7 +92,7 @@ export class CartService extends NotifiableService {
    * Update current item.
    * @param item - a partial item to update.
    */
-  updateCurrentItem(item: Partial<CartItem>): void {
+  updateCurrentItem(item: Partial<CartItem>, notify = true): void {
     if (!this.currentItem) return
 
     this.currentItem = { ...this.currentItem, ...item }
@@ -98,29 +102,35 @@ export class CartService extends NotifiableService {
     }
 
     this.cachedSubtotal = null
-    this.notify()
+    if (notify) {
+      this.notify()
+    }
   }
 
   /**
    * Update shipping address.
    * @param address - a partial address to update.
    */
-  updateShippingAddress(address: Partial<CartShippingAddress>): void {
+  updateShippingAddress(address: Partial<CartShippingAddress>, notify = true): void {
     this.shippingAddress = { ...this.shippingAddress, ...address }
     this.cachedSubtotal = null
-    this.notify()
+    if (notify) {
+      this.notify()
+    }
   }
 
   /**
    * Update shipping method.
    * @param method - a partial shipping method to update.
    */
-  updateShippingMethod(method: Partial<ShippingMethodEntity>): void {
+  updateShippingMethod(method: Partial<ShippingMethodEntity>, notify = true): void {
     if (!this.shippingMethod) return
 
     this.shippingMethod = { ...this.shippingMethod, ...method }
     this.cachedSubtotal = null
-    this.notify()
+    if (notify) {
+      this.notify()
+    }
   }
 
   /**
@@ -204,11 +214,13 @@ export class CartService extends NotifiableService {
   /**
    * Clears all items from the cart.
    */
-  clear(): void {
+  clear(notify = true): void {
     if (this.items.size > 0) {
       this.items.clear()
       this.cachedSubtotal = null
-      this.notify()
+      if (notify) {
+        this.notify()
+      }
     }
   }
 
@@ -262,7 +274,7 @@ export class CartService extends NotifiableService {
    * Sets the shipping method.
    * @param method - Either a store or a shipping method.
    */
-  setShippingMethod(method: ShippingMethodEntity | StoreEntity): void {
+  setShippingMethod(method: ShippingMethodEntity | StoreEntity, notify = true): void {
     const store = (method as StoreEntity)?.defaultShippingRates ? (method as StoreEntity) : null
     const shippingMethod = (method as ShippingMethodEntity)?.rates
       ? (method as ShippingMethodEntity)
@@ -288,10 +300,14 @@ export class CartService extends NotifiableService {
         orders: [],
         source: null,
       }
-      this.notify()
+      if (notify) {
+        this.notify()
+      }
     } else if (shippingMethod) {
       this.shippingMethod = shippingMethod
-      this.notify()
+      if (notify) {
+        this.notify()
+      }
     } else {
       throw new Error('Invalid shipping method')
     }
@@ -336,14 +352,16 @@ export class CartService extends NotifiableService {
    * Sets the shipping address for the cart.
    * @param address - The shipping address.
    */
-  setShippingAddress(address: CartShippingAddress): void {
+  setShippingAddress(address: CartShippingAddress, notify = true): void {
     if (
       this.shippingAddress.city !== address.city ||
       this.shippingAddress.state !== address.state ||
       this.shippingAddress.type !== address.type
     ) {
       this.shippingAddress = address
-      this.notify()
+      if (notify) {
+        this.notify()
+      }
     }
   }
 

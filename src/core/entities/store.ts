@@ -98,6 +98,7 @@ export interface StoreDecoration {
   logoFullHeight?: boolean
   showStoreNameInHeader?: boolean
   metadata?: Record<string, any>
+  [key: string]: any
 }
 
 export interface StoreAction {

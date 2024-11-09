@@ -48,6 +48,8 @@ export interface ProductEntity {
 
   variant?: ProductVariant | null
 
+  offers?: PrdouctOffer[] | null
+
   metadata: Record<string, any>
 
   status: ProductStatus
@@ -107,4 +109,12 @@ export enum ProductType {
   physical = 'physical',
   digital = 'digital',
   service = 'service',
+}
+
+export interface PrdouctOffer {
+  code: string
+  title: string
+  subtitle?: string
+  discount?: number
+  price?: number
 }
