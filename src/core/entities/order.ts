@@ -44,7 +44,7 @@ export interface OrderEntity {
   discount: number
   coupon?: string | null
   storeId: string
-  metadata: any
+  metadata: OrderMetadata
   status: OrderStatus
   paymentStatus: PaymentStatus
   deliveryStatus: DeliveryStatus
@@ -64,24 +64,59 @@ export interface OrderItem {
 export interface OrderTrackEntity {
   id: string
   customerName?: string | null
-  customerPhone: string
-  customerIp?: string | null
-  shippingAddress?: string | null
-  shippingCity?: string | null
-  shippingState?: string | null
-  shippingMethodId?: string | null
-  paymentMethodId?: string | null
   items: OrderItem[]
-  subtotal: number
-  shippingPrice: number
   total: number
-  discount: number
-  coupon?: string | null
-  storeId: string
-  metadata: any
-  status: OrderStatus
-  paymentStatus: PaymentStatus
-  deliveryStatus: DeliveryStatus
   createdAt: any
-  updatedAt: any
+  storeId: string
+  status: OrderStatus
+  history: OrderTrackHistory[]
+}
+
+// order track history
+export interface OrderTrackHistory {
+  status: OrderStatus
+  deliveryStatus: string
+  paymentStatus: string
+  createdAt: string
+}
+
+// order metadata history
+interface OrderMetadataHistory {
+  status: OrderStatus
+  deliveryStatus: string
+  paymentStatus: string
+  createdAt: string
+  message: string
+  code: string
+  userId: string
+}
+
+// order metadata
+interface OrderMetadata {
+  note?: string
+  history?: OrderMetadataHistory[]
+  metaPixel?: any
+  customOrderTagHistories?: any[]
+  [key: string]: any
+}
+
+// utils
+// order entity to order track entity
+export const convertOrderEntityToOrderTrackEntity = (order: OrderEntity): OrderTrackEntity => {
+  return {
+    id: order.id,
+    customerName: order.customerName,
+    items: order.items,
+    total: order.total,
+    createdAt: order.createdAt,
+    storeId: order.storeId,
+    status: order.status,
+    history:
+      order.metadata.history?.map((history) => ({
+        status: history.status,
+        deliveryStatus: history.deliveryStatus,
+        paymentStatus: history.paymentStatus,
+        createdAt: history.createdAt,
+      })) || [],
+  }
 }

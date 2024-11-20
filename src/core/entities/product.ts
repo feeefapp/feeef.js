@@ -82,7 +82,15 @@ export interface ProductDecoration {
 
 export interface ProductVariant {
   name: string
+  view?: ProductVariantView
   options: ProductVariantOption[]
+  required?: boolean
+}
+
+export enum ProductVariantView {
+  list = 'list',
+  chips = 'chips',
+  dropdown = 'dropdown',
 }
 
 export interface ProductVariantOption {

@@ -144,6 +144,11 @@ export interface GoogleSheetsIntegration {
   metadata: Record<string, any>
   columns?: GoogleSheetsColumn<any>[]
 }
+export interface GoogleTagsIntegration {
+  id: string
+  active: boolean
+  metadata: Record<string, any>
+}
 
 export interface StoreIntegrations {
   [key: string]: any
@@ -156,6 +161,7 @@ export interface StoreIntegrations {
   metaPixel?: MetaPixelIntegration
   googleAnalytics?: any
   googleSheet?: GoogleSheetsIntegration
+  googleTags?: GoogleTagsIntegration
 
   sms?: any
   telegram?: any

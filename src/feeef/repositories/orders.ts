@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { ModelRepository } from './repository.js'
-import { OrderEntity } from '../../core/entities/order.js'
+import { OrderEntity, OrderTrackEntity } from '../../core/entities/order.js'
 /**
  * Represents the options for tracking an order.
  */
@@ -65,9 +65,9 @@ export class OrderRepository extends ModelRepository<OrderEntity, any, any> {
    * @param options - The options for finding the model.
    * @returns A promise that resolves to the found model.
    */
-  async track(options: OrderModelTrackOptions): Promise<OrderEntity> {
+  async track(options: OrderModelTrackOptions): Promise<OrderTrackEntity> {
     const { id, params } = options
-    const res = await this.client.get(`/${this.resource}/${id}`, {
+    const res = await this.client.get(`/${this.resource}/${id}/track`, {
       params: {
         ...params,
       },
