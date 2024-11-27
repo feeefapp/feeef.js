@@ -36,6 +36,7 @@ export interface OrderEntity {
   shippingCity?: string | null
   shippingState?: string | null
   shippingMethodId?: string | null
+  shippingType: ShippingType
   paymentMethodId?: string | null
   items: OrderItem[]
   subtotal: number

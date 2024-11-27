@@ -1,3 +1,4 @@
+import { ShippingType } from '../../core/entities/order.js'
 import { ProductEntity } from '../../core/entities/product.js'
 import {
   ShippingMethodEntity,
@@ -22,7 +23,7 @@ export interface CartItem {
  * - `home`: The order will be delivered to the user's home.
  * - `store`: The order will be delivered to the store.
  */
-export type CartShippingTypes = 'pickup' | 'home' | 'store'
+// export type CartShippingTypes = 'pickup' | 'home' | 'store'
 
 /**
  * Interface for a shipping address.
@@ -34,7 +35,7 @@ export interface CartShippingAddress {
   state: string | null
   street: string | null
   country: 'dz'
-  type: CartShippingTypes
+  type: ShippingType
 }
 
 /**
@@ -50,7 +51,7 @@ export class CartService extends NotifiableService {
     state: null,
     street: null,
     country: 'dz',
-    type: 'pickup',
+    type: ShippingType.pickup,
   }
   private cachedSubtotal: number | null = null // Cache for subtotal to avoid redundant calculations
   private currentItem: CartItem | null = null
@@ -323,7 +324,7 @@ export class CartService extends NotifiableService {
    *
    * @returns An array of available shipping types.
    */
-  getAvailableShippingTypes(): CartShippingTypes[] {
+  getAvailableShippingTypes(): ShippingType[] {
     if (!this.shippingMethod?.rates) return []
 
     var state = Number.parseInt(this.shippingAddress.state!)
@@ -331,11 +332,11 @@ export class CartService extends NotifiableService {
 
     if (!stateRates) return []
 
-    var availableTypes: CartShippingTypes[] = []
+    var availableTypes: ShippingType[] = []
 
-    if (stateRates[0] || stateRates[0] === 0) availableTypes.push('pickup')
-    if (stateRates[1] || stateRates[1] === 0) availableTypes.push('home')
-    if (stateRates[2] || stateRates[2] === 0) availableTypes.push('store')
+    if (stateRates[0] || stateRates[0] === 0) availableTypes.push(ShippingType.pickup)
+    if (stateRates[1] || stateRates[1] === 0) availableTypes.push(ShippingType.home)
+    if (stateRates[2] || stateRates[2] === 0) availableTypes.push(ShippingType.store)
 
     return availableTypes
   }

@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { ModelRepository } from './repository.js'
-import { OrderEntity, OrderTrackEntity } from '../../core/entities/order.js'
+import { OrderEntity, OrderTrackEntity, ShippingType } from '../../core/entities/order.js'
 /**
  * Represents the options for tracking an order.
  */
@@ -17,7 +17,7 @@ export interface SendOrderSchema {
   shippingAddress?: string // Address for shipping (optional)
   shippingCity?: string // City for shipping (optional)
   shippingState?: string // State for shipping (optional)
-  shippingType: 'home' | 'pickup' | 'store' // Shipping type (required)
+  shippingType: ShippingType // Shipping type (required)
   shippingMethodId?: string // ID of the shipping method (optional)
   paymentMethodId?: string // ID of the payment method (optional)
   items: GuestOrderItemSchema[] // Array of order items, must have at least one item
