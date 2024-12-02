@@ -14,7 +14,7 @@ import { NotifiableService } from './service.js'
 export interface CartItem {
   product: ProductEntity
   quantity: number
-  variant?: string
+  variantPath?: string
 }
 
 /**
@@ -250,12 +250,12 @@ export class CartService extends NotifiableService {
    * @returns The total price for the item.
    */
   getItemTotal(item: CartItem): number {
-    const { product, variant, quantity } = item
+    const { product, variantPath, quantity } = item
     let price = product.price
     let discount = product.discount ?? 0
 
-    if (variant) {
-      const parts = variant.split('/')
+    if (variantPath) {
+      const parts = variantPath.split('/')
       let currentVariant = product.variant
 
       for (const part of parts) {
