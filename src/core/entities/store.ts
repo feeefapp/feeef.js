@@ -46,6 +46,9 @@ export interface StoreEntity {
   // metaPixelIds
   metaPixelIds?: string[]
 
+  // tiktokPixelIds
+  tiktokPixelIds?: string[]
+
   // members
   members?: Record<string, StoreMember>
 }
@@ -117,9 +120,22 @@ export interface MetaPixel {
   id: string
   key?: string
 }
+// tiktok pixel
+export interface TikTokPixel {
+  id: string
+  key?: string
+}
+// meta pixel integration
 export interface MetaPixelIntegration {
   id: string
   pixels: MetaPixel[]
+  active: boolean
+  metadata: Record<string, any>
+}
+// tiktok pixel integration
+export interface TikTokPixelIntegration {
+  id: string
+  pixels: TikTokPixel[]
   active: boolean
   metadata: Record<string, any>
 }
@@ -159,6 +175,7 @@ export interface StoreIntegrations {
   // @Default(true) bool active,
   // @Default({}) Map<String, dynamic> metadata,
   metaPixel?: MetaPixelIntegration
+  tiktokPixel?: TikTokPixelIntegration
   googleAnalytics?: any
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration
