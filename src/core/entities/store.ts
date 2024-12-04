@@ -139,6 +139,13 @@ export interface TikTokPixelIntegration {
   active: boolean
   metadata: Record<string, any>
 }
+
+export interface GoogleAnalyticsIntegration {
+  id: string
+  active: boolean
+  metadata: Record<string, any>
+}
+
 // export enum GoogleSheetsColumnType {
 //   string = 'string',
 //   number = 'number',
@@ -176,7 +183,7 @@ export interface StoreIntegrations {
   // @Default({}) Map<String, dynamic> metadata,
   metaPixel?: MetaPixelIntegration
   tiktokPixel?: TikTokPixelIntegration
-  googleAnalytics?: any
+  googleAnalytics?: GoogleAnalyticsIntegration
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration
 
