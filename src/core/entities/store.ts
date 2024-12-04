@@ -44,10 +44,13 @@ export interface StoreEntity {
   configs?: StoreConfigs
 
   // metaPixelIds
-  metaPixelIds?: string[]
+  metaPixelIds?: string[] | null
 
   // tiktokPixelIds
-  tiktokPixelIds?: string[]
+  tiktokPixelIds?: string[] | null
+
+  // googleAnalyticsId
+  googleAnalyticsId?: string | null
 
   // members
   members?: Record<string, StoreMember>
