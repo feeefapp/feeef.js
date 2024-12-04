@@ -65,8 +65,8 @@ export interface ProductEntity {
   updatedAt: any
 
   // relations
-  store?: StoreEntity
-  shippingMethod?: ShippingMethodEntity
+  store?: StoreEntity | null
+  shippingMethod?: ShippingMethodEntity | null
 }
 
 export enum ProductStatus {
