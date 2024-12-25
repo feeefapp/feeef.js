@@ -13,6 +13,7 @@ A TypeScript service for managing shopping carts in e-commerce platforms. It all
 - **Cart management**: Add, remove, toggle cart items.
 - **Shipping management**: Set shipping method and address.
 - **Subtotal and total calculation**: Calculate total prices with or without shipping.
+- **Product offers**: Support for product-specific offers with quantity constraints.
 - **Reactive updates**: Use listeners to react to cart changes, useful in React or other reactive UI frameworks.
 - **Customization**: Flexible enough to handle product variants and shipping policies.
 
@@ -47,11 +48,20 @@ const cart = new CartService()
 cart.setCurrentItem({ product, quantity: 2 })
 cart.addCurrentItemToCart()
 
+// Apply an offer to the cart item
+cart.updateCurrentItemOffer({
+  code: "SUMMER2024",
+  title: "Summer Sale",
+  price: 899.99,
+  minQuantity: 2,  // Must buy at least 2
+  maxQuantity: 5   // Cannot buy more than 5 with this offer
+})
+
 // Set shipping method (from store)
 cart.setShippingMethod(store)
 
 // Calculate totals
-console.log('Subtotal:', cart.getSubtotal()) // 2000
+console.log('Subtotal:', cart.getSubtotal()) // 1799.98 (2 * 899.99)
 console.log('Total with shipping:', cart.getTotal()) // Includes shipping if set
 
 // Example listener to track cart changes
@@ -156,6 +166,12 @@ cart.removeListener(listener) // Removes the previously added listener
 - **`removeListener(listener: Listener<CartService>): void`**  
   Removes a previously registered listener.
 
+- **`updateItemOffer(itemId: string, offer?: ProductOffer): void`**  
+  Updates or removes an offer for a specific cart item. The offer can include price overrides and quantity constraints.
+
+- **`updateCurrentItemOffer(offer?: ProductOffer): void`**  
+  Updates or removes an offer for the current cart item.
+
 ### NotifiableService
 
 #### Methods
@@ -169,6 +185,19 @@ cart.removeListener(listener) // Removes the previously added listener
 - **`notify(): void`**  
   Notifies all registered listeners.
 
+### ProductOffer Interface
+
+```typescript
+interface ProductOffer {
+  code: string           // Unique identifier for the offer
+  title: string         // Display title for the offer
+  subtitle?: string     // Optional subtitle/description
+  price?: number        // Optional fixed price override
+  minQuantity?: number  // Minimum quantity required for the offer
+  maxQuantity?: number  // Maximum quantity allowed for the offer
+}
+```
+
 ## Best Practices
 
 1. **Use Listeners for UI updates**: In reactive frameworks like React, use `addListener` to trigger state updates or side effects based on changes in the `CartService`.
@@ -176,6 +205,10 @@ cart.removeListener(listener) // Removes the previously added listener
 2. **Unsubscribe Listeners**: Always clean up listeners in your components to prevent memory leaks, especially in React's `useEffect`.
 
 3. **Optimize with Cached Subtotals**: The `CartService` uses caching for subtotals to avoid recalculations. Rely on `getSubtotal()` and `getTotal()` for efficient price calculations.
+
+4. **Handle Offer Constraints**: When applying offers with quantity constraints, the cart will automatically adjust quantities to be within the valid range.
+
+5. **Price Overrides**: When using offers with fixed prices, they take precedence over regular product pricing and discounts.
 
 ## Contributing
 

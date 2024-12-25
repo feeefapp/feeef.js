@@ -1,5 +1,5 @@
 import { ShippingType } from '../../core/entities/order.js'
-import { ProductEntity } from '../../core/entities/product.js'
+import { ProductEntity, ProductOffer } from '../../core/entities/product.js'
 import {
   ShippingMethodEntity,
   ShippingMethodPolicy,
@@ -13,6 +13,7 @@ import { NotifiableService } from './service.js'
  */
 export interface CartItem {
   product: ProductEntity
+  offer?: ProductOffer
   quantity: number
   variantPath?: string
 }
@@ -73,6 +74,22 @@ export class CartService extends NotifiableService {
   }
 
   /**
+   * Clamps the quantity to be within the offer's min/max range
+   * @param offer - The offer containing quantity constraints
+   * @param quantity - The quantity to clamp
+   * @returns The clamped quantity value
+   */
+  private clampQuantityToOfferLimits(offer: ProductOffer, quantity: number): number {
+    if (offer.minQuantity !== undefined) {
+      quantity = Math.max(quantity, offer.minQuantity)
+    }
+    if (offer.maxQuantity !== undefined) {
+      quantity = Math.min(quantity, offer.maxQuantity)
+    }
+    return quantity
+  }
+
+  /**
    * Update item by id.
    * @param id - The id of the item to update.
    * @param item - a partial item to update.
@@ -81,7 +98,13 @@ export class CartService extends NotifiableService {
     const currentItem = this.items.get(id)
 
     if (currentItem) {
-      this.items.set(id, { ...currentItem, ...item })
+      const newItem = { ...currentItem, ...item }
+      // Clamp quantity if there's an offer with constraints
+      if (newItem.offer) {
+        newItem.quantity = this.clampQuantityToOfferLimits(newItem.offer, newItem.quantity)
+      }
+
+      this.items.set(id, newItem)
       this.cachedSubtotal = null
       if (notify) {
         this.notify()
@@ -250,10 +273,11 @@ export class CartService extends NotifiableService {
    * @returns The total price for the item.
    */
   getItemTotal(item: CartItem): number {
-    const { product, variantPath, quantity } = item
+    const { product, variantPath, quantity, offer } = item
     let price = product.price
     let discount = product.discount ?? 0
 
+    // Handle variant pricing if a variant path exists
     if (variantPath) {
       const parts = variantPath.split('/')
       let currentVariant = product.variant
@@ -268,7 +292,68 @@ export class CartService extends NotifiableService {
       }
     }
 
+    // Apply offer if present
+    if (offer) {
+      if (offer.price !== undefined) {
+        // If offer has a fixed price, use it
+        price = offer.price
+        discount = 0 // Reset discount since we're using a fixed price
+      }
+    }
+
     return (price - discount) * quantity
+  }
+
+  /**
+   * Validates if an offer can be applied to the given quantity
+   * @param offer - The offer to validate
+   * @param quantity - The quantity to check
+   * @returns boolean indicating if the offer is valid for the quantity
+   */
+  isOfferValidForQuantity(offer: ProductOffer, quantity: number): boolean {
+    if (offer.minQuantity && quantity < offer.minQuantity) return false
+    if (offer.maxQuantity && quantity > offer.maxQuantity) return false
+    return true
+  }
+
+  /**
+   * Updates the offer for a specific cart item
+   * @param itemId - The ID of the item to update
+   * @param offer - The offer to apply, or undefined to remove the offer
+   */
+  updateItemOffer(itemId: string, offer?: ProductOffer): void {
+    const item = this.items.get(itemId)
+    if (!item) return
+
+    const updatedItem = { ...item, offer }
+    // If applying an offer, ensure quantity is within limits
+    if (offer) {
+      updatedItem.quantity = this.clampQuantityToOfferLimits(offer, item.quantity)
+    }
+
+    this.updateItem(itemId, updatedItem)
+    this.cachedSubtotal = null
+    this.notifyIfChanged()
+  }
+
+  /**
+   * Updates the offer for the current item
+   * @param offer - The offer to apply, or undefined to remove the offer
+   */
+  updateCurrentItemOffer(offer?: ProductOffer): void {
+    if (!this.currentItem) return
+
+    const updatedItem = { ...this.currentItem }
+    updatedItem.offer = offer
+
+    // If applying an offer, ensure quantity is within limits
+    if (offer) {
+      updatedItem.quantity = this.clampQuantityToOfferLimits(offer, this.currentItem.quantity)
+    }
+
+    this.updateCurrentItem(updatedItem)
+    this.cachedSubtotal = null
+    this.notifyIfChanged()
   }
 
   /**

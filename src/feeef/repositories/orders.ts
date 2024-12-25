@@ -30,6 +30,7 @@ export interface SendOrderSchema {
 // Assuming GuestOrderItemSchema was defined elsewhere, define it here as well if needed.
 export interface GuestOrderItemSchema {
   productId: string
+  offerCode?: string
   variantPath?: string
   quantity: number
 }

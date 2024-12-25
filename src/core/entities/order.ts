@@ -59,6 +59,8 @@ export interface OrderItem {
   variantPath?: string
   quantity: number
   price: number
+  offerCode?: string | null
+  offerName?: string | null
 }
 
 // order track entity

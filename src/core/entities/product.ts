@@ -48,7 +48,7 @@ export interface ProductEntity {
 
   variant?: ProductVariant | null
 
-  offers?: PrdouctOffer[] | null
+  offers?: ProductOffer[] | null
 
   metadata: Record<string, any>
 
@@ -119,10 +119,11 @@ export enum ProductType {
   service = 'service',
 }
 
-export interface PrdouctOffer {
+export interface ProductOffer {
   code: string
   title: string
   subtitle?: string
-  discount?: number
   price?: number
+  minQuantity?: number
+  maxQuantity?: number
 }
