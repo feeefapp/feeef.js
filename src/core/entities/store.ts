@@ -15,7 +15,9 @@ export interface StoreEntity {
   domain: StoreDomain | null
   decoration: StoreDecoration | null
   name: string
+  iconUrl: string | null
   logoUrl: string | null
+  // deprecated
   ondarkLogoUrl: string | null
   userId: string
   categories: EmbaddedCategory[]
@@ -98,8 +100,21 @@ export interface StoreBanner {
 }
 
 export interface StoreDecoration {
+  // primary
   primary: number
   onPrimary?: number
+  // on dark mode
+  primaryDark?: number
+  onPrimaryDark?: number
+  // secondary
+  secondary?: number
+  onSecondary?: number
+  // on dark mode
+  secondaryDark?: number
+  onSecondaryDark?: number
+
+  useLogoDarkFilter?: boolean
+
   showStoreLogoInHeader?: boolean
   logoFullHeight?: boolean
   showStoreNameInHeader?: boolean
