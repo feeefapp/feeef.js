@@ -474,6 +474,31 @@ export class CartService extends NotifiableService {
   }
 
   /**
+   * Gets the shipping price for a specific shipping type using the current shipping address state.
+   * @param type - The shipping type to check (pickup, home, store)
+   * @returns The shipping price for the specified type, or null if not available
+   */
+  getShippingPriceForType(type: ShippingType): number | null {
+    if (!this.shippingMethod?.rates || !this.shippingAddress.state) return null
+
+    const stateIndex = Number.parseInt(this.shippingAddress.state, 10) - 1
+    const rates = this.shippingMethod.rates[stateIndex]
+
+    if (!rates) return null
+
+    switch (type) {
+      case ShippingType.pickup:
+        return rates[0]
+      case ShippingType.home:
+        return rates[1]
+      case ShippingType.store:
+        return rates[2]
+      default:
+        return null
+    }
+  }
+
+  /**
    * Calculates the total cost of the cart including shipping.
    * @param withCurrentItem - Whether to include the current item in the total.
    * @returns The total cost.
