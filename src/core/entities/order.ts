@@ -61,6 +61,7 @@ export interface OrderItem {
   price: number
   offerCode?: string | null
   offerName?: string | null
+  addons?: Record<string, number>
 }
 
 // order track entity

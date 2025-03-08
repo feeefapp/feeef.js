@@ -34,6 +34,7 @@ export interface GuestOrderItemSchema {
   offerCode?: string
   variantPath?: string
   quantity: number
+  addons?: Record<string, number>
 }
 
 /**

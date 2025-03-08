@@ -16,6 +16,7 @@ export interface CartItem {
   offer?: ProductOffer
   quantity: number
   variantPath?: string
+  addons?: Record<string, number>
 }
 
 /**
