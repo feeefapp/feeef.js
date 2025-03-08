@@ -64,9 +64,21 @@ export interface ProductEntity {
 
   updatedAt: any
 
+  addons?: ProductAddon[] | null
+
   // relations
   store?: StoreEntity | null
   shippingMethod?: ShippingMethodEntity | null
+}
+
+export interface ProductAddon {
+  photoUrl?: string
+  title: string
+  subtitle?: string
+  stock?: number
+  price?: number
+  min?: number
+  max?: number
 }
 
 export enum ProductStatus {
