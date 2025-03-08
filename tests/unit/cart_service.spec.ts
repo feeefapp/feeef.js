@@ -286,4 +286,67 @@ test.group('CartService', () => {
 
     assert.equal(cart.getTotal(), 250)
   })
+
+  test('calculate total with addons', (ctx) => {
+    const { assert } = ctx as any
+    const cart = new CartService()
+
+    const product: ProductEntity = {
+      photoUrl: null,
+      id: 'p1',
+      slug: 'product-1',
+      name: 'Test Product 1',
+      price: 100,
+      stock: 50,
+      sold: 10,
+      views: 100,
+      likes: 20,
+      dislikes: 2,
+      status: ProductStatus.published,
+      type: ProductType.physical,
+      metadata: {},
+      media: [],
+      storeId: 's1',
+      category: { name: 'Category 1', description: 'Category 1', photoUrl: null },
+      addons: [
+        {
+          title: 'Extra Cheese',
+          subtitle: 'Add more cheese',
+          price: 10,
+        },
+        {
+          title: 'Extra Sauce',
+          subtitle: 'Add more sauce',
+          price: 5,
+        },
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      decoration: null,
+      title: null,
+      description: null,
+      body: null,
+      sku: null,
+      cost: null,
+      discount: null,
+      variant: null,
+      verifiedAt: null,
+      blockedAt: null,
+    }
+
+    // Add product with 2 quantity and 2 addons
+    cart.add({
+      product,
+      quantity: 2,
+      addons: {
+        'Extra Cheese': 1, // 1 extra cheese
+        'Extra Sauce': 2, // 2 extra sauce
+      },
+    })
+
+    // Base product price: 100 * 2 = 200
+    // Addon prices: (10 * 1) + (5 * 2) = 20
+    // Expected total: 220
+    assert.equal(cart.getSubtotal(), 220)
+  })
 })

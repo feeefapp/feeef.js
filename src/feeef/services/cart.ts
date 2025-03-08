@@ -274,7 +274,7 @@ export class CartService extends NotifiableService {
    * @returns The total price for the item.
    */
   getItemTotal(item: CartItem): number {
-    const { product, variantPath, quantity, offer } = item
+    const { product, variantPath, quantity, offer, addons } = item
     let price = product.price
     let discount = product.discount ?? 0
 
@@ -302,7 +302,22 @@ export class CartService extends NotifiableService {
       }
     }
 
-    return (price - discount) * quantity
+    // Calculate base product price with quantity
+    let total = (price - discount) * quantity
+
+    // Add pricing for addons if present
+    if (addons && product.addons) {
+      for (const [addonId, addonQuantity] of Object.entries(addons)) {
+        // Find the addon in the product's addons array
+        const addon = product.addons.find((a) => a.title === addonId)
+        if (addon && addon.price) {
+          // Add the addon price * quantity to the total
+          total += addon.price * addonQuantity
+        }
+      }
+    }
+
+    return total
   }
 
   /**
