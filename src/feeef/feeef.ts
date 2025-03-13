@@ -82,7 +82,7 @@ export class FeeeF {
    */
   //
   constructor({ apiKey, client, cache, baseURL = 'http://localhost:3333/api/v1' }: FeeeFConfig) {
-    console.log(cache)
+    console.log('feeef super cache', cache)
     this.apiKey = apiKey
     // get th "cache" search param
     // const urlParams = new URLSearchParams(window.location.search)
