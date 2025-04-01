@@ -138,4 +138,5 @@ export interface ProductOffer {
   price?: number
   minQuantity?: number
   maxQuantity?: number
+  freeShipping?: boolean
 }

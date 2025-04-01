@@ -480,6 +480,12 @@ export class CartService extends NotifiableService {
    * @returns The shipping price or 0 if not applicable.
    */
   getShippingPrice(): number {
+    // if at least one item have freeShipping offer return 0
+    for (const key in this.items) {
+      const item: CartItem = this.items[key]
+      if (item.offer?.freeShipping) return 0
+    }
+
     if (!this.shippingMethod) return 0
     if (!this.shippingAddress.state) return this.shippingMethod.price ?? 0
 
