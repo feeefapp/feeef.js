@@ -481,8 +481,7 @@ export class CartService extends NotifiableService {
    */
   getShippingPrice(): number {
     // if at least one item have freeShipping offer return 0
-    for (const key in this.items) {
-      const item: CartItem = this.items[key]
+    for (const item of this.items.values()) {
       if (item.offer?.freeShipping) return 0
     }
 
