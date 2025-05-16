@@ -57,6 +57,8 @@ export interface OrderItem {
   productName: string
   productPhotoUrl?: string | null
   variantPath?: string
+  sku?: string | null
+  discount?: number | null
   quantity: number
   price: number
   offerCode?: string | null

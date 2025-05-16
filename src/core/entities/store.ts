@@ -183,6 +183,7 @@ export interface GoogleSheetsIntegration {
   active: boolean
   oauth2?: Record<string, any>
   metadata: Record<string, any>
+  simple?: boolean
   columns?: GoogleSheetsColumn<any>[]
 }
 export interface GoogleTagsIntegration {

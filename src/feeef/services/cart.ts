@@ -525,7 +525,13 @@ export class CartService extends NotifiableService {
    * @returns The total cost.
    */
   getTotal(withCurrentItem = true): number {
-    return this.getSubtotal(withCurrentItem) + (this.getShippingPrice() ?? 0)
+    const subTotal = this.getSubtotal(withCurrentItem)
+    const shippingPrice = this.getShippingPrice() ?? 0
+    const selectedOffer = this.currentItem?.offer
+    if (selectedOffer && selectedOffer.freeShipping) {
+      return subTotal // If the current item has free shipping, return subtotal only
+    }
+    return subTotal + shippingPrice
   }
 
   /**
