@@ -65,14 +65,15 @@ export interface StoreEntity {
 // function that generate public data from the integrations data
 export const generatePublicStoreIntegrations = (
   integrations: StoreIntegrations | null | undefined
-) => {
+): PublicStoreIntegrations | null => {
   if (!integrations) return null
   const { metaPixel, tiktokPixel, googleAnalytics, googleTags } = integrations
   return {
-    metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel),
-    tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel),
-    googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics),
-    googleTags: generatePublicStoreIntegrationGoogleTags(googleTags),
+    metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
+    tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
+    googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
+    googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
+    googleSheet: null,
   }
 }
 export const generatePublicStoreIntegrationMetaPixel = (
