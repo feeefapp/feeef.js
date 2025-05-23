@@ -485,13 +485,27 @@ export class CartService extends NotifiableService {
       if (item.offer?.freeShipping) return 0
     }
 
+    // if no shipping method is set, return 0
     if (!this.shippingMethod) return 0
+
+    // if no shipping address is set, return the shipping method price
     if (!this.shippingAddress.state) return this.shippingMethod.price ?? 0
 
-    const stateIndex = Number.parseInt(this.shippingAddress.state, 10) - 1
-    const rates = this.shippingMethod.rates?.[stateIndex]
+    // avalable shipping types
+    const shippings = this.getAvailableShippingTypes()
 
-    return this.shippingAddress.type === 'pickup' ? (rates?.[0] ?? 0) : (rates?.[1] ?? 0)
+    const currentOne = this.getShippingPriceForType(this.shippingAddress.type)
+    if (currentOne) {
+      return currentOne
+    }
+
+    for (const type of shippings) {
+      if (this.getShippingPriceForType(type) !== null) {
+        return this.getShippingPriceForType(type)!
+      }
+    }
+
+    return 0
   }
 
   /**

@@ -28,6 +28,7 @@ export interface StoreEntity {
   metadata: Record<string, any>
   contacts: EmbaddedContact[]
   integrations: StoreIntegrations
+  publicIntegrations: PublicStoreIntegrations
   verifiedAt: any | null
   blockedAt: any | null
   createdAt: any
@@ -54,8 +55,99 @@ export interface StoreEntity {
   // googleAnalyticsId
   googleAnalyticsId?: string | null
 
+  // googleTagsId
+  googleTagsId?: string | null
+
   // members
   members?: Record<string, StoreMember>
+}
+
+// function that generate public data from the integrations data
+export const generatePublicStoreIntegrations = (
+  integrations: StoreIntegrations | null | undefined
+) => {
+  if (!integrations) return null
+  const { metaPixel, tiktokPixel, googleAnalytics, googleTags } = integrations
+  return {
+    metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel),
+    tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel),
+    googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics),
+    googleTags: generatePublicStoreIntegrationGoogleTags(googleTags),
+  }
+}
+export const generatePublicStoreIntegrationMetaPixel = (
+  metaPixel: MetaPixelIntegration | null | undefined
+): PublicMetaPixelIntegration | null | undefined => {
+  if (!metaPixel) return null
+  return {
+    pixels: metaPixel.pixels.map((pixel) => ({
+      id: pixel.id,
+    })),
+    active: metaPixel.active,
+  }
+}
+export const generatePublicStoreIntegrationTiktokPixel = (
+  tiktokPixel: TiktokPixelIntegration | null | undefined
+): PublicTiktokPixelIntegration | null | undefined => {
+  if (!tiktokPixel) return null
+  return {
+    pixels: tiktokPixel.pixels.map((pixel) => ({
+      id: pixel.id,
+    })),
+    active: tiktokPixel.active,
+  }
+}
+export const generatePublicStoreIntegrationGoogleAnalytics = (
+  googleAnalytics: GoogleAnalyticsIntegration | null | undefined
+): PublicGoogleAnalyticsIntegration | null | undefined => {
+  if (!googleAnalytics) return null
+  return {
+    id: googleAnalytics.id,
+    active: googleAnalytics.active,
+  }
+}
+export const generatePublicStoreIntegrationGoogleSheet = (
+  googleSheet: GoogleSheetsIntegration | null | undefined
+): PublicGoogleSheetsIntegration | null | undefined => {
+  if (!googleSheet) return null
+  return null
+}
+export const generatePublicStoreIntegrationGoogleTags = (
+  googleTags: GoogleTagsIntegration | null | undefined
+): PublicGoogleTagsIntegration | null | undefined => {
+  if (!googleTags) return null
+  const { id, active } = googleTags
+  return {
+    id,
+    active,
+  }
+}
+export interface PublicMetaPixelIntegration {
+  pixels: { id: string }[]
+  active: boolean
+}
+export interface PublicTiktokPixelIntegration {
+  pixels: { id: string }[]
+  active: boolean
+}
+export interface PublicGoogleAnalyticsIntegration {
+  id: string
+  active: boolean
+}
+export interface PublicGoogleSheetsIntegration {
+  id: string
+  active: boolean
+}
+export interface PublicGoogleTagsIntegration {
+  id: string
+  active: boolean
+}
+export interface PublicStoreIntegrations {
+  metaPixel: PublicMetaPixelIntegration | null
+  tiktokPixel: PublicTiktokPixelIntegration | null
+  googleAnalytics: PublicGoogleAnalyticsIntegration | null
+  googleSheet: PublicGoogleSheetsIntegration | null
+  googleTags: PublicGoogleTagsIntegration | null
 }
 
 export enum StoreMemberRole {
@@ -135,6 +227,7 @@ export enum StoreActionType {
   phone = 'phone',
 }
 export interface MetaPixel {
+  name?: string
   id: string
   key?: string
 }
@@ -170,8 +263,10 @@ export interface GoogleAnalyticsIntegration {
 //   boolean = 'boolean',
 //   date = 'date',
 // }
+
 export interface GoogleSheetsColumn<T> {
-  field: keyof OrderEntity | null
+  // it can be path in json field for exmple metadata.customData
+  field: keyof OrderEntity | string | 'skus' | 'quantities' | 'itemsNames'
   name: string
   enabled: boolean
   defaultValue?: T

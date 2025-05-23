@@ -66,10 +66,129 @@ export interface ProductEntity {
 
   addons?: ProductAddon[] | null
 
+  // integrations configs
+  integrationsData?: IntegrationsData | null
+  publicIntegrationsData?: IntegrationsData | null
+
   // relations
   store?: StoreEntity | null
   shippingMethod?: ShippingMethodEntity | null
 }
+
+// function that generate public data from the integrations data
+export function generatePublicIntegrationsData(data: IntegrationsData | null | null): any {
+  if (!data) return data
+  const { metaPixelData, tiktokPixelData, googleAnalyticsData, googleTagsData } = data
+  return {
+    metaPixelData: generatePublicIntegrationsDataMetaPixel(metaPixelData),
+    tiktokPixelData: generatePublicIntegrationsDataTiktokPixel(tiktokPixelData),
+    googleAnalyticsData: generatePublicIntegrationsDataGoogleAnalytics(googleAnalyticsData),
+    googleTagsData: generatePublicIntegrationsDataGoogleTag(googleTagsData),
+  }
+}
+// function that generate public data from the meta pixel data
+export function generatePublicIntegrationsDataMetaPixel(
+  data: MetaPixelData | null | undefined
+): PublicMetaPixelData | null | undefined {
+  if (!data) return data
+  const { ids, objective, draftObjective } = data
+  return {
+    ids: ids,
+    objective,
+    draftObjective,
+  }
+}
+// function that generate public data from the tiktok pixel data
+export function generatePublicIntegrationsDataTiktokPixel(
+  data: TiktokPixelData | null | undefined
+): PubllicTiktokPixelData | null | undefined {
+  if (!data) return data
+  // const { ids, objective, draftObjective } = data
+  return {}
+}
+// function that generate public data from the google analytics data
+export function generatePublicIntegrationsDataGoogleAnalytics(
+  data: GoogleAnalyticsData | null | undefined
+): PublicGoogleAnalyticsData | null | undefined {
+  if (!data) return data
+  return {}
+}
+// function that generate public data from the google tag data
+export function generatePublicIntegrationsDataGoogleTag(
+  data: GoogleTagData | null | undefined
+): PublicGoogleTagData | null | undefined {
+  if (!data) return data
+  return {}
+}
+// function that generate public data from the google sheets data
+export function generatePublicIntegrationsDataGoogleSheets(
+  data: GoogleSheetsData | null | undefined
+): PublicGoogleSheetsData | null | undefined {
+  if (!data) return data
+  return {}
+}
+
+export interface IntegrationsData {
+  metaPixelData?: MetaPixelData | null
+  tiktokPixelData?: TiktokPixelData | null
+  googleAnalyticsData?: GoogleAnalyticsData | null
+  googleTagsData?: GoogleTagData | null
+  googleSheetsData?: GoogleSheetsData | null
+}
+
+export enum MetaPixelEvent {
+  lead = 'Lead',
+  purchase = 'Purchase',
+  viewContent = 'ViewContent',
+  addToCart = 'AddToCart',
+  initiateCheckout = 'InitiateCheckout',
+}
+export interface MetaPixelData {
+  // active meta pixel ids
+  ids: string[] | null
+  // main objective
+  objective: MetaPixelEvent | null
+  // draft objective
+  draftObjective: MetaPixelEvent | null
+}
+
+export enum TiktokPixelEvent {}
+export interface TiktokPixelData {
+  // active tiktok pixel ids
+  ids: string[] | null
+  // main objective
+  objective: TiktokPixelEvent | null
+  // draft objective
+  draftObjective: TiktokPixelEvent | null
+}
+export interface GoogleAnalyticsData {}
+export interface GoogleTagData {}
+export interface GoogleSheetsData {
+  enabled: boolean
+  // use cant use both sheetId and sheetName
+  sheetId: string | null
+  // if sheetId is null, use sheetName
+  // if sheetName not exists in the spreadsheet, create it
+  sheetName: string | null
+  spreadsheetId: string | null
+  // the next row to insert data
+  nextRow: number | null
+}
+
+// public meta pixel data
+export interface PublicMetaPixelData {
+  ids: string[] | null
+  objective: MetaPixelEvent | null
+  draftObjective: MetaPixelEvent | null
+}
+// public tiktok pixel data
+export interface PubllicTiktokPixelData {}
+// public google analytics data
+export interface PublicGoogleAnalyticsData {}
+// public google tag data
+export interface PublicGoogleTagData {}
+// public google sheets data
+export interface PublicGoogleSheetsData {}
 
 export interface ProductAddon {
   photoUrl?: string

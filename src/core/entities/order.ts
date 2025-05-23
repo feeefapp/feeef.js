@@ -22,8 +22,11 @@ export enum DeliveryStatus {
 }
 
 export enum ShippingType {
+  // delivery to customer home
   home = 'home',
+  // the customer picks up the order from the local shipping center
   pickup = 'pickup',
+  // the customer picks up the order from the store
   store = 'store',
 }
 
