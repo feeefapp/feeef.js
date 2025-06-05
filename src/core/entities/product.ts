@@ -1,6 +1,6 @@
 import { EmbaddedCategory } from '../embadded/category.js'
 import { ShippingMethodEntity } from './shipping_method.js'
-import { StoreEntity } from './store.js'
+import { GoogleSheetsColumn, StoreEntity } from './store.js'
 
 export interface ProductEntity {
   id: string
@@ -173,6 +173,8 @@ export interface GoogleSheetsData {
   spreadsheetId: string | null
   // the next row to insert data
   nextRow: number | null
+  // columns to insert data
+  columns: GoogleSheetsColumn<any>[] | null
 }
 
 // public meta pixel data
@@ -236,6 +238,8 @@ export interface ProductVariantOption {
   mediaIndex?: number | null
   hint?: string | null
   value?: any
+  mediaId?: string | null
+  hidden?: boolean
 }
 
 export enum VariantOptionType {

@@ -46,12 +46,18 @@ export interface OrderEntity {
   shippingPrice: number
   total: number
   discount: number
+  // @Deprecated
   coupon?: string | null
+  couponId?: string | null
+  couponCode?: string | null
+  couponDiscount?: string | null
   storeId: string
+  confirmerId: string | null
   metadata: OrderMetadata
   status: OrderStatus
   paymentStatus: PaymentStatus
   deliveryStatus: DeliveryStatus
+  tags: string[] | null
   createdAt: any
   updatedAt: any
 }
