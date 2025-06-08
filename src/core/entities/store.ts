@@ -27,7 +27,7 @@ export interface StoreEntity {
   address: EmbaddedAddress | null
   metadata: Record<string, any>
   contacts: EmbaddedContact[]
-  integrations: StoreIntegrations
+  integrations?: StoreIntegrations | null
   publicIntegrations: PublicStoreIntegrations | null
   verifiedAt: any | null
   blockedAt: any | null

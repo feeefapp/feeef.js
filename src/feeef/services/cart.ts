@@ -36,7 +36,7 @@ export interface CartShippingAddress {
   city: string | null
   state: string | null
   street: string | null
-  country: 'dz'
+  country: 'dz' | string
   type: ShippingType
 }
 

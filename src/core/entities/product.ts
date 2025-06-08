@@ -19,7 +19,7 @@ export interface ProductEntity {
 
   shippingMethodId?: string | null
 
-  category: EmbaddedCategory
+    category?: EmbaddedCategory | null;
 
   title: string | null
 
