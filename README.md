@@ -50,11 +50,11 @@ cart.addCurrentItemToCart()
 
 // Apply an offer to the cart item
 cart.updateCurrentItemOffer({
-  code: "SUMMER2024",
-  title: "Summer Sale",
+  code: 'SUMMER2024',
+  title: 'Summer Sale',
   price: 899.99,
-  minQuantity: 2,  // Must buy at least 2
-  maxQuantity: 5   // Cannot buy more than 5 with this offer
+  minQuantity: 2, // Must buy at least 2
+  maxQuantity: 5, // Cannot buy more than 5 with this offer
 })
 
 // Set shipping method (from store)
@@ -83,7 +83,7 @@ cart.removeListener(listener)
 import React, { useEffect, useState } from 'react'
 import { CartService } from './services/cart_service.js'
 
-const CartComponent = ({ product, store }: { product: ProductEntity, store: StoreEntity }) => {
+const CartComponent = ({ product, store }: { product: ProductEntity; store: StoreEntity }) => {
   // Initialize state with CartService instance
   const [cart, setCart] = useState<CartService>(new CartService())
 
@@ -189,12 +189,12 @@ cart.removeListener(listener) // Removes the previously added listener
 
 ```typescript
 interface ProductOffer {
-  code: string           // Unique identifier for the offer
-  title: string         // Display title for the offer
-  subtitle?: string     // Optional subtitle/description
-  price?: number        // Optional fixed price override
-  minQuantity?: number  // Minimum quantity required for the offer
-  maxQuantity?: number  // Maximum quantity allowed for the offer
+  code: string // Unique identifier for the offer
+  title: string // Display title for the offer
+  subtitle?: string // Optional subtitle/description
+  price?: number // Optional fixed price override
+  minQuantity?: number // Minimum quantity required for the offer
+  maxQuantity?: number // Maximum quantity allowed for the offer
 }
 ```
 
