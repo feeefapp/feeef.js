@@ -67,15 +67,15 @@ export const generatePublicStoreIntegrations = (
   integrations: StoreIntegrations | null | undefined
 ): PublicStoreIntegrations | null => {
   if (!integrations) return null
-  const { metaPixel, tiktokPixel, googleAnalytics, googleTags } = integrations
+  const { metaPixel, tiktokPixel, googleAnalytics, googleTags, orderdz, webhooks } = integrations
   return {
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
     tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
     googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
     googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
     googleSheet: null,
-    orderdz: null,
-    webhooks: null,
+    orderdz: generatePublicStoreIntegrationOrderdz(orderdz) || null,
+    webhooks: generatePublicStoreIntegrationWebhooks(webhooks) || null,
   }
 }
 export const generatePublicStoreIntegrationMetaPixel = (
@@ -148,10 +148,14 @@ export const generatePublicStoreIntegrationWebhooks = (
   webhooks: WebhooksIntegration | null | undefined
 ): PublicWebhooksIntegration | null | undefined => {
   if (!webhooks) return null
+
+  const activeWebhooks = webhooks.webhooks.filter((webhook) => webhook.active)
+
   return {
     webhookCount: webhooks.webhooks.length,
+    activeWebhookCount: activeWebhooks.length,
     active: webhooks.active,
-    webhookUrls: webhooks.webhooks.map((webhook) => webhook.url),
+    webhookUrls: activeWebhooks.map((webhook) => webhook.url),
   }
 }
 
@@ -169,11 +173,13 @@ export interface PublicOrderdzIntegration {
  * Contains only non-sensitive information that can be safely exposed to clients.
  */
 export interface PublicWebhooksIntegration {
-  /** Number of active webhooks */
+  /** Total number of configured webhooks */
   webhookCount: number
+  /** Number of active webhooks */
+  activeWebhookCount: number
   /** Whether the integration is active */
   active: boolean
-  /** List of webhook URLs (without secrets) */
+  /** List of active webhook URLs (without secrets) */
   webhookUrls: string[]
 }
 
