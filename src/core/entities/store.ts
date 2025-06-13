@@ -74,6 +74,7 @@ export const generatePublicStoreIntegrations = (
     googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
     googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
     googleSheet: null,
+    orderdz: null,
   }
 }
 export const generatePublicStoreIntegrationMetaPixel = (
@@ -123,6 +124,21 @@ export const generatePublicStoreIntegrationGoogleTags = (
     active,
   }
 }
+
+/**
+ * Generates public OrderDZ integration data from private integration data.
+ * Only exposes the URL and active status, keeping the token private for security.
+ */
+export const generatePublicStoreIntegrationOrderdz = (
+  orderdz: OrderdzIntegration | null | undefined
+): PublicOrderdzIntegration | null | undefined => {
+  if (!orderdz) return null
+  return {
+    url: orderdz.url,
+    active: orderdz.active,
+  }
+}
+
 export interface PublicMetaPixelIntegration {
   pixels: { id: string }[]
   active: boolean
@@ -143,12 +159,23 @@ export interface PublicGoogleTagsIntegration {
   id: string
   active: boolean
 }
+
+/**
+ * Public interface for OrderDZ integration.
+ * Contains only non-sensitive information that can be safely exposed to clients.
+ */
+export interface PublicOrderdzIntegration {
+  url: string
+  active: boolean
+}
+
 export interface PublicStoreIntegrations {
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
   googleAnalytics: PublicGoogleAnalyticsIntegration | null
   googleSheet: PublicGoogleSheetsIntegration | null
   googleTags: PublicGoogleTagsIntegration | null
+  orderdz: PublicOrderdzIntegration | null
 }
 
 export enum StoreMemberRole {
@@ -288,6 +315,23 @@ export interface GoogleTagsIntegration {
   metadata: Record<string, any>
 }
 
+/**
+ * OrderDZ integration configuration for order confirmation service.
+ * This integration allows automatic order confirmation via OrderDZ API.
+ */
+export interface OrderdzIntegration {
+  /** Unique identifier for this integration instance */
+  id: string
+  /** API endpoint URL for OrderDZ service (e.g., "https://orderdz.com/api/v1/feeef/order") */
+  url: string
+  /** Authentication token for OrderDZ API */
+  token: string
+  /** Whether this integration is currently active */
+  active: boolean
+  /** Additional metadata for the integration */
+  metadata: Record<string, any>
+}
+
 export interface StoreIntegrations {
   [key: string]: any
   metadata?: Record<string, any>
@@ -301,6 +345,7 @@ export interface StoreIntegrations {
   googleAnalytics?: GoogleAnalyticsIntegration
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration
+  orderdz?: OrderdzIntegration
 
   sms?: any
   telegram?: any
