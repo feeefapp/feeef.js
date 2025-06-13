@@ -75,6 +75,7 @@ export const generatePublicStoreIntegrations = (
     googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
     googleSheet: null,
     orderdz: null,
+    webhooks: null,
   }
 }
 export const generatePublicStoreIntegrationMetaPixel = (
@@ -139,6 +140,43 @@ export const generatePublicStoreIntegrationOrderdz = (
   }
 }
 
+/**
+ * Generates public webhooks integration data from private integration data.
+ * Only exposes non-sensitive information, keeping secrets private for security.
+ */
+export const generatePublicStoreIntegrationWebhooks = (
+  webhooks: WebhooksIntegration | null | undefined
+): PublicWebhooksIntegration | null | undefined => {
+  if (!webhooks) return null
+  return {
+    webhookCount: webhooks.webhooks.length,
+    active: webhooks.active,
+    webhookUrls: webhooks.webhooks.map((webhook) => webhook.url),
+  }
+}
+
+/**
+ * Public interface for OrderDZ integration.
+ * Contains only non-sensitive information that can be safely exposed to clients.
+ */
+export interface PublicOrderdzIntegration {
+  url: string
+  active: boolean
+}
+
+/**
+ * Public interface for webhooks integration.
+ * Contains only non-sensitive information that can be safely exposed to clients.
+ */
+export interface PublicWebhooksIntegration {
+  /** Number of active webhooks */
+  webhookCount: number
+  /** Whether the integration is active */
+  active: boolean
+  /** List of webhook URLs (without secrets) */
+  webhookUrls: string[]
+}
+
 export interface PublicMetaPixelIntegration {
   pixels: { id: string }[]
   active: boolean
@@ -160,15 +198,6 @@ export interface PublicGoogleTagsIntegration {
   active: boolean
 }
 
-/**
- * Public interface for OrderDZ integration.
- * Contains only non-sensitive information that can be safely exposed to clients.
- */
-export interface PublicOrderdzIntegration {
-  url: string
-  active: boolean
-}
-
 export interface PublicStoreIntegrations {
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
@@ -176,6 +205,7 @@ export interface PublicStoreIntegrations {
   googleSheet: PublicGoogleSheetsIntegration | null
   googleTags: PublicGoogleTagsIntegration | null
   orderdz: PublicOrderdzIntegration | null
+  webhooks: PublicWebhooksIntegration | null
 }
 
 export enum StoreMemberRole {
@@ -332,6 +362,49 @@ export interface OrderdzIntegration {
   metadata: Record<string, any>
 }
 
+/**
+ * Webhook event types for order lifecycle
+ */
+export enum WebhookEvent {
+  ORDER_CREATED = 'orderCreated',
+  ORDER_UPDATED = 'orderUpdated',
+  ORDER_DELETED = 'orderDeleted',
+}
+
+/**
+ * Individual webhook configuration
+ */
+export interface WebhookConfig {
+  /** Unique identifier for this webhook */
+  id: string
+  /** Human-readable name for this webhook */
+  name: string
+  /** Target URL where webhook events will be sent */
+  url: string
+  /** Events this webhook is subscribed to */
+  events: WebhookEvent[]
+  /** Optional secret key for HMAC signature verification */
+  secret?: string
+  /** Whether this webhook is currently active */
+  active: boolean
+  /** Additional HTTP headers to send with webhook requests */
+  headers?: Record<string, string>
+  /** Additional metadata for this webhook */
+  metadata: Record<string, any>
+}
+
+/**
+ * Webhooks integration configuration for real-time order notifications
+ */
+export interface WebhooksIntegration {
+  /** List of configured webhooks */
+  webhooks: WebhookConfig[]
+  /** Whether the webhooks integration is active */
+  active: boolean
+  /** Additional metadata for the integration */
+  metadata: Record<string, any>
+}
+
 export interface StoreIntegrations {
   [key: string]: any
   metadata?: Record<string, any>
@@ -346,6 +419,7 @@ export interface StoreIntegrations {
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration
   orderdz?: OrderdzIntegration
+  webhooks?: WebhooksIntegration
 
   sms?: any
   telegram?: any
