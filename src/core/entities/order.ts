@@ -34,6 +34,7 @@ export interface OrderEntity {
   id: string
   customerName?: string | null
   customerPhone: string
+  customerEmail?: string | null
   customerIp?: string | null
   shippingAddress?: string | null
   shippingCity?: string | null

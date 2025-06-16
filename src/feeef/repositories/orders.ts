@@ -14,6 +14,7 @@ export interface SendOrderSchema {
   customerName?: string // Name of the customer (optional)
   customerNote?: string // Note from the customer (optional)
   customerPhone: string // Customer's phone number (required)
+  customerEmail?: string // Customer's email address (optional)
   source?: string // the source of the order (facebook...tiktok..)
   shippingAddress?: string // Address for shipping (optional)
   shippingCity?: string // City for shipping (optional)
