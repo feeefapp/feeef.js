@@ -137,6 +137,7 @@ export interface IntegrationsData {
 }
 
 export enum MetaPixelEvent {
+  none = 'none',
   lead = 'Lead',
   purchase = 'Purchase',
   viewContent = 'ViewContent',

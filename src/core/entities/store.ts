@@ -2,6 +2,7 @@ import { EmbaddedAddress } from '../embadded/address.js'
 import { EmbaddedCategory } from '../embadded/category.js'
 import { EmbaddedContact } from '../embadded/contact.js'
 import { OrderEntity } from './order.js'
+import { MetaPixelEvent } from './product.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
 import { UserEntity } from './user.js'
@@ -87,6 +88,8 @@ export const generatePublicStoreIntegrationMetaPixel = (
       id: pixel.id,
     })),
     active: metaPixel.active,
+    objective: metaPixel.objective,
+    draftObjective: metaPixel.draftObjective,
   }
 }
 export const generatePublicStoreIntegrationTiktokPixel = (
@@ -186,6 +189,8 @@ export interface PublicWebhooksIntegration {
 export interface PublicMetaPixelIntegration {
   pixels: { id: string }[]
   active: boolean
+  objective?: MetaPixelEvent | null
+  draftObjective?: MetaPixelEvent | null
 }
 export interface PublicTiktokPixelIntegration {
   pixels: { id: string }[]
@@ -304,6 +309,8 @@ export interface TiktokPixel {
 export interface MetaPixelIntegration {
   id: string
   pixels: MetaPixel[]
+  objective?: MetaPixelEvent | null
+  draftObjective?: MetaPixelEvent | null
   active: boolean
   metadata: Record<string, any>
 }
