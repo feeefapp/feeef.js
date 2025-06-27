@@ -44,7 +44,7 @@ export interface CartShippingAddress {
  * Manages the shopping cart and its operations.
  */
 export class CartService extends NotifiableService {
-  private items: Map<string, CartItem> = new Map() // Fast lookup of cart items
+  private items: CartItem[] = [] // Array to support multiple items with same product but different variants
   private shippingMethod: ShippingMethodEntity | null = null
   private shippingAddress: CartShippingAddress = {
     name: null,
@@ -59,14 +59,45 @@ export class CartService extends NotifiableService {
   private currentItem: CartItem | null = null
 
   /**
+   * Generates a unique key for a cart item based on product ID, variant path, offer code, and addons
+   * @param item - The cart item to generate a key for
+   * @returns A unique string key
+   */
+  private getItemKey(item: CartItem): string {
+    const addonKeys = item.addons ? Object.keys(item.addons).sort().join('|') : ''
+    return `${item.product.id}:${item.variantPath || ''}:${item.offer?.code || ''}:${addonKeys}`
+  }
+
+  /**
+   * Finds an item in the cart that matches the given item's key
+   * @param item - The item to find
+   * @returns The matching cart item or undefined
+   */
+  private findItem(item: CartItem): CartItem | undefined {
+    const targetKey = this.getItemKey(item)
+    return this.items.find((cartItem) => this.getItemKey(cartItem) === targetKey)
+  }
+
+  /**
+   * Finds the index of an item in the cart that matches the given item's key
+   * @param item - The item to find
+   * @returns The index of the matching cart item or -1 if not found
+   */
+  private findItemIndex(item: CartItem): number {
+    const targetKey = this.getItemKey(item)
+    return this.items.findIndex((cartItem) => this.getItemKey(cartItem) === targetKey)
+  }
+
+  /**
    * Sets the current item to be managed in the cart.
    * @param item - The item to be set as current.
    */
   setCurrentItem(item: CartItem, notify = true): void {
     this.currentItem = item
 
-    if (this.has(this.currentItem.product.id)) {
-      this.items.set(this.currentItem.product.id, this.currentItem)
+    const existingItemIndex = this.findItemIndex(this.currentItem)
+    if (existingItemIndex !== -1) {
+      this.items[existingItemIndex] = this.currentItem
     }
     this.cachedSubtotal = null
     if (notify) {
@@ -91,21 +122,23 @@ export class CartService extends NotifiableService {
   }
 
   /**
-   * Update item by id.
-   * @param id - The id of the item to update.
-   * @param item - a partial item to update.
+   * Update item by unique key (product ID + variant + offer + addons).
+   * @param item - The item to identify the cart item to update.
+   * @param updates - Partial item data to update.
    */
-  updateItem(id: string, item: Partial<CartItem>, notify = true): void {
-    const currentItem = this.items.get(id)
+  updateItem(item: CartItem, updates: Partial<CartItem>, notify = true): void {
+    const index = this.findItemIndex(item)
 
-    if (currentItem) {
-      const newItem = { ...currentItem, ...item }
+    if (index !== -1) {
+      const currentItem = this.items[index]
+      const newItem = { ...currentItem, ...updates }
+
       // Clamp quantity if there's an offer with constraints
       if (newItem.offer) {
         newItem.quantity = this.clampQuantityToOfferLimits(newItem.offer, newItem.quantity)
       }
 
-      this.items.set(id, newItem)
+      this.items[index] = newItem
       this.cachedSubtotal = null
       if (notify) {
         this.notify()
@@ -115,15 +148,16 @@ export class CartService extends NotifiableService {
 
   /**
    * Update current item.
-   * @param item - a partial item to update.
+   * @param updates - a partial item to update.
    */
-  updateCurrentItem(item: Partial<CartItem>, notify = true): void {
+  updateCurrentItem(updates: Partial<CartItem>, notify = true): void {
     if (!this.currentItem) return
 
-    this.currentItem = { ...this.currentItem, ...item }
+    this.currentItem = { ...this.currentItem, ...updates }
 
-    if (this.has(this.currentItem.product.id)) {
-      this.items.set(this.currentItem.product.id, this.currentItem)
+    const existingItemIndex = this.findItemIndex(this.currentItem)
+    if (existingItemIndex !== -1) {
+      this.items[existingItemIndex] = this.currentItem
     }
 
     this.cachedSubtotal = null
@@ -171,7 +205,7 @@ export class CartService extends NotifiableService {
    * @returns True if the current item is in the cart, false otherwise.
    */
   isCurrentItemInCart(): boolean {
-    return this.currentItem ? this.items.has(this.currentItem.product.id) : false
+    return this.currentItem ? this.findItem(this.currentItem) !== undefined : false
   }
 
   /**
@@ -188,7 +222,7 @@ export class CartService extends NotifiableService {
    */
   removeCurrentItemFromCart(): void {
     if (this.currentItem) {
-      this.remove(this.currentItem.product.id)
+      this.remove(this.currentItem)
     }
   }
 
@@ -204,12 +238,12 @@ export class CartService extends NotifiableService {
    * @param item - The cart item to add.
    */
   add(item: CartItem): void {
-    const existingItem = this.items.get(item.product.id)
+    const existingItem = this.findItem(item)
 
     if (existingItem) {
       existingItem.quantity += item.quantity
     } else {
-      this.items.set(item.product.id, item)
+      this.items.push({ ...item })
     }
 
     this.cachedSubtotal = null // Reset subtotal cache
@@ -217,20 +251,63 @@ export class CartService extends NotifiableService {
   }
 
   /**
-   * Checks if an item exists in the cart by product ID.
-   * @param itemId - The ID of the item to check.
+   * Checks if an item exists in the cart by matching product ID and variant path.
+   * @param productId - The product ID to check for.
+   * @param variantPath - The variant path to check for.
    * @returns True if the item exists in the cart, false otherwise.
    */
-  has(itemId: string): boolean {
-    return this.items.has(itemId)
+  has(productId: string, variantPath?: string): boolean {
+    return this.items.some((item) => {
+      if (item.product.id !== productId) return false
+      if (variantPath !== undefined && item.variantPath !== variantPath) return false
+      return true
+    })
   }
 
   /**
-   * Removes an item from the cart by product ID.
-   * @param itemId - The ID of the item to remove.
+   * Checks if an item exists in the cart by matching the item's unique key.
+   * @param item - The item to check for.
+   * @returns True if the item exists in the cart, false otherwise.
    */
-  remove(itemId: string): void {
-    if (this.items.delete(itemId)) {
+  hasItem(item: CartItem): boolean {
+    return this.findItem(item) !== undefined
+  }
+
+  /**
+   * Checks if any item with the given product ID exists in the cart.
+   * @param productId - The product ID to check for.
+   * @returns True if any item with the product ID exists, false otherwise.
+   */
+  hasProduct(productId: string): boolean {
+    return this.items.some((item) => item.product.id === productId)
+  }
+
+  /**
+   * Removes an item from the cart by matching the item's unique key.
+   * @param item - The item to remove.
+   */
+  remove(item: CartItem): void {
+    const index = this.findItemIndex(item)
+    if (index !== -1) {
+      this.items.splice(index, 1)
+      this.cachedSubtotal = null
+      this.notifyIfChanged()
+    }
+  }
+
+  /**
+   * Removes all items with the given product ID from the cart.
+   * @param productId - The product ID to remove.
+   */
+  removeByProductId(productId: string, variantPath?: string): void {
+    const initialLength = this.items.length
+    this.items = this.items.filter((item) => {
+      if (item.product.id !== productId) return true
+      if (variantPath !== undefined && item.variantPath !== variantPath) return true
+      return false
+    })
+
+    if (this.items.length !== initialLength) {
       this.cachedSubtotal = null
       this.notifyIfChanged()
     }
@@ -240,8 +317,8 @@ export class CartService extends NotifiableService {
    * Clears all items from the cart.
    */
   clear(notify = true): void {
-    if (this.items.size > 0) {
-      this.items.clear()
+    if (this.items.length > 0) {
+      this.items = []
       this.cachedSubtotal = null
       if (notify) {
         this.notify()
@@ -256,12 +333,12 @@ export class CartService extends NotifiableService {
    */
   getSubtotal(withCurrentItem = true): number {
     if (this.cachedSubtotal === null) {
-      this.cachedSubtotal = Array.from(this.items.values()).reduce((sum, item) => {
+      this.cachedSubtotal = this.items.reduce((sum, item) => {
         return sum + this.getItemTotal(item)
       }, 0)
     }
 
-    if (withCurrentItem && this.currentItem && !this.has(this.currentItem.product.id)) {
+    if (withCurrentItem && this.currentItem && !this.hasItem(this.currentItem)) {
       return this.cachedSubtotal + this.getItemTotal(this.currentItem)
     }
 
@@ -334,20 +411,20 @@ export class CartService extends NotifiableService {
 
   /**
    * Updates the offer for a specific cart item
-   * @param itemId - The ID of the item to update
+   * @param item - The item to update
    * @param offer - The offer to apply, or undefined to remove the offer
    */
-  updateItemOffer(itemId: string, offer?: ProductOffer): void {
-    const item = this.items.get(itemId)
-    if (!item) return
+  updateItemOffer(item: CartItem, offer?: ProductOffer): void {
+    const existingItem = this.findItem(item)
+    if (!existingItem) return
 
-    const updatedItem = { ...item, offer }
+    const updatedItem = { ...existingItem, offer }
     // If applying an offer, ensure quantity is within limits
     if (offer) {
-      updatedItem.quantity = this.clampQuantityToOfferLimits(offer, item.quantity)
+      updatedItem.quantity = this.clampQuantityToOfferLimits(offer, existingItem.quantity)
     }
 
-    this.updateItem(itemId, updatedItem)
+    this.updateItem(item, updatedItem)
     this.cachedSubtotal = null
     this.notifyIfChanged()
   }
@@ -481,7 +558,7 @@ export class CartService extends NotifiableService {
    */
   getShippingPrice(): number {
     // if at least one item have freeShipping offer return 0
-    for (const item of this.items.values()) {
+    for (const item of this.items) {
       if (item.offer?.freeShipping) return 0
     }
 
@@ -553,7 +630,7 @@ export class CartService extends NotifiableService {
    * @returns An array of cart items.
    */
   getAll(): CartItem[] {
-    return Array.from(this.items.values())
+    return [...this.items] // Return a copy to prevent external modification
   }
 
   /**
@@ -561,7 +638,7 @@ export class CartService extends NotifiableService {
    * @returns True if the cart is empty, otherwise false.
    */
   isEmpty(): boolean {
-    return this.items.size === 0
+    return this.items.length === 0
   }
 
   /**

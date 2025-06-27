@@ -5,7 +5,7 @@ import {
   ShippingMethodStatus,
   ShippingMethodPolicy,
 } from '../../src/core/entities/shipping_method.js'
-import { CartService } from '../../src/feeef/services/cart.js'
+import { CartItem, CartService } from '../../src/feeef/services/cart.js'
 
 test.group('CartService', () => {
   test('add new item to cart', (ctx) => {
@@ -123,8 +123,13 @@ test.group('CartService', () => {
       blockedAt: null,
     }
 
-    cart.add({ product, quantity: 2 })
-    cart.remove(product.id)
+    const item: CartItem = {
+      product,
+      quantity: 1,
+    }
+
+    cart.add(item)
+    cart.remove(item)
 
     assert.equal(cart.getAll().length, 0)
   })
