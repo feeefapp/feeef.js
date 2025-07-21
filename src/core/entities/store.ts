@@ -2,7 +2,7 @@ import { EmbaddedAddress } from '../embadded/address.js'
 import { EmbaddedCategory } from '../embadded/category.js'
 import { EmbaddedContact } from '../embadded/contact.js'
 import { OrderEntity } from './order.js'
-import { MetaPixelEvent } from './product.js'
+import { MetaPixelEvent, TiktokPixelEvent } from './product.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
 import { UserEntity } from './user.js'
@@ -101,6 +101,8 @@ export const generatePublicStoreIntegrationTiktokPixel = (
       id: pixel.id,
     })),
     active: tiktokPixel.active,
+    objective: tiktokPixel.objective,
+    draftObjective: tiktokPixel.draftObjective,
   }
 }
 export const generatePublicStoreIntegrationGoogleAnalytics = (
@@ -195,6 +197,8 @@ export interface PublicMetaPixelIntegration {
 export interface PublicTiktokPixelIntegration {
   pixels: { id: string }[]
   active: boolean
+  objective?: TiktokPixelEvent | null
+  draftObjective?: TiktokPixelEvent | null
 }
 export interface PublicGoogleAnalyticsIntegration {
   id: string
@@ -302,8 +306,9 @@ export interface MetaPixel {
 }
 // tiktok pixel
 export interface TiktokPixel {
+  name?: string
   id: string
-  key?: string
+  accessToken?: string
 }
 // meta pixel integration
 export interface MetaPixelIntegration {
@@ -318,6 +323,8 @@ export interface MetaPixelIntegration {
 export interface TiktokPixelIntegration {
   id: string
   pixels: TiktokPixel[]
+  objective?: TiktokPixelEvent | null
+  draftObjective?: TiktokPixelEvent | null
   active: boolean
   metadata: Record<string, any>
 }

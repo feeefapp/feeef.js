@@ -101,10 +101,14 @@ export function generatePublicIntegrationsDataMetaPixel(
 // function that generate public data from the tiktok pixel data
 export function generatePublicIntegrationsDataTiktokPixel(
   data: TiktokPixelData | null | undefined
-): PubllicTiktokPixelData | null | undefined {
+): PublicTiktokPixelData | null | undefined {
   if (!data) return data
-  // const { ids, objective, draftObjective } = data
-  return {}
+  const { ids, objective, draftObjective } = data
+  return {
+    ids: ids,
+    objective,
+    draftObjective,
+  }
 }
 // function that generate public data from the google analytics data
 export function generatePublicIntegrationsDataGoogleAnalytics(
@@ -153,7 +157,18 @@ export interface MetaPixelData {
   draftObjective: MetaPixelEvent | null
 }
 
-export enum TiktokPixelEvent {}
+export enum TiktokPixelEvent {
+  none = 'none',
+  viewContent = 'ViewContent',
+  addToWishlist = 'AddToWishlist',
+  search = 'Search',
+  addPaymentInfo = 'AddPaymentInfo',
+  addToCart = 'AddToCart',
+  initiateCheckout = 'InitiateCheckout',
+  placeAnOrder = 'PlaceAnOrder',
+  completeRegistration = 'CompleteRegistration',
+  purchase = 'Purchase',
+}
 export interface TiktokPixelData {
   // active tiktok pixel ids
   ids: string[] | null
@@ -185,7 +200,11 @@ export interface PublicMetaPixelData {
   draftObjective: MetaPixelEvent | null
 }
 // public tiktok pixel data
-export interface PubllicTiktokPixelData {}
+export interface PublicTiktokPixelData {
+  ids: string[] | null
+  objective: TiktokPixelEvent | null
+  draftObjective: TiktokPixelEvent | null
+}
 // public google analytics data
 export interface PublicGoogleAnalyticsData {}
 // public google tag data
