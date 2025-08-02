@@ -39,6 +39,24 @@ export interface GuestOrderItemSchema {
 }
 
 /**
+ * Schema for assigning a single order to a member
+ */
+export interface AssignOrderSchema {
+  orderId: string
+  memberId: string
+  storeId: string
+}
+
+/**
+ * Schema for assigning multiple orders to a member
+ */
+export interface AssignManyOrdersSchema {
+  orderIds: string[]
+  memberId: string
+  storeId: string
+}
+
+/**
  * Represents a repository for managing orders.
  */
 export class OrderRepository extends ModelRepository<OrderEntity, any, any> {
@@ -76,6 +94,26 @@ export class OrderRepository extends ModelRepository<OrderEntity, any, any> {
         ...params,
       },
     })
+    return res.data
+  }
+
+  /**
+   * Assigns a single order to a member (as confirmer)
+   * @param data - The data containing orderId, memberId, and storeId
+   * @returns A Promise that resolves to the updated OrderEntity
+   */
+  async assign(data: AssignOrderSchema): Promise<OrderEntity> {
+    const res = await this.client.post(`/${this.resource}/assign`, data)
+    return res.data
+  }
+
+  /**
+   * Assigns multiple orders to a member (as confirmer)
+   * @param data - The data containing orderIds, memberId, and storeId
+   * @returns A Promise that resolves to a success message
+   */
+  async assignMany(data: AssignManyOrdersSchema): Promise<{ message: string }> {
+    const res = await this.client.post(`/${this.resource}/assignMany`, data)
     return res.data
   }
 }
