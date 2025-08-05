@@ -21,6 +21,7 @@ export interface SendOrderSchema {
   shippingState?: string // State for shipping (optional)
   shippingType: ShippingType // Shipping type (required)
   shippingMethodId?: string // ID of the shipping method (optional)
+  shippingNote?: string // Note for shipping (optional)
   paymentMethodId?: string // ID of the payment method (optional)
   items: GuestOrderItemSchema[] // Array of order items, must have at least one item
   coupon?: string // Applied coupon code (optional)
