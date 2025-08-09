@@ -58,6 +58,7 @@ export interface OrderEntity {
   status: OrderStatus
   paymentStatus: PaymentStatus
   deliveryStatus: DeliveryStatus
+  customStatus?: string | null
   tags: string[] | null
   createdAt: any
   updatedAt: any

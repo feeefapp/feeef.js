@@ -1,7 +1,7 @@
 import { EmbaddedAddress } from '../embadded/address.js'
 import { EmbaddedCategory } from '../embadded/category.js'
 import { EmbaddedContact } from '../embadded/contact.js'
-import { OrderEntity } from './order.js'
+import { OrderEntity, OrderStatus, DeliveryStatus, PaymentStatus } from './order.js'
 import { MetaPixelEvent, TiktokPixelEvent } from './product.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
@@ -243,6 +243,26 @@ export interface StoreMember {
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
   defaultCurrency: number
+  customStatusMappings?: CustomStatusMapping[]
+  /** Feature flag to enable custom statuses across the app */
+  customStatusEnabled?: boolean
+}
+
+export interface CustomStatusMapping {
+  /** The custom status name (e.g., "not_respond", "phone_closed_1") */
+  name: string
+  /** Auto-generated code based on name if not provided (e.g., "not_respond" -> "not_respond") */
+  code?: string
+  /** Optional color for UI display (hex color as number) */
+  color?: number
+  /** Whether this custom status is enabled and should be shown in UI */
+  enabled?: boolean
+  /** Status to map to (null means no change) */
+  status?: OrderStatus | null
+  /** Delivery status to map to (null means no change) */
+  deliveryStatus?: DeliveryStatus | null
+  /** Payment status to map to (null means no change) */
+  paymentStatus?: PaymentStatus | null
 }
 
 export interface StoreCurrencyConfig {
