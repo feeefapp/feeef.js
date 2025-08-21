@@ -96,6 +96,8 @@ export class FeeeF {
     // if is 0 or false, disable cache
     // if (cacheParam == '0') {
     this.client = client || axios
+    // set the api key
+    this.client.defaults.headers.common['Authorization'] = `Bearer ${this.apiKey}`
     // } else {
     //   this.client = setupCache(client || axios, {
     //     ttl: cache === false ? 5 : Math.max(cache!, 5) || 1 * 60 * 1000, // 1 minute by default
