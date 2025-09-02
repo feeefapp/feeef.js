@@ -68,13 +68,15 @@ export const generatePublicStoreIntegrations = (
   integrations: StoreIntegrations | null | undefined
 ): PublicStoreIntegrations | null => {
   if (!integrations) return null
-  const { metaPixel, tiktokPixel, googleAnalytics, googleTags, orderdz, webhooks } = integrations
+  const { metaPixel, tiktokPixel, googleAnalytics, googleTags, orderdz, webhooks, ai } =
+    integrations
   return {
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
     tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
     googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
     googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
     googleSheet: null,
+    ai: generatePublicStoreIntegrationAi(ai) || null,
     orderdz: generatePublicStoreIntegrationOrderdz(orderdz) || null,
     webhooks: generatePublicStoreIntegrationWebhooks(webhooks) || null,
   }
@@ -128,6 +130,21 @@ export const generatePublicStoreIntegrationGoogleTags = (
   return {
     id,
     active,
+  }
+}
+
+/**
+ * Generates public AI integration data from private integration data.
+ * Only exposes non-sensitive information, keeping the API key private for security.
+ */
+export const generatePublicStoreIntegrationAi = (
+  ai: AiIntegration | null | undefined
+): PublicAiIntegration | null | undefined => {
+  if (!ai) return null
+  return {
+    active: ai.active,
+    textModel: ai.textModel,
+    imageModel: ai.imageModel,
   }
 }
 
@@ -213,12 +230,19 @@ export interface PublicGoogleTagsIntegration {
   active: boolean
 }
 
+export interface PublicAiIntegration {
+  active: boolean
+  textModel: string
+  imageModel: string
+}
+
 export interface PublicStoreIntegrations {
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
   googleAnalytics: PublicGoogleAnalyticsIntegration | null
   googleSheet: PublicGoogleSheetsIntegration | null
   googleTags: PublicGoogleTagsIntegration | null
+  ai: PublicAiIntegration | null
   orderdz: PublicOrderdzIntegration | null
   webhooks: PublicWebhooksIntegration | null
 }
@@ -386,6 +410,17 @@ export interface GoogleTagsIntegration {
 }
 
 /**
+ * AI integration configuration for Google AI Studio.
+ */
+export interface AiIntegration {
+  active: boolean
+  apiKey?: string
+  textModel: string
+  imageModel: string
+  metadata: Record<string, any>
+}
+
+/**
  * OrderDZ integration configuration for order confirmation service.
  * This integration allows automatic order confirmation via OrderDZ API.
  */
@@ -458,6 +493,7 @@ export interface StoreIntegrations {
   googleAnalytics?: GoogleAnalyticsIntegration
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration
+  ai?: AiIntegration
   orderdz?: OrderdzIntegration
   webhooks?: WebhooksIntegration
 
