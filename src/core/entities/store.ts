@@ -267,6 +267,8 @@ export interface StoreMember {
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
   defaultCurrency: number
+  languages?: StoreLanguageConfig[]
+  defaultLanguage?: string
   customStatusMappings?: CustomStatusMapping[]
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
@@ -294,6 +296,13 @@ export interface StoreCurrencyConfig {
   symbol: string
   precision: number
   rate: number
+}
+
+export interface StoreLanguageConfig {
+  code: string
+  name: string
+  nativeName: string
+  rtl?: boolean
 }
 
 export interface StoreDomain {
