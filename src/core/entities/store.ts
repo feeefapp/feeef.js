@@ -447,6 +447,23 @@ export interface OrderdzIntegration {
 }
 
 /**
+ * Ecomanager integration configuration for delivery management.
+ * This integration allows order management and tracking via Ecomanager API.
+ */
+export interface EcomanagerIntegration {
+  /** Unique identifier for this integration instance */
+  id: string
+  /** Base URL for Ecomanager instance (e.g., "https://feeef.ecomanager.dz") */
+  baseUrl: string
+  /** API authentication token */
+  token: string
+  /** Whether this integration is currently active */
+  active: boolean
+  /** Additional metadata for the integration */
+  metadata: Record<string, any>
+}
+
+/**
  * Webhook event types for order lifecycle
  */
 export enum WebhookEvent {
@@ -511,6 +528,8 @@ export interface StoreIntegrations {
   yalidine?: any
   maystroDelivery?: any
   echotrak?: any
+  ecotrack?: any
+  ecomanager?: EcomanagerIntegration
   procolis?: any
   noest?: any
 }
