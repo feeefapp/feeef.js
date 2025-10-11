@@ -442,6 +442,8 @@ export interface OrderdzIntegration {
   token: string
   /** Whether this integration is currently active */
   active: boolean
+  /** Whether to automatically send orders when they are marked as sent */
+  autoSend?: boolean
   /** Additional metadata for the integration */
   metadata: Record<string, any>
 }
@@ -451,16 +453,11 @@ export interface OrderdzIntegration {
  * This integration allows order management and tracking via Ecomanager API.
  */
 export interface EcomanagerIntegration {
-  /** Unique identifier for this integration instance */
-  id: string
-  /** Base URL for Ecomanager instance (e.g., "https://feeef.ecomanager.dz") */
-  baseUrl: string
-  /** API authentication token */
-  token: string
-  /** Whether this integration is currently active */
   active: boolean
-  /** Additional metadata for the integration */
-  metadata: Record<string, any>
+  baseUrl: string
+  token: string
+  autoSend?: boolean
+  metadata?: Record<string, any>
 }
 
 /**
