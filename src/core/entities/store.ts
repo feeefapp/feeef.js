@@ -461,6 +461,25 @@ export interface EcomanagerIntegration {
 }
 
 /**
+ * Zimou Express integration configuration for delivery management.
+ * This integration allows order management and tracking via Zimou Express API.
+ */
+export interface ZimouIntegration {
+  /** Unique identifier for this integration instance */
+  id: string
+  /** API authentication key for Zimou Express */
+  apiKey: string
+  /** Whether this integration is currently active */
+  active: boolean
+  /** Whether to send orders directly without confirmation dialog */
+  silentMode?: boolean
+  /** Whether to automatically send orders when they are marked as sent */
+  autoSend?: boolean
+  /** Additional metadata for the integration */
+  metadata?: Record<string, any>
+}
+
+/**
  * Webhook event types for order lifecycle
  */
 export enum WebhookEvent {
@@ -529,6 +548,7 @@ export interface StoreIntegrations {
   ecomanager?: EcomanagerIntegration
   procolis?: any
   noest?: any
+  zimou?: ZimouIntegration
 }
 
 export enum StoreSubscriptionStatus {

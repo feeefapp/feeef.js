@@ -116,4 +116,19 @@ export class FeeeF {
     // cart
     this.cart = new CartService()
   }
+
+  /**
+   * set header method to set custom headers for all requests
+   */
+  setHeader(key: string, value: string) {
+    this.client.defaults.headers.common[key] = value
+  }
+
+  /**
+   * Removes a header from the default headers.
+   * @param {string} key - The key of the header to remove.
+   */
+  removeHeader(key: string) {
+    delete this.client.defaults.headers.common[key]
+  }
 }
