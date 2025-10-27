@@ -35,6 +35,7 @@ export interface OrderEntity {
   customerName?: string | null
   customerPhone: string
   customerEmail?: string | null
+  customerNote?: string | null
   customerIp?: string | null
   shippingAddress?: string | null
   shippingCity?: string | null
@@ -53,6 +54,7 @@ export interface OrderEntity {
   couponCode?: string | null
   couponDiscount?: string | null
   storeId: string
+  source: string | null
   confirmerId: string | null
   metadata: OrderMetadata
   status: OrderStatus
