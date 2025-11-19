@@ -68,7 +68,7 @@ export const generatePublicStoreIntegrations = (
   integrations: StoreIntegrations | null | undefined
 ): PublicStoreIntegrations | null => {
   if (!integrations) return null
-  const { metaPixel, tiktokPixel, googleAnalytics, googleTags, orderdz, webhooks, ai } =
+  const { metaPixel, tiktokPixel, googleAnalytics, googleTags, orderdz, webhooks, ai, security } =
     integrations
   return {
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
@@ -79,6 +79,7 @@ export const generatePublicStoreIntegrations = (
     ai: generatePublicStoreIntegrationAi(ai) || null,
     orderdz: generatePublicStoreIntegrationOrderdz(orderdz) || null,
     webhooks: generatePublicStoreIntegrationWebhooks(webhooks) || null,
+    security: generatePublicStoreIntegrationSecurity(security) || null,
   }
 }
 export const generatePublicStoreIntegrationMetaPixel = (
@@ -180,6 +181,24 @@ export const generatePublicStoreIntegrationWebhooks = (
     webhookUrls: activeWebhooks.map((webhook) => webhook.url),
   }
 }
+/**
+ * Generates public security integration data from private integration data.
+ * Only exposes non-sensitive information, keeping backend protection details private for security.
+ */
+export const generatePublicStoreIntegrationSecurity = (
+  security: SecurityIntegration | null | undefined
+): PublicSecurityIntegration | null | undefined => {
+  if (!security) return null
+
+  return {
+    orders: security.orders
+      ? {
+          frontend: security.orders.frontend,
+        }
+      : undefined,
+    active: security.active,
+  }
+}
 
 /**
  * Public interface for OrderDZ integration.
@@ -245,6 +264,7 @@ export interface PublicStoreIntegrations {
   ai: PublicAiIntegration | null
   orderdz: PublicOrderdzIntegration | null
   webhooks: PublicWebhooksIntegration | null
+  security: PublicSecurityIntegration | null
 }
 
 export enum StoreMemberRole {
@@ -479,6 +499,40 @@ export interface ZimouIntegration {
   metadata?: Record<string, any>
 }
 
+export interface SecurityIntegrationOrdersProtection {
+  frontend: {
+    active: boolean
+  }
+  backend: {
+    active: boolean
+    phoneTtl: number
+    ipTtl: number
+    blockDirectOrders: boolean
+    adsOnlyMode: boolean
+  }
+}
+export interface PublicSecurityIntegrationOrdersProtection {
+  frontend: {
+    active: boolean
+  }
+}
+export interface SecurityIntegration {
+  orders?: SecurityIntegrationOrdersProtection
+
+  /** Whether this integration is currently active */
+  active: boolean
+  /** Additional metadata for the integration */
+  metadata?: Record<string, any>
+}
+export interface PublicSecurityIntegration {
+  orders?: PublicSecurityIntegrationOrdersProtection
+
+  /** Whether this integration is currently active */
+  active: boolean
+  /** Additional metadata for the integration */
+  metadata?: Record<string, any>
+}
+
 /**
  * Webhook event types for order lifecycle
  */
@@ -549,6 +603,8 @@ export interface StoreIntegrations {
   procolis?: any
   noest?: any
   zimou?: ZimouIntegration
+
+  security?: SecurityIntegration
 }
 
 export enum StoreSubscriptionStatus {
