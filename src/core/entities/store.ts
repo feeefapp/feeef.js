@@ -191,6 +191,7 @@ export const generatePublicStoreIntegrationSecurity = (
   if (!security) return null
 
   return {
+    key: '[none]',
     orders: security.orders
       ? {
           frontend: security.orders.frontend,
@@ -525,6 +526,7 @@ export interface SecurityIntegration {
   metadata?: Record<string, any>
 }
 export interface PublicSecurityIntegration {
+  key?: string | null
   orders?: PublicSecurityIntegrationOrdersProtection
 
   /** Whether this integration is currently active */
