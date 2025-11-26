@@ -6,6 +6,7 @@ import { MetaPixelEvent, TiktokPixelEvent } from './product.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
 import { UserEntity } from './user.js'
+import { CategoryEntity } from './category.js'
 import { DateTime } from 'luxon'
 
 export interface StoreEntity {
@@ -22,6 +23,7 @@ export interface StoreEntity {
   ondarkLogoUrl: string | null
   userId: string
   categories: EmbaddedCategory[]
+  categoriesRelation?: CategoryEntity[]
   title: string | null
   description: string | null
   addresses: EmbaddedAddress[]

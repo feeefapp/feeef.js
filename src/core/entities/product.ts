@@ -1,6 +1,7 @@
 import { EmbaddedCategory } from '../embadded/category.js'
 import { ShippingMethodEntity } from './shipping_method.js'
 import { GoogleSheetsColumn, StoreEntity } from './store.js'
+import { CategoryEntity } from './category.js'
 
 export interface ProductEntity {
   id: string
@@ -19,7 +20,11 @@ export interface ProductEntity {
 
   shippingMethodId?: string | null
 
+  categoryId?: string | null
+
   category?: EmbaddedCategory | null
+
+  categoryRelation?: CategoryEntity | null
 
   title: string | null
 

@@ -5,6 +5,7 @@ import { ProductRepository } from './repositories/products.js'
 import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
 import { DepositRepository } from './repositories/deposits.js'
+import { CategoryRepository } from './repositories/categories.js'
 import { CartService } from './services/cart.js'
 
 /**
@@ -75,6 +76,11 @@ export class FeeeF {
   deposits: DepositRepository
 
   /**
+   * The repository for managing categories.
+   */
+  categories: CategoryRepository
+
+  /**
    * The cart service for managing the cart.
    */
   cart: CartService
@@ -112,6 +118,7 @@ export class FeeeF {
     this.users = new UserRepository(this.client)
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
+    this.categories = new CategoryRepository(this.client)
 
     // cart
     this.cart = new CartService()
