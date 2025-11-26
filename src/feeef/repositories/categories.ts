@@ -80,3 +80,4 @@ export class CategoryRepository extends ModelRepository<
     return super.create(options)
   }
 }
+
