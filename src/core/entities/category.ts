@@ -11,14 +11,3 @@ export interface CategoryEntity {
   createdAt: any
   updatedAt: any
 }
-
-
-
-
-
-
-
-
-
-
-
