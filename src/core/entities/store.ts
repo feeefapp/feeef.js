@@ -292,6 +292,8 @@ export interface StoreConfigs {
   defaultCurrency: number
   languages?: StoreLanguageConfig[]
   defaultLanguage?: string
+  countries?: StoreCountryConfig[]
+  defaultCountry?: string
   customStatusMappings?: CustomStatusMapping[]
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
@@ -326,6 +328,12 @@ export interface StoreLanguageConfig {
   name: string
   nativeName: string
   rtl?: boolean
+}
+
+export interface StoreCountryConfig {
+  code: string
+  name: string
+  nativeName: string
 }
 
 export interface StoreDomain {
