@@ -18,6 +18,7 @@ export * from './core/embadded/contact.js'
 
 // services
 export * from './feeef/services/cart.js'
+export * from './feeef/services/actions.js'
 
 // utils
 export * from './utils.js'

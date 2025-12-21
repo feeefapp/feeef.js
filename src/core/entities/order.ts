@@ -56,6 +56,7 @@ export interface OrderEntity {
   storeId: string
   source: string | null
   confirmerId: string | null
+  customFields?: Record<string, any> | null
   metadata: OrderMetadata
   status: OrderStatus
   paymentStatus: PaymentStatus

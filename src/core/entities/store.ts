@@ -70,8 +70,17 @@ export const generatePublicStoreIntegrations = (
   integrations: StoreIntegrations | null | undefined
 ): PublicStoreIntegrations | null => {
   if (!integrations) return null
-  const { metaPixel, tiktokPixel, googleAnalytics, googleTags, orderdz, webhooks, ai, security } =
-    integrations
+  const {
+    metaPixel,
+    tiktokPixel,
+    googleAnalytics,
+    googleTags,
+    orderdz,
+    webhooks,
+    ai,
+    security,
+    customFields,
+  } = integrations
   return {
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
     tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
@@ -82,6 +91,31 @@ export const generatePublicStoreIntegrations = (
     orderdz: generatePublicStoreIntegrationOrderdz(orderdz) || null,
     webhooks: generatePublicStoreIntegrationWebhooks(webhooks) || null,
     security: generatePublicStoreIntegrationSecurity(security) || null,
+    customFields: generatePublicStoreIntegrationCustomFields(customFields) || null,
+  }
+}
+
+export const generatePublicStoreIntegrationCustomFields = (
+  customFields: any | null | undefined
+): PublicCustomFieldsIntegration | null | undefined => {
+  if (!customFields || !customFields.active) return null
+  return {
+    fields: (customFields.fields || []).map((field: any) => ({
+      id: field.id,
+      label: field.label,
+      type: field.type,
+      required: field.required,
+      multiple: field.multiple,
+      minCount: field.minCount,
+      maxCount: field.maxCount,
+      placeholder: field.placeholder,
+      helpText: field.helpText,
+      regexPattern: field.regexPattern,
+      defaultValue: field.defaultValue,
+      order: field.order,
+      active: field.active,
+    })),
+    active: customFields.active,
   }
 }
 export const generatePublicStoreIntegrationMetaPixel = (
@@ -258,6 +292,27 @@ export interface PublicAiIntegration {
   imageModel: string
 }
 
+export interface PublicCustomField {
+  id: string
+  label: string
+  type: string
+  required?: boolean
+  multiple?: boolean
+  minCount?: number
+  maxCount?: number
+  placeholder?: string
+  helpText?: string
+  regexPattern?: string
+  defaultValue?: any
+  order?: number
+  active?: boolean
+}
+
+export interface PublicCustomFieldsIntegration {
+  fields: PublicCustomField[]
+  active: boolean
+}
+
 export interface PublicStoreIntegrations {
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
@@ -268,6 +323,7 @@ export interface PublicStoreIntegrations {
   orderdz: PublicOrderdzIntegration | null
   webhooks: PublicWebhooksIntegration | null
   security: PublicSecurityIntegration | null
+  customFields: PublicCustomFieldsIntegration | null
 }
 
 export enum StoreMemberRole {

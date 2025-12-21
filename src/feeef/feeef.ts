@@ -7,6 +7,7 @@ import { UserRepository } from './repositories/users.js'
 import { DepositRepository } from './repositories/deposits.js'
 import { CategoryRepository } from './repositories/categories.js'
 import { CartService } from './services/cart.js'
+import { ActionsService } from './services/actions.js'
 
 /**
  * Configuration options for the FeeeF module.
@@ -86,6 +87,11 @@ export class FeeeF {
   cart: CartService
 
   /**
+   * The actions service for performing various actions (file uploads, etc.)
+   */
+  actions: ActionsService
+
+  /**
    * Constructs a new instance of the FeeeF class.
    * @param {FeeeFConfig} config - The configuration object.
    * @param {string} config.apiKey - The API key used for authentication.
@@ -122,6 +128,9 @@ export class FeeeF {
 
     // cart
     this.cart = new CartService()
+
+    // actions
+    this.actions = new ActionsService(this.client)
   }
 
   /**
