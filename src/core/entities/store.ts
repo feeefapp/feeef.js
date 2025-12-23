@@ -345,11 +345,11 @@ export interface StoreMember {
 
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
-  defaultCurrency: string
+  selectedCurrency: string
   languages?: StoreLanguageConfig[]
   defaultLanguage?: string
   countries?: StoreCountryConfig[]
-  defaultCountry?: string
+  selectedCountry?: string
   customStatusMappings?: CustomStatusMapping[]
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
