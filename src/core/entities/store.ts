@@ -345,7 +345,7 @@ export interface StoreMember {
 
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
-  defaultCurrency: number
+  defaultCurrency: string
   languages?: StoreLanguageConfig[]
   defaultLanguage?: string
   countries?: StoreCountryConfig[]
