@@ -9,6 +9,7 @@ import { CategoryRepository } from './repositories/categories.js'
 import { CountryRepository } from './repositories/countries.js'
 import { StateRepository } from './repositories/states.js'
 import { CityRepository } from './repositories/cities.js'
+import { CurrencyRepository } from './repositories/currencies.js'
 import { ShippingPriceRepository } from './repositories/shipping_prices.js'
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
@@ -101,6 +102,11 @@ export class FeeeF {
   cities: CityRepository
 
   /**
+   * The repository for managing currencies.
+   */
+  currencies: CurrencyRepository
+
+  /**
    * The repository for managing shipping prices.
    */
   shippingPrices: ShippingPriceRepository
@@ -152,6 +158,7 @@ export class FeeeF {
     this.countries = new CountryRepository(this.client)
     this.states = new StateRepository(this.client)
     this.cities = new CityRepository(this.client)
+    this.currencies = new CurrencyRepository(this.client)
     this.shippingPrices = new ShippingPriceRepository(this.client)
 
     // cart

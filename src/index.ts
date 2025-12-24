@@ -11,6 +11,7 @@ export * from './core/entities/category.js'
 export * from './core/entities/country.js'
 export * from './core/entities/state.js'
 export * from './core/entities/city.js'
+export * from './core/entities/currency.js'
 
 // repositories
 export * from './feeef/repositories/deposits.js'
