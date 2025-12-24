@@ -8,9 +8,13 @@ export * from './core/entities/user.js'
 export * from './core/entities/shipping_method.js'
 export * from './core/entities/shipping_price.js'
 export * from './core/entities/category.js'
+export * from './core/entities/country.js'
+export * from './core/entities/state.js'
+export * from './core/entities/city.js'
 
 // repositories
 export * from './feeef/repositories/deposits.js'
+export * from './feeef/repositories/shipping_prices.js'
 
 // embaddeds
 export * from './core/embadded/address.js'

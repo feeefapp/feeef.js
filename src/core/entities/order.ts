@@ -40,6 +40,7 @@ export interface OrderEntity {
   shippingAddress?: string | null
   shippingCity?: string | null
   shippingState?: string | null
+  shippingCountry?: string | null
   shippingMethodId?: string | null
   shippingType: ShippingType
   trackingCode: string | null

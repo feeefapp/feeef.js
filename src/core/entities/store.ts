@@ -42,6 +42,8 @@ export interface StoreEntity {
   // shippingMethods: ShippingMethodEntity[];
   defaultShippingRates: (number | null)[][] | null
 
+  shippingPriceId?: string | null
+
   // subscription
   subscription?: any
   due?: number

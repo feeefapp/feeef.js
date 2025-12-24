@@ -5,6 +5,12 @@ import {
   ShippingMethodPolicy,
   ShippingMethodStatus,
 } from '../../core/entities/shipping_method.js'
+import {
+  ShippingPriceEntity,
+  ShippingPriceType,
+  getShippingPrice as getShippingPriceHelper,
+  getAvailableShippingTypes as getAvailableShippingTypesHelper,
+} from '../../core/entities/shipping_price.js'
 import { StoreEntity } from '../../core/entities/store.js'
 import { NotifiableService } from './service.js'
 
@@ -46,6 +52,8 @@ export interface CartShippingAddress {
 export class CartService extends NotifiableService {
   private items: CartItem[] = [] // Array to support multiple items with same product but different variants
   private shippingMethod: ShippingMethodEntity | null = null
+  private shippingPrice: ShippingPriceEntity | null = null // New shipping price system
+  private store: StoreEntity | null = null // Store entity for accessing shippingPriceId
   private shippingAddress: CartShippingAddress = {
     name: null,
     phone: null,
@@ -460,6 +468,7 @@ export class CartService extends NotifiableService {
       : null
 
     if (store) {
+      this.store = store
       this.shippingMethod = {
         id: store.id,
         name: store.name,
@@ -492,29 +501,303 @@ export class CartService extends NotifiableService {
     }
   }
 
-  // getAvailableShippingTypes
   /**
-   * Retrieves the available shipping types for the current shipping method.
+   * Sets the shipping price (new system).
+   * @param shippingPrice - The shipping price entity.
+   * @param notify - Whether to notify listeners.
+   */
+  setShippingPrice(shippingPrice: ShippingPriceEntity | null, notify = true): void {
+    this.shippingPrice = shippingPrice
+    if (notify) {
+      this.notify()
+    }
+  }
+
+  /**
+   * Sets the store entity.
+   * @param store - The store entity.
+   * @param notify - Whether to notify listeners.
+   */
+  setStore(store: StoreEntity | null, notify = true): void {
+    this.store = store
+    if (notify) {
+      this.notify()
+    }
+  }
+
+  /**
+   * Maps ShippingType enum to ShippingPriceType string.
+   * @param shippingType - The shipping type enum.
+   * @returns The corresponding shipping price type.
+   */
+  private mapShippingTypeToPriceType(shippingType: ShippingType): ShippingPriceType {
+    switch (shippingType) {
+      case ShippingType.home:
+        return 'home'
+      case ShippingType.pickup:
+        return 'pickup'
+      case ShippingType.store:
+        return 'desk'
+      default:
+        return 'home'
+    }
+  }
+
+  /**
+   * Resolves shipping price using the priority chain.
+   * Priority: 1. Product shippingPriceId, 2. Store shippingPriceId, 3. Product shippingMethodId, 4. Store defaultShippingRates
    *
-   *   rates is a 2D array for example `[[10, 20, 30], [5, 10, 15]]`
-   *   where the first array is for `home` fees and the second is for `pickup` fees, and the third is for `store` fees
-   *   if the fee value is 0, then it's free shipping, and if it's null, then it's not available
+   * Note: Shipping prices must be loaded and set via setShippingPrice() for the new system to work.
+   * If shipping prices are not loaded, the method falls back to the legacy system.
+   *
+   * @param countryCode - ISO 3166-1 alpha-2 country code (optional, required for new system)
+   * @param stateCode - State/province code
+   * @param shippingType - The shipping type
+   * @returns The shipping price or null if not available
+   */
+  private resolveShippingPrice(
+    countryCode: string | undefined,
+    stateCode: string,
+    shippingType: ShippingType
+  ): number | null {
+    if (!stateCode) return null
+
+    const priceType = this.mapShippingTypeToPriceType(shippingType)
+
+    // Collect all products (items + currentItem if not in items)
+    const allProducts = [...this.items]
+    if (this.currentItem && !this.hasItem(this.currentItem)) {
+      allProducts.push(this.currentItem)
+    }
+
+    console.log('[resolveShippingPrice]', {
+      countryCode,
+      stateCode,
+      shippingType,
+      priceType,
+      hasShippingPrice: !!this.shippingPrice,
+      shippingPriceId: this.shippingPrice?.id,
+      allProductsCount: allProducts.length,
+    })
+
+    // 1. Try product-specific ShippingPrice (new system) - HIGHEST PRIORITY
+    // Check if all products have the same shippingPriceId
+    if (countryCode && this.shippingPrice) {
+      const productShippingPriceIds = allProducts
+        .map((item) => item.product.shippingPriceId)
+        .filter((id): id is string => id !== null)
+
+      console.log('[resolveShippingPrice] Product shippingPriceIds:', productShippingPriceIds)
+
+      if (productShippingPriceIds.length > 0) {
+        // Check if all products have the same shippingPriceId
+        const uniqueIds = new Set(productShippingPriceIds)
+        if (uniqueIds.size === 1 && this.shippingPrice.id === productShippingPriceIds[0]) {
+          console.log(
+            '[resolveShippingPrice] Using product shippingPriceId:',
+            productShippingPriceIds[0]
+          )
+          const price = getShippingPriceHelper(
+            this.shippingPrice.prices,
+            countryCode,
+            stateCode,
+            priceType
+          )
+          console.log('[resolveShippingPrice] Product price result:', price)
+          if (price !== null) {
+            return price
+          }
+          // If product has shippingPriceId but no rate for this location, fall through
+        }
+      }
+    }
+
+    // 2. Try store shippingPriceId (new system)
+    if (
+      countryCode &&
+      this.store?.shippingPriceId &&
+      this.shippingPrice &&
+      this.shippingPrice.id === this.store.shippingPriceId
+    ) {
+      console.log('[resolveShippingPrice] Using store shippingPriceId:', this.store.shippingPriceId)
+      const price = getShippingPriceHelper(
+        this.shippingPrice.prices,
+        countryCode,
+        stateCode,
+        priceType
+      )
+      console.log('[resolveShippingPrice] Store price result:', price)
+      if (price !== null) {
+        return price
+      }
+      // If store has shippingPriceId but no rate for this location, fall through
+    }
+
+    // 3. Try product-specific ShippingMethod (legacy)
+    // Check if all products have the same shippingMethodId
+    const productShippingMethodIds = allProducts
+      .map((item) => item.product.shippingMethodId)
+      .filter((id): id is string => id !== null)
+
+    if (productShippingMethodIds.length > 0) {
+      const uniqueIds = new Set(productShippingMethodIds)
+      if (
+        uniqueIds.size === 1 &&
+        this.shippingMethod &&
+        this.shippingMethod.id === productShippingMethodIds[0]
+      ) {
+        const legacyPrice = this.getShippingPriceForTypeLegacy(shippingType)
+        if (legacyPrice !== null) {
+          return legacyPrice
+        }
+      }
+    }
+
+    // 4. Fall back to store.defaultShippingRates (legacy)
+    if (this.shippingMethod?.rates) {
+      console.log('[resolveShippingPrice] Falling back to legacy system')
+      const legacyPrice = this.getShippingPriceForTypeLegacy(shippingType)
+      console.log('[resolveShippingPrice] Legacy price result:', legacyPrice)
+      return legacyPrice
+    }
+
+    console.log('[resolveShippingPrice] No shipping price found, returning null')
+    return null
+  }
+
+  /**
+   * Gets shipping price using legacy system (array-based rates).
+   * @param type - The shipping type
+   * @returns The shipping price or null if not available
+   */
+  private getShippingPriceForTypeLegacy(type: ShippingType): number | null {
+    if (!this.shippingMethod?.rates || !this.shippingAddress.state) return null
+
+    const stateIndex = Number.parseInt(this.shippingAddress.state, 10) - 1
+    const rates = this.shippingMethod.rates[stateIndex]
+
+    if (!rates) return null
+
+    switch (type) {
+      case ShippingType.pickup:
+        return rates[0]
+      case ShippingType.home:
+        return rates[1]
+      case ShippingType.store:
+        return rates[2]
+      default:
+        return null
+    }
+  }
+
+  /**
+   * Retrieves the available shipping types using the priority chain.
+   * Priority: 1. Product shippingPriceId, 2. Store shippingPriceId, 3. Product shippingMethodId, 4. Store defaultShippingRates
+   *
+   * Note: Shipping prices must be loaded and set via setShippingPrice() for the new system to work.
+   * If shipping prices are not loaded, the method falls back to the legacy system.
    *
    * @returns An array of available shipping types.
    */
   getAvailableShippingTypes(): ShippingType[] {
+    if (!this.shippingAddress.state) return []
+
+    // Get country code from shipping address first, then store config
+    // If shippingAddress.country is 'dz' (lowercase), it means legacy system
+    let countryCode: string | undefined
+    if (this.shippingAddress.country && this.shippingAddress.country.toLowerCase() !== 'dz') {
+      countryCode = this.shippingAddress.country.toUpperCase()
+    } else if (this.store?.configs?.selectedCountry) {
+      countryCode = this.store.configs.selectedCountry.toUpperCase()
+    } else {
+      // No country configured - use legacy system
+      countryCode = undefined
+    }
+
+    // Collect all products (items + currentItem if not in items)
+    const allProducts = [...this.items]
+    if (this.currentItem && !this.hasItem(this.currentItem)) {
+      allProducts.push(this.currentItem)
+    }
+
+    // 1. Try product-specific ShippingPrice (new system) - only if countryCode is available
+    if (countryCode && this.shippingPrice) {
+      const productShippingPriceIds = allProducts
+        .map((item) => item.product.shippingPriceId)
+        .filter((id): id is string => id !== null)
+
+      if (productShippingPriceIds.length > 0) {
+        const uniqueIds = new Set(productShippingPriceIds)
+        if (uniqueIds.size === 1 && this.shippingPrice.id === productShippingPriceIds[0]) {
+          const available = getAvailableShippingTypesHelper(
+            this.shippingPrice.prices,
+            countryCode,
+            this.shippingAddress.state
+          )
+          if (available.length > 0) {
+            return available.map((a) => {
+              switch (a.type) {
+                case 'home':
+                  return ShippingType.home
+                case 'pickup':
+                  return ShippingType.pickup
+                case 'desk':
+                  return ShippingType.store
+                default:
+                  return ShippingType.home
+              }
+            })
+          }
+          // If product has shippingPriceId but no rate for this location, fall through
+        }
+      }
+    }
+
+    // 2. Try store shippingPriceId (new system) - only if countryCode is available
+    if (
+      countryCode &&
+      this.store?.shippingPriceId &&
+      this.shippingPrice &&
+      this.shippingPrice.id === this.store.shippingPriceId
+    ) {
+      const available = getAvailableShippingTypesHelper(
+        this.shippingPrice.prices,
+        countryCode,
+        this.shippingAddress.state
+      )
+      if (available.length > 0) {
+        return available.map((a) => {
+          switch (a.type) {
+            case 'home':
+              return ShippingType.home
+            case 'pickup':
+              return ShippingType.pickup
+            case 'desk':
+              return ShippingType.store
+            default:
+              return ShippingType.home
+          }
+        })
+      }
+      // If store has shippingPriceId but no rate for this location, fall through
+    }
+
+    // 3. Fall back to legacy system
     if (!this.shippingMethod?.rates) return []
 
-    var state = Number.parseInt(this.shippingAddress.state!)
-    var stateRates = this.shippingMethod.rates[state - 1]
+    const state = Number.parseInt(this.shippingAddress.state, 10)
+    const stateRates = this.shippingMethod.rates[state - 1]
 
     if (!stateRates) return []
 
-    var availableTypes: ShippingType[] = []
+    const availableTypes: ShippingType[] = []
 
-    if (stateRates[0] || stateRates[0] === 0) availableTypes.push(ShippingType.pickup)
-    if (stateRates[1] || stateRates[1] === 0) availableTypes.push(ShippingType.home)
-    if (stateRates[2] || stateRates[2] === 0) availableTypes.push(ShippingType.store)
+    if (stateRates[0] !== null && stateRates[0] !== undefined)
+      availableTypes.push(ShippingType.pickup)
+    if (stateRates[1] !== null && stateRates[1] !== undefined)
+      availableTypes.push(ShippingType.home)
+    if (stateRates[2] !== null && stateRates[2] !== undefined)
+      availableTypes.push(ShippingType.store)
 
     return availableTypes
   }
@@ -557,8 +840,14 @@ export class CartService extends NotifiableService {
    * @returns The shipping price or 0 if not applicable.
    */
   getShippingPrice(): number {
+    // Collect all items (items + currentItem if not in items)
+    const allItems = [...this.items]
+    if (this.currentItem && !this.hasItem(this.currentItem)) {
+      allItems.push(this.currentItem)
+    }
+
     // if at least one item have freeShipping offer return 0
-    for (const item of this.items) {
+    for (const item of allItems) {
       if (item.offer?.freeShipping) return 0
     }
 
@@ -572,13 +861,14 @@ export class CartService extends NotifiableService {
     const shippings = this.getAvailableShippingTypes()
 
     const currentOne = this.getShippingPriceForType(this.shippingAddress.type)
-    if (currentOne) {
+    if (currentOne !== null) {
       return currentOne
     }
 
     for (const type of shippings) {
-      if (this.getShippingPriceForType(type) !== null) {
-        return this.getShippingPriceForType(type)!
+      const price = this.getShippingPriceForType(type)
+      if (price !== null) {
+        return price
       }
     }
 
@@ -586,28 +876,58 @@ export class CartService extends NotifiableService {
   }
 
   /**
-   * Gets the shipping price for a specific shipping type using the current shipping address state.
+   * Gets the shipping price for a specific shipping type using the priority chain.
+   * Priority: 1. Product shippingPriceId, 2. Store shippingPriceId, 3. Product shippingMethodId, 4. Store defaultShippingRates
    * @param type - The shipping type to check (pickup, home, store)
    * @returns The shipping price for the specified type, or null if not available
    */
   getShippingPriceForType(type: ShippingType): number | null {
-    if (!this.shippingMethod?.rates || !this.shippingAddress.state) return null
-
-    const stateIndex = Number.parseInt(this.shippingAddress.state, 10) - 1
-    const rates = this.shippingMethod.rates[stateIndex]
-
-    if (!rates) return null
-
-    switch (type) {
-      case ShippingType.pickup:
-        return rates[0]
-      case ShippingType.home:
-        return rates[1]
-      case ShippingType.store:
-        return rates[2]
-      default:
-        return null
+    if (!this.shippingAddress.state) {
+      console.log('[getShippingPriceForType] No state, returning null')
+      return null
     }
+
+    // Get country code from shipping address first, then store config, then default to 'DZ'
+    // Convert to uppercase to match shipping price data format
+    // If shippingAddress.country is 'dz' (lowercase), it means legacy system
+    let countryCode: string | undefined
+    if (this.shippingAddress.country && this.shippingAddress.country.toLowerCase() !== 'dz') {
+      countryCode = this.shippingAddress.country.toUpperCase()
+    } else if (this.store?.configs?.selectedCountry) {
+      countryCode = this.store.configs.selectedCountry.toUpperCase()
+    } else {
+      // No country configured - use legacy system
+      countryCode = undefined
+    }
+
+    console.log('[getShippingPriceForType]', {
+      type,
+      state: this.shippingAddress.state,
+      country: this.shippingAddress.country,
+      countryCode,
+      storeSelectedCountry: this.store?.configs?.selectedCountry,
+      hasShippingPrice: !!this.shippingPrice,
+      shippingPriceId: this.shippingPrice?.id,
+    })
+
+    // Try new system first (requires countryCode)
+    if (countryCode) {
+      const newSystemPrice = this.resolveShippingPrice(
+        countryCode,
+        this.shippingAddress.state,
+        type
+      )
+      if (newSystemPrice !== null) {
+        console.log('[getShippingPriceForType] New system price:', newSystemPrice)
+        return newSystemPrice
+      }
+    }
+
+    // Fall back to legacy system
+    console.log('[getShippingPriceForType] Falling back to legacy system')
+    const legacyPrice = this.getShippingPriceForTypeLegacy(type)
+    console.log('[getShippingPriceForType] Legacy price:', legacyPrice)
+    return legacyPrice
   }
 
   /**

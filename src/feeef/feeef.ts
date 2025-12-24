@@ -6,6 +6,10 @@ import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
 import { DepositRepository } from './repositories/deposits.js'
 import { CategoryRepository } from './repositories/categories.js'
+import { CountryRepository } from './repositories/countries.js'
+import { StateRepository } from './repositories/states.js'
+import { CityRepository } from './repositories/cities.js'
+import { ShippingPriceRepository } from './repositories/shipping_prices.js'
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
 
@@ -82,6 +86,26 @@ export class FeeeF {
   categories: CategoryRepository
 
   /**
+   * The repository for managing countries.
+   */
+  countries: CountryRepository
+
+  /**
+   * The repository for managing states.
+   */
+  states: StateRepository
+
+  /**
+   * The repository for managing cities.
+   */
+  cities: CityRepository
+
+  /**
+   * The repository for managing shipping prices.
+   */
+  shippingPrices: ShippingPriceRepository
+
+  /**
    * The cart service for managing the cart.
    */
   cart: CartService
@@ -125,6 +149,10 @@ export class FeeeF {
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
     this.categories = new CategoryRepository(this.client)
+    this.countries = new CountryRepository(this.client)
+    this.states = new StateRepository(this.client)
+    this.cities = new CityRepository(this.client)
+    this.shippingPrices = new ShippingPriceRepository(this.client)
 
     // cart
     this.cart = new CartService()
