@@ -6,6 +6,7 @@ export * from './core/entities/store.js'
 export * from './core/entities/product.js'
 export * from './core/entities/user.js'
 export * from './core/entities/shipping_method.js'
+export * from './core/entities/shipping_price.js'
 export * from './core/entities/category.js'
 
 // repositories
