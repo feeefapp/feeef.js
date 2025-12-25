@@ -5,6 +5,7 @@ import { ProductRepository } from './repositories/products.js'
 import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
 import { DepositRepository } from './repositories/deposits.js'
+import { TransferRepository } from './repositories/transfers.js'
 import { CategoryRepository } from './repositories/categories.js'
 import { CountryRepository } from './repositories/countries.js'
 import { StateRepository } from './repositories/states.js'
@@ -82,6 +83,11 @@ export class FeeeF {
   deposits: DepositRepository
 
   /**
+   * The repository for managing transfers.
+   */
+  transfers: TransferRepository
+
+  /**
    * The repository for managing categories.
    */
   categories: CategoryRepository
@@ -154,6 +160,7 @@ export class FeeeF {
     this.users = new UserRepository(this.client)
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
+    this.transfers = new TransferRepository(this.client)
     this.categories = new CategoryRepository(this.client)
     this.countries = new CountryRepository(this.client)
     this.states = new StateRepository(this.client)

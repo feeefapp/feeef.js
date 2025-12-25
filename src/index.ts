@@ -15,7 +15,13 @@ export * from './core/entities/currency.js'
 
 // repositories
 export * from './feeef/repositories/deposits.js'
+export * from './feeef/repositories/transfers.js'
 export * from './feeef/repositories/shipping_prices.js'
+export * from './feeef/repositories/users.js'
+
+// Transfer and Deposit entities are exported from their repositories
+export type { TransferEntity, TransferCreateInput } from './feeef/repositories/transfers.js'
+export type { DepositEntity, DepositCreateInput } from './feeef/repositories/deposits.js'
 
 // embaddeds
 export * from './core/embadded/address.js'
