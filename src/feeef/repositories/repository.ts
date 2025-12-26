@@ -64,12 +64,34 @@ export abstract class ModelRepository<T, C, U> {
 
   /**
    * Creates a new model.
-   * @param options - The options for creating the model.
+   * Supports two call patterns:
+   * 1. `create(data, params?)` - Pass data directly with optional params
+   * 2. `create({ data, params })` - Pass options object
+   * @param dataOrOptions - The data to create or options object containing data and params
+   * @param params - Optional query parameters (only used when data is passed directly)
    * @returns A promise that resolves to the created model.
    */
-  async create(options: ModelCreateOptions<C>): Promise<T> {
-    const { data, params } = options
-    const res = await this.client.post(`/${this.resource}`, data, { params })
+  async create(dataOrOptions: C | ModelCreateOptions<C>, params?: Record<string, any>): Promise<T> {
+    // If dataOrOptions is already wrapped in ModelCreateOptions, use it directly
+    if (dataOrOptions && typeof dataOrOptions === 'object' && 'data' in dataOrOptions) {
+      const options = dataOrOptions as ModelCreateOptions<C>
+      const { data, params: optionsParams } = options
+      const requestParams = optionsParams || params
+      const res = await this.client.post(`/${this.resource}`, data, {
+        params: requestParams,
+      })
+      return res.data
+    }
+    // Otherwise, wrap the data in ModelCreateOptions
+    const options: ModelCreateOptions<C> = {
+      data: dataOrOptions as C,
+    }
+    if (params) {
+      options.params = params
+    }
+    const res = await this.client.post(`/${this.resource}`, options.data, {
+      params: options.params,
+    })
     return res.data
   }
 

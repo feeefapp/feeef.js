@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios'
-import { ModelRepository, ModelCreateOptions } from './repository.js'
+import { ModelRepository } from './repository.js'
 
 /**
  * Represents a deposit entity for wallet transactions
@@ -75,31 +75,9 @@ export class DepositRepository extends ModelRepository<DepositEntity, DepositCre
     super('deposits', client)
   }
 
-  // TypeScript method overloads for better type inference
-  /**
-   * Creates a new deposit with data directly.
-   * @param data - The deposit data to create
-   * @param params - Optional query parameters
-   * @returns A promise that resolves to the created deposit entity
-   */
-  async create(data: DepositCreateInput, params?: Record<string, any>): Promise<DepositEntity>
-  /**
-   * Creates a new deposit with options object.
-   * @param options - The options object containing data and optional params
-   * @returns A promise that resolves to the created deposit entity
-   */
-  async create(options: ModelCreateOptions<DepositCreateInput>): Promise<DepositEntity>
-  async create(
-    dataOrOptions: DepositCreateInput | ModelCreateOptions<DepositCreateInput>,
-    params?: Record<string, any>
-  ): Promise<DepositEntity> {
-    // If dataOrOptions is already wrapped in ModelCreateOptions, use it directly
-    if (dataOrOptions && typeof dataOrOptions === 'object' && 'data' in dataOrOptions) {
-      return super.create(dataOrOptions as ModelCreateOptions<DepositCreateInput>)
-    }
-    // Otherwise, wrap the data in ModelCreateOptions
-    return super.create({ data: dataOrOptions as DepositCreateInput, params })
-  }
+  // The create method is inherited from ModelRepository and supports both:
+  // 1. create(data, params?) - Pass data directly
+  // 2. create({ data, params }) - Pass options object
 
   /**
    * Create a new deposit request

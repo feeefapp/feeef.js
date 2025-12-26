@@ -14,6 +14,7 @@ import { CurrencyRepository } from './repositories/currencies.js'
 import { ShippingPriceRepository } from './repositories/shipping_prices.js'
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
+import { NotificationsService } from './services/notifications.js'
 
 /**
  * Configuration options for the FeeeF module.
@@ -128,6 +129,11 @@ export class FeeeF {
   actions: ActionsService
 
   /**
+   * The notifications service for sending push notifications
+   */
+  notifications: NotificationsService
+
+  /**
    * Constructs a new instance of the FeeeF class.
    * @param {FeeeFConfig} config - The configuration object.
    * @param {string} config.apiKey - The API key used for authentication.
@@ -173,6 +179,9 @@ export class FeeeF {
 
     // actions
     this.actions = new ActionsService(this.client)
+
+    // notifications
+    this.notifications = new NotificationsService(this.client)
   }
 
   /**
