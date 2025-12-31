@@ -290,3 +290,79 @@ export interface ProductOffer {
   maxQuantity?: number
   freeShipping?: boolean
 }
+
+/**
+ * Input data for creating a new product
+ */
+export interface ProductCreateInput {
+  name: string
+  storeId: string
+  slug?: string
+  photoUrl?: string
+  media?: string[]
+  shippingMethodId?: string
+  shippingPriceId?: string
+  categoryId?: string
+  category?: EmbaddedCategory
+  title?: string
+  description?: string
+  body?: string
+  sku?: string
+  price: number
+  cost?: number
+  discount?: number
+  stock?: number
+  variant?: ProductVariant
+  offers?: ProductOffer[]
+  addons?: ProductAddon[]
+  metadata?: Record<string, any>
+  status?: ProductStatus
+  type?: ProductType
+  decoration?: ProductDecoration
+  integrationsData?: IntegrationsData
+}
+
+/**
+ * Input data for updating an existing product
+ */
+export interface ProductUpdateInput {
+  name?: string
+  slug?: string
+  photoUrl?: string
+  media?: string[]
+  shippingMethodId?: string
+  shippingPriceId?: string
+  categoryId?: string
+  category?: EmbaddedCategory
+  title?: string
+  description?: string
+  body?: string
+  sku?: string
+  price?: number
+  cost?: number
+  discount?: number
+  stock?: number
+  variant?: ProductVariant
+  offers?: ProductOffer[]
+  addons?: ProductAddon[]
+  metadata?: Record<string, any>
+  status?: ProductStatus
+  type?: ProductType
+  decoration?: ProductDecoration
+  integrationsData?: IntegrationsData
+}
+
+/**
+ * Product report/analytics data
+ */
+export interface ProductReport {
+  views: number
+  likes: number
+  dislikes: number
+  sold: number
+  revenue: number
+  conversionRate: number
+  averageOrderValue: number
+  topVariants?: Array<{ path: string; sold: number }>
+  salesByDate?: Record<string, number>
+}

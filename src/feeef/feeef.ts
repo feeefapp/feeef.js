@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
-// import { buildMemoryStorage, buildWebStorage, setupCache } from 'axios-cache-interceptor'
+// Repositories
 import { OrderRepository } from './repositories/orders.js'
 import { ProductRepository } from './repositories/products.js'
 import { StoreRepository } from './repositories/stores.js'
@@ -12,9 +12,14 @@ import { StateRepository } from './repositories/states.js'
 import { CityRepository } from './repositories/cities.js'
 import { CurrencyRepository } from './repositories/currencies.js'
 import { ShippingPriceRepository } from './repositories/shipping_prices.js'
+import { ShippingMethodRepository } from './repositories/shipping_methods.js'
+import { FeedbackRepository } from './repositories/feedbacks.js'
+// Services
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
 import { NotificationsService } from './services/notifications.js'
+import { StorageService } from './services/storage.js'
+import { IntegrationFactory } from './services/integrations.js'
 
 /**
  * Configuration options for the FeeeF module.
@@ -119,6 +124,16 @@ export class FeeeF {
   shippingPrices: ShippingPriceRepository
 
   /**
+   * The repository for managing shipping methods.
+   */
+  shippingMethods: ShippingMethodRepository
+
+  /**
+   * The repository for managing feedbacks.
+   */
+  feedbacks: FeedbackRepository
+
+  /**
    * The cart service for managing the cart.
    */
   cart: CartService
@@ -134,33 +149,36 @@ export class FeeeF {
   notifications: NotificationsService
 
   /**
+   * The storage service for uploading files
+   */
+  storage: StorageService
+
+  /**
+   * The integration factory for creating integration API instances
+   */
+  integrations: IntegrationFactory
+
+  /**
    * Constructs a new instance of the FeeeF class.
    * @param {FeeeFConfig} config - The configuration object.
    * @param {string} config.apiKey - The API key used for authentication.
    * @param {AxiosInstance} config.client - The Axios instance used for making HTTP requests.
    * @param {boolean | number} config.cache - The caching configuration. Set to `false` to disable caching, or provide a number to set the cache TTL in milliseconds.
    */
-  //
   constructor({ apiKey, client, cache, baseURL = 'http://localhost:3333/api/v1' }: FeeeFConfig) {
     console.log('feeef super cache', cache)
     this.apiKey = apiKey
-    // get th "cache" search param
-    // const urlParams = new URLSearchParams(window.location.search)
-    // const cacheParam = urlParams.get('cache')
-    // if is 0 or false, disable cache
-    // if (cacheParam == '0') {
+
     this.client = client || axios
     // set the api key
     this.client.defaults.headers.common['Authorization'] = `Bearer ${this.apiKey}`
-    // } else {
-    //   this.client = setupCache(client || axios, {
-    //     ttl: cache === false ? 5 : Math.max(cache!, 5) || 1 * 60 * 1000, // 1 minute by default
-    //     // for persistent cache use buildWebStorage
-    //     storage: buildWebStorage(localStorage, 'ff:'),
-    //   })
-    // }
     // set base url
     this.client.defaults.baseURL = baseURL
+    // set accept header
+    this.client.defaults.headers.common['Accept'] = 'application/json'
+    this.client.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+
+    // Initialize repositories
     this.stores = new StoreRepository(this.client)
     this.products = new ProductRepository(this.client)
     this.users = new UserRepository(this.client)
@@ -173,19 +191,21 @@ export class FeeeF {
     this.cities = new CityRepository(this.client)
     this.currencies = new CurrencyRepository(this.client)
     this.shippingPrices = new ShippingPriceRepository(this.client)
+    this.shippingMethods = new ShippingMethodRepository(this.client)
+    this.feedbacks = new FeedbackRepository(this.client)
 
-    // cart
+    // Initialize services
     this.cart = new CartService()
-
-    // actions
     this.actions = new ActionsService(this.client)
-
-    // notifications
     this.notifications = new NotificationsService(this.client)
+    this.storage = new StorageService(this.client)
+    this.integrations = new IntegrationFactory(this.client)
   }
 
   /**
-   * set header method to set custom headers for all requests
+   * Sets a header for all requests
+   * @param {string} key - The header key.
+   * @param {string} value - The header value.
    */
   setHeader(key: string, value: string) {
     this.client.defaults.headers.common[key] = value

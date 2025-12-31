@@ -1,6 +1,18 @@
 import { AxiosInstance } from 'axios'
-import { ModelRepository } from './repository.js'
-import { OrderEntity, OrderTrackEntity, ShippingType } from '../../core/entities/order.js'
+import { ModelRepository, ListResponse } from './repository.js'
+import {
+  OrderEntity,
+  OrderTrackEntity,
+  OrderStatus,
+  DeliveryStatus,
+  PaymentStatus,
+  ShippingType,
+  OrderCreateInput,
+  OrderUpdateInput,
+  OrderPricing,
+  CalculateOrderPricingOptions,
+} from '../../core/entities/order.js'
+
 /**
  * Represents the options for tracking an order.
  */
@@ -9,28 +21,35 @@ export interface OrderModelTrackOptions {
   params?: Record<string, any>
 }
 
+/**
+ * Schema for sending an order from an anonymous user
+ */
 export interface SendOrderSchema {
-  id?: string // Order ID (optional)
-  customerName?: string // Name of the customer (optional)
-  customerNote?: string // Note from the customer (optional)
-  customerPhone: string // Customer's phone number (required)
-  customerEmail?: string // Customer's email address (optional)
-  source?: string // the source of the order (facebook...tiktok..)
-  shippingAddress?: string // Address for shipping (optional)
-  shippingCity?: string // City for shipping (optional)
-  shippingState?: string // State for shipping (optional)
-  shippingType: ShippingType // Shipping type (required)
-  shippingMethodId?: string // ID of the shipping method (optional)
-  shippingNote?: string // Note for shipping (optional)
-  paymentMethodId?: string // ID of the payment method (optional)
-  items: GuestOrderItemSchema[] // Array of order items, must have at least one item
-  coupon?: string // Applied coupon code (optional)
-  status: 'pending' | 'draft' // Order status (required)
-  storeId: string // ID of the store (required)
-  metadata?: any // Additional metadata (optional)
+  id?: string
+  customerName?: string
+  customerNote?: string
+  customerPhone: string
+  customerEmail?: string
+  source?: string
+  shippingAddress?: string
+  shippingCity?: string
+  shippingState?: string
+  shippingCountry?: string
+  shippingType: ShippingType
+  shippingMethodId?: string
+  shippingNote?: string
+  paymentMethodId?: string
+  items: GuestOrderItemSchema[]
+  coupon?: string
+  status: 'pending' | 'draft'
+  storeId: string
+  customFields?: Record<string, any>
+  metadata?: any
 }
 
-// Assuming GuestOrderItemSchema was defined elsewhere, define it here as well if needed.
+/**
+ * Schema for guest order items
+ */
 export interface GuestOrderItemSchema {
   productId: string
   offerCode?: string
@@ -58,9 +77,51 @@ export interface AssignManyOrdersSchema {
 }
 
 /**
+ * Delivery service filter enum
+ */
+export enum DeliveryServiceFilter {
+  yalidine = 'yalidine',
+  ecotrack = 'ecotrack',
+  procolis = 'procolis',
+  noest = 'noest',
+  zimou = 'zimou',
+  maystro = 'maystro',
+  ecomanager = 'ecomanager',
+}
+
+/**
+ * Options for listing orders
+ */
+export interface OrderListOptions {
+  page?: number
+  offset?: number
+  limit?: number
+  storeId?: string
+  status?: OrderStatus | OrderStatus[]
+  deliveryStatus?: DeliveryStatus
+  paymentStatus?: PaymentStatus
+  customStatus?: string | string[]
+  source?: string | string[]
+  tags?: string[]
+  createdBefore?: Date | string
+  createdAfter?: Date | string
+  q?: string
+  confirmer?: string
+  products?: string[]
+  shippingState?: string
+  shippingCity?: string
+  deliveryService?: DeliveryServiceFilter
+  params?: Record<string, any>
+}
+
+/**
  * Represents a repository for managing orders.
  */
-export class OrderRepository extends ModelRepository<OrderEntity, any, any> {
+export class OrderRepository extends ModelRepository<
+  OrderEntity,
+  OrderCreateInput,
+  OrderUpdateInput
+> {
   /**
    * Constructs a new OrderRepository instance.
    * @param client - The AxiosInstance used for making HTTP requests.
@@ -70,38 +131,107 @@ export class OrderRepository extends ModelRepository<OrderEntity, any, any> {
   }
 
   /**
+   * Lists orders with optional filtering.
+   * @param options - The options for listing orders.
+   * @returns A Promise that resolves to a list of Order entities.
+   */
+  async list(options?: OrderListOptions): Promise<ListResponse<OrderEntity>> {
+    const params: Record<string, any> = { ...options?.params }
+
+    if (options) {
+      if (options.page) params.page = options.page
+      if (options.offset) params.offset = options.offset
+      if (options.limit) params.limit = options.limit
+      if (options.storeId) params.store_id = options.storeId
+      if (options.status) {
+        params.status = Array.isArray(options.status) ? options.status : [options.status]
+      }
+      if (options.deliveryStatus) params.deliveryStatus = options.deliveryStatus
+      if (options.paymentStatus) params.paymentStatus = options.paymentStatus
+      if (options.customStatus) params.customStatus = options.customStatus
+      if (options.source) params.source = options.source
+      if (options.tags) params.tags = options.tags
+      if (options.createdBefore) {
+        params.created_before =
+          options.createdBefore instanceof Date
+            ? options.createdBefore.toISOString()
+            : options.createdBefore
+      }
+      if (options.createdAfter) {
+        params.created_after =
+          options.createdAfter instanceof Date
+            ? options.createdAfter.toISOString()
+            : options.createdAfter
+      }
+      if (options.q) params.q = options.q
+      if (options.confirmer) params.confirmer = options.confirmer
+      if (options.products) params.products = options.products
+      if (options.shippingState) params.shippingState = options.shippingState
+      if (options.shippingCity) params.shippingCity = options.shippingCity
+      if (options.deliveryService) params.deliveryService = options.deliveryService
+    }
+
+    return super.list({ params })
+  }
+
+  /**
    * Sends an order from an anonymous user.
    * @param data - The data representing the order to be sent.
    * @returns A Promise that resolves to the sent OrderEntity.
    */
   async send(data: SendOrderSchema): Promise<OrderEntity> {
-    const output = data
-    const res = await this.client.post(`/${this.resource}/send`, output)
-
-    // Return the sent OrderEntity
+    const res = await this.client.post(`/${this.resource}/send`, data)
     return res.data
   }
 
   /**
-   * track the order by the order id
-   * it will return the order status and history
-   * @param options - The options for finding the model.
-   * @returns A promise that resolves to the found model.
+   * Tracks the order by the order ID.
+   * Returns the order status and history.
+   * @param options - The options for tracking the order.
+   * @returns A promise that resolves to the order track entity.
    */
   async track(options: OrderModelTrackOptions): Promise<OrderTrackEntity> {
     const { id, params } = options
     const res = await this.client.get(`/${this.resource}/${id}/track`, {
-      params: {
-        ...params,
-      },
+      params,
     })
     return res.data
   }
 
   /**
-   * Assigns a single order to a member (as confirmer)
-   * @param data - The data containing orderId, memberId, and storeId
-   * @returns A Promise that resolves to the updated OrderEntity
+   * Calculates order pricing based on items, shipping details, etc.
+   * @param options - The calculation options.
+   * @returns A Promise that resolves to the calculated pricing.
+   */
+  async calculate(options: CalculateOrderPricingOptions): Promise<OrderPricing> {
+    const res = await this.client.post(`/${this.resource}/calculate`, {
+      storeId: options.storeId,
+      items: options.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        variantPath: item.variantPath,
+        offerCode: item.offerCode,
+        addons: item.addons,
+        price: item.price,
+        discount: item.discount,
+      })),
+      shippingState: options.shippingState,
+      shippingCountry: options.shippingCountry,
+      shippingType: options.shippingType,
+      shippingAddress: options.shippingAddress,
+    })
+
+    return {
+      subtotal: res.data.pricing.subtotal,
+      shippingPrice: res.data.pricing.shippingPrice,
+      calculatedTotal: res.data.pricing.calculatedTotal,
+    }
+  }
+
+  /**
+   * Assigns a single order to a member (as confirmer).
+   * @param data - The data containing orderId, memberId, and storeId.
+   * @returns A Promise that resolves to the updated OrderEntity.
    */
   async assign(data: AssignOrderSchema): Promise<OrderEntity> {
     const res = await this.client.post(`/${this.resource}/assign`, data)
@@ -109,9 +239,9 @@ export class OrderRepository extends ModelRepository<OrderEntity, any, any> {
   }
 
   /**
-   * Assigns multiple orders to a member (as confirmer)
-   * @param data - The data containing orderIds, memberId, and storeId
-   * @returns A Promise that resolves to a success message
+   * Assigns multiple orders to a member (as confirmer).
+   * @param data - The data containing orderIds, memberId, and storeId.
+   * @returns A Promise that resolves to a success message.
    */
   async assignMany(data: AssignManyOrdersSchema): Promise<{ message: string }> {
     const res = await this.client.post(`/${this.resource}/assignMany`, data)

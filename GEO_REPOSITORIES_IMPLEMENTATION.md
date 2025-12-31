@@ -1,6 +1,7 @@
 # Geo Repositories Implementation - feeefjs
 
 ## Overview
+
 This document describes the implementation of Countries, States, and Cities repositories in feeefjs, matching the Dart implementation.
 
 ## Implementation Status
@@ -8,6 +9,7 @@ This document describes the implementation of Countries, States, and Cities repo
 ### ✅ Entity Models Created
 
 1. **CountryEntity** (`src/core/entities/country.ts`)
+
    - `code`: ISO 3166-1 alpha-2 country code (e.g., US, DZ, SA)
    - `name`: Country name
    - `phone`: Phone country code without +
@@ -15,6 +17,7 @@ This document describes the implementation of Countries, States, and Cities repo
    - `createdAt`: Creation timestamp
 
 2. **StateEntity** (`src/core/entities/state.ts`)
+
    - `countryCode`: Country code (part of composite key)
    - `code`: State/province code (part of composite key)
    - `name`: State/province name
@@ -31,10 +34,12 @@ This document describes the implementation of Countries, States, and Cities repo
 ### ✅ Repositories Created
 
 1. **CountryRepository** (`src/feeef/repositories/countries.ts`)
+
    - Standard CRUD operations
    - `findByCode(code)`: Find country by ISO code
 
 2. **StateRepository** (`src/feeef/repositories/states.ts`)
+
    - Standard CRUD operations
    - `list(options?)`: List states with optional countryCode filter
    - `listByCountry(countryCode, options?)`: List states for a country (nested route)
@@ -56,6 +61,7 @@ This document describes the implementation of Countries, States, and Cities repo
 ### ✅ Integration
 
 - Added to `FeeeF` class:
+
   - `feeef.countries`: CountryRepository
   - `feeef.states`: StateRepository
   - `feeef.cities`: CityRepository
@@ -71,6 +77,7 @@ This document describes the implementation of Countries, States, and Cities repo
 ## API Routes Supported
 
 ### Countries
+
 - `GET /countries` - List countries
 - `GET /countries/:code` - Get country by code
 - `POST /countries` - Create country
@@ -78,6 +85,7 @@ This document describes the implementation of Countries, States, and Cities repo
 - `DELETE /countries/:code` - Delete country
 
 ### States
+
 - `GET /states` - List states (with optional countryCode filter)
 - `GET /countries/:country_code/states` - List states for a country
 - `GET /countries/:country_code/states/:id` - Get state by composite key
@@ -86,6 +94,7 @@ This document describes the implementation of Countries, States, and Cities repo
 - `DELETE /countries/:country_code/states/:id` - Delete state
 
 ### Cities
+
 - `GET /cities` - List cities (with optional countryCode/stateCode filters)
 - `GET /countries/:country_code/states/:state_code/cities` - List cities for a state
 - `GET /countries/:country_code/states/:state_code/cities/:id` - Get city by composite key

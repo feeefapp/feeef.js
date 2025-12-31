@@ -142,3 +142,101 @@ export const convertOrderEntityToOrderTrackEntity = (order: OrderEntity): OrderT
       })) || [],
   }
 }
+
+/**
+ * Input for creating a new order (admin/merchant)
+ */
+export interface OrderCreateInput {
+  id?: string
+  customerName?: string
+  customerPhone: string
+  customerEmail?: string
+  customerNote?: string
+  shippingAddress?: string
+  shippingCity?: string
+  shippingState?: string
+  shippingCountry?: string
+  shippingType: ShippingType
+  shippingMethodId?: string
+  paymentMethodId?: string
+  items: OrderItemInput[]
+  coupon?: string
+  couponId?: string
+  source?: string
+  status?: OrderStatus
+  paymentStatus?: PaymentStatus
+  deliveryStatus?: DeliveryStatus
+  customStatus?: string
+  customFields?: Record<string, any>
+  metadata?: Record<string, any>
+  storeId: string
+  tags?: string[]
+}
+
+/**
+ * Input for order items when creating/updating an order
+ */
+export interface OrderItemInput {
+  productId: string
+  quantity: number
+  variantPath?: string
+  offerCode?: string
+  addons?: Record<string, number>
+  price?: number
+  discount?: number
+}
+
+/**
+ * Input data for updating an existing order
+ */
+export interface OrderUpdateInput {
+  customerName?: string
+  customerPhone?: string
+  customerEmail?: string
+  customerNote?: string
+  shippingAddress?: string
+  shippingCity?: string
+  shippingState?: string
+  shippingCountry?: string
+  shippingType?: ShippingType
+  shippingMethodId?: string
+  trackingCode?: string
+  paymentMethodId?: string
+  items?: OrderItemInput[]
+  subtotal?: number
+  shippingPrice?: number
+  total?: number
+  discount?: number
+  coupon?: string
+  couponId?: string
+  source?: string
+  confirmerId?: string
+  status?: OrderStatus
+  paymentStatus?: PaymentStatus
+  deliveryStatus?: DeliveryStatus
+  customStatus?: string
+  customFields?: Record<string, any>
+  metadata?: Record<string, any>
+  tags?: string[]
+}
+
+/**
+ * Order pricing calculation result
+ */
+export interface OrderPricing {
+  subtotal: number
+  shippingPrice: number | null
+  calculatedTotal: number
+}
+
+/**
+ * Options for calculating order pricing
+ */
+export interface CalculateOrderPricingOptions {
+  storeId: string
+  items: OrderItemInput[]
+  shippingState?: string
+  shippingCountry?: string
+  shippingType?: ShippingType
+  shippingAddress?: string
+}

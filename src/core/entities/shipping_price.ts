@@ -179,3 +179,24 @@ export function getAvailableShippingTypes(
 
   return available
 }
+
+/**
+ * Input data for creating a new shipping price
+ */
+export interface ShippingPriceCreateInput {
+  name: string
+  storeId: string
+  logoUrl?: string
+  prices: ShippingPriceRates
+  status?: ShippingPriceStatus
+}
+
+/**
+ * Input data for updating an existing shipping price
+ */
+export interface ShippingPriceUpdateInput {
+  name?: string
+  logoUrl?: string
+  prices?: ShippingPriceRates
+  status?: ShippingPriceStatus
+}

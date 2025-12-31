@@ -30,3 +30,33 @@ export enum ShippingMethodPolicy {
   private = 'private',
   public = 'public',
 }
+
+/**
+ * Input data for creating a new shipping method
+ */
+export interface ShippingMethodCreateInput {
+  name: string
+  storeId: string
+  description?: string
+  logoUrl?: string
+  ondarkLogoUrl?: string
+  price?: number
+  rates?: (number | null)[][] | null
+  status?: ShippingMethodStatus
+  policy?: ShippingMethodPolicy
+  sourceId?: string
+}
+
+/**
+ * Input data for updating an existing shipping method
+ */
+export interface ShippingMethodUpdateInput {
+  name?: string
+  description?: string
+  logoUrl?: string
+  ondarkLogoUrl?: string
+  price?: number
+  rates?: (number | null)[][] | null
+  status?: ShippingMethodStatus
+  policy?: ShippingMethodPolicy
+}

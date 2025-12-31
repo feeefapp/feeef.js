@@ -700,3 +700,91 @@ export interface StoreSubscription {
   remaining: number
   metadata: Record<string, any>
 }
+
+/**
+ * Input data for creating a new store
+ */
+export interface StoreCreateInput {
+  name: string
+  slug?: string
+  title?: string
+  description?: string
+  iconUrl?: string
+  logoUrl?: string
+  ondarkLogoUrl?: string
+  categories?: EmbaddedCategory[]
+  addresses?: EmbaddedAddress[]
+  contacts?: EmbaddedContact[]
+  decoration?: StoreDecoration
+  domain?: StoreDomain
+  banner?: StoreBanner
+  action?: StoreAction
+  metadata?: Record<string, any>
+  defaultShippingRates?: (number | null)[][] | null
+  shippingPriceId?: string
+  configs?: StoreConfigs
+  metaPixelIds?: string[]
+  tiktokPixelIds?: string[]
+  googleAnalyticsId?: string
+  googleTagsId?: string
+}
+
+/**
+ * Input data for updating an existing store
+ */
+export interface StoreUpdateInput {
+  name?: string
+  slug?: string
+  title?: string
+  description?: string
+  iconUrl?: string
+  logoUrl?: string
+  ondarkLogoUrl?: string
+  categories?: EmbaddedCategory[]
+  addresses?: EmbaddedAddress[]
+  contacts?: EmbaddedContact[]
+  decoration?: StoreDecoration
+  domain?: StoreDomain
+  banner?: StoreBanner
+  action?: StoreAction
+  metadata?: Record<string, any>
+  defaultShippingRates?: (number | null)[][] | null
+  shippingPriceId?: string
+  configs?: StoreConfigs
+  metaPixelIds?: string[]
+  tiktokPixelIds?: string[]
+  googleAnalyticsId?: string
+  googleTagsId?: string
+  integrations?: StoreIntegrations
+}
+
+/**
+ * Store summary data
+ */
+export interface StoreSummary {
+  ordersCount: number
+  productsCount: number
+  revenue: number
+  topProducts?: Array<{ id: string; name: string; sold: number }>
+  ordersByStatus?: Record<string, number>
+  recentOrders?: any[]
+}
+
+/**
+ * Input for adding a store member
+ */
+export interface AddStoreMemberInput {
+  email: string
+  role: StoreMemberRole
+  name?: string
+  metadata?: Record<string, any>
+}
+
+/**
+ * Input for updating a store member
+ */
+export interface UpdateStoreMemberInput {
+  role?: StoreMemberRole
+  name?: string
+  metadata?: Record<string, any>
+}
