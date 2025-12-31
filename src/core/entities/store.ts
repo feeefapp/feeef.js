@@ -120,10 +120,16 @@ export const generatePublicStoreIntegrationCustomFields = (
     active: customFields.active,
   }
 }
+/**
+ * Generates public Meta Pixel integration data from private integration data.
+ * Only exposes non-sensitive information (pixel IDs, active status, objectives).
+ * Sensitive data like oauth2 tokens, pixel API keys, and metadata are NOT exposed.
+ */
 export const generatePublicStoreIntegrationMetaPixel = (
   metaPixel: MetaPixelIntegration | null | undefined
 ): PublicMetaPixelIntegration | null | undefined => {
   if (!metaPixel) return null
+  // NOTE: oauth2, pixel.key, and metadata are intentionally excluded for security
   return {
     pixels: metaPixel.pixels.map((pixel) => ({
       id: pixel.id,
@@ -446,6 +452,19 @@ export interface MetaPixel {
   id: string
   key?: string
 }
+
+/**
+ * Facebook Marketing OAuth data
+ * Used for accessing Facebook Marketing API (pixels, ads, etc.)
+ */
+export interface FacebookMarketingOAuth {
+  accessToken: string
+  tokenType?: string
+  expiresIn?: number
+  expiresAt?: string // ISO date string
+  scopes?: string[]
+}
+
 // tiktok pixel
 export interface TiktokPixel {
   name?: string
@@ -460,6 +479,8 @@ export interface MetaPixelIntegration {
   draftObjective?: MetaPixelEvent | null
   active: boolean
   metadata: Record<string, any>
+  /** Facebook Marketing OAuth data - for accessing pixels via API */
+  oauth2?: FacebookMarketingOAuth | null
 }
 // tiktok pixel integration
 export interface TiktokPixelIntegration {
