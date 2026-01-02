@@ -17,6 +17,9 @@ export interface StateEntity {
   /** Additional metadata as key-value pairs */
   metadata: Record<string, any>
 
+  /** Localized names by language code (e.g., { en: "California", ar: "كاليفورنيا" }) */
+  locales?: Record<string, string>
+
   /** Creation timestamp */
   createdAt: any
 }

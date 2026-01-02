@@ -17,6 +17,9 @@ export interface CountryEntity {
   /** Additional metadata as key-value pairs */
   metadata: Record<string, any>
 
+  /** Localized names by language code (e.g., { en: "United States", ar: "الولايات المتحدة" }) */
+  locales?: Record<string, string>
+
   /** Creation timestamp */
   createdAt: any
 }
