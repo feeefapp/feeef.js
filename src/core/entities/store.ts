@@ -589,6 +589,28 @@ export interface ZimouIntegration {
   metadata?: Record<string, any>
 }
 
+/**
+ * ZR Express integration configuration for delivery management.
+ * This integration allows order management and tracking via ZR Express API.
+ * Uses header-based authentication (x-api-key, x-tenant).
+ */
+export interface ZrexpressIntegration {
+  /** Unique identifier for this integration instance */
+  id: string
+  /** API key for ZR Express (x-api-key header) */
+  apiKey: string
+  /** Tenant UUID for ZR Express (x-tenant header) */
+  tenantId: string
+  /** Whether this integration is currently active */
+  active: boolean
+  /** Whether to send orders directly without confirmation dialog */
+  silentMode?: boolean
+  /** Whether to automatically send orders when they are marked as sent */
+  autoSend?: boolean
+  /** Additional metadata for the integration */
+  metadata?: Record<string, any>
+}
+
 export interface SecurityIntegrationOrdersProtection {
   frontend: {
     active: boolean
@@ -694,6 +716,7 @@ export interface StoreIntegrations {
   procolis?: any
   noest?: any
   zimou?: ZimouIntegration
+  zrexpress?: ZrexpressIntegration
 
   security?: SecurityIntegration
 }
