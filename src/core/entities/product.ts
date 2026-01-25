@@ -226,7 +226,7 @@ export interface PublicGoogleSheetsData {}
  * Payment method data for product-level override
  */
 export interface PaymentMethodData {
-  methodId?: string // Which payment method ID to use (optional, falls back to store default)
+  methodIds?: string[] // Which payment method IDs to use (optional, falls back to store defaults)
   enabled: boolean
 }
 
@@ -234,7 +234,7 @@ export interface PaymentMethodData {
  * Public payment method data (same structure, no sensitive data)
  */
 export interface PublicPaymentMethodData {
-  methodId?: string
+  methodIds?: string[]
   enabled: boolean
 }
 
@@ -244,7 +244,7 @@ export function generatePublicIntegrationsDataPaymentMethod(
 ): PublicPaymentMethodData | null | undefined {
   if (!data) return data
   return {
-    methodId: data.methodId,
+    methodIds: data.methodIds,
     enabled: data.enabled,
   }
 }
