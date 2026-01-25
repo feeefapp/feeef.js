@@ -9,7 +9,6 @@ This document describes the implementation of Countries, States, and Cities repo
 ### ✅ Entity Models Created
 
 1. **CountryEntity** (`src/core/entities/country.ts`)
-
    - `code`: ISO 3166-1 alpha-2 country code (e.g., US, DZ, SA)
    - `name`: Country name
    - `phone`: Phone country code without +
@@ -17,7 +16,6 @@ This document describes the implementation of Countries, States, and Cities repo
    - `createdAt`: Creation timestamp
 
 2. **StateEntity** (`src/core/entities/state.ts`)
-
    - `countryCode`: Country code (part of composite key)
    - `code`: State/province code (part of composite key)
    - `name`: State/province name
@@ -34,12 +32,10 @@ This document describes the implementation of Countries, States, and Cities repo
 ### ✅ Repositories Created
 
 1. **CountryRepository** (`src/feeef/repositories/countries.ts`)
-
    - Standard CRUD operations
    - `findByCode(code)`: Find country by ISO code
 
 2. **StateRepository** (`src/feeef/repositories/states.ts`)
-
    - Standard CRUD operations
    - `list(options?)`: List states with optional countryCode filter
    - `listByCountry(countryCode, options?)`: List states for a country (nested route)
@@ -61,7 +57,6 @@ This document describes the implementation of Countries, States, and Cities repo
 ### ✅ Integration
 
 - Added to `FeeeF` class:
-
   - `feeef.countries`: CountryRepository
   - `feeef.states`: StateRepository
   - `feeef.cities`: CityRepository

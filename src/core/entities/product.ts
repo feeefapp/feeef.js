@@ -85,7 +85,8 @@ export interface ProductEntity {
 // function that generate public data from the integrations data
 export function generatePublicIntegrationsData(data: IntegrationsData | null | null): any {
   if (!data) return data
-  const { metaPixelData, tiktokPixelData, googleAnalyticsData, googleTagsData, paymentMethodData } = data
+  const { metaPixelData, tiktokPixelData, googleAnalyticsData, googleTagsData, paymentMethodData } =
+    data
   return {
     metaPixelData: generatePublicIntegrationsDataMetaPixel(metaPixelData),
     tiktokPixelData: generatePublicIntegrationsDataTiktokPixel(tiktokPixelData),
