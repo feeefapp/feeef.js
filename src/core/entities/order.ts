@@ -60,6 +60,7 @@ export interface OrderEntity {
   confirmerId: string | null
   customFields?: Record<string, any> | null
   metadata: OrderMetadata
+  claims?: Record<string, any> | null // System-only, secure data storage (read-only for users)
   status: OrderStatus
   paymentStatus: PaymentStatus
   deliveryStatus: DeliveryStatus

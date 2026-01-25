@@ -82,6 +82,7 @@ export const generatePublicStoreIntegrations = (
     ai,
     security,
     customFields,
+    payment,
   } = integrations
   return {
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
@@ -94,6 +95,7 @@ export const generatePublicStoreIntegrations = (
     webhooks: generatePublicStoreIntegrationWebhooks(webhooks) || null,
     security: generatePublicStoreIntegrationSecurity(security) || null,
     customFields: generatePublicStoreIntegrationCustomFields(customFields) || null,
+    payment: generatePublicStoreIntegrationPayment(payment) || null,
   }
 }
 
@@ -246,6 +248,28 @@ export const generatePublicStoreIntegrationSecurity = (
 }
 
 /**
+ * Generates public payment integration data from private integration data.
+ * Only exposes non-sensitive information (method IDs, names, active status).
+ * Sensitive data like API keys, client secrets are NOT exposed.
+ */
+export const generatePublicStoreIntegrationPayment = (
+  payment: PaymentIntegration | null | undefined
+): PublicPaymentIntegration | null | undefined => {
+  if (!payment) return null
+
+  return {
+    active: payment.active,
+    methods: payment.methods.map((method) => ({
+      id: method.id,
+      name: method.name,
+      active: method.active,
+      // API keys, client secrets, etc. are intentionally excluded
+    })),
+    defaultMethod: payment.defaultMethod,
+  }
+}
+
+/**
  * Public interface for OrderDZ integration.
  * Contains only non-sensitive information that can be safely exposed to clients.
  */
@@ -321,6 +345,24 @@ export interface PublicCustomFieldsIntegration {
   active: boolean
 }
 
+/**
+ * Public payment method (no sensitive data like API keys)
+ */
+export interface PublicPaymentMethod {
+  id: string // Slug identifier (e.g., 'chargily', 'paypal')
+  name: string // Display name (e.g., 'Chargily Pay', 'PayPal')
+  active: boolean
+}
+
+/**
+ * Public payment integration (exposes only non-sensitive information)
+ */
+export interface PublicPaymentIntegration {
+  active: boolean
+  methods: PublicPaymentMethod[]
+  defaultMethod?: string // Method ID to use by default
+}
+
 export interface PublicStoreIntegrations {
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
@@ -332,6 +374,7 @@ export interface PublicStoreIntegrations {
   webhooks: PublicWebhooksIntegration | null
   security: PublicSecurityIntegration | null
   customFields: PublicCustomFieldsIntegration | null
+  payment: PublicPaymentIntegration | null
 }
 
 export enum StoreMemberRole {
@@ -689,6 +732,30 @@ export interface WebhooksIntegration {
   metadata: Record<string, any>
 }
 
+/**
+ * Payment method configuration (includes sensitive data like API keys)
+ */
+export interface PaymentMethodConfig {
+  id: string // Slug identifier (e.g., 'chargily', 'paypal')
+  name: string // Display name (e.g., 'Chargily Pay', 'PayPal')
+  active: boolean
+  // Method-specific configuration
+  apiKey?: string // For Chargily
+  clientId?: string // For PayPal, Stripe, etc.
+  clientSecret?: string // For PayPal, Stripe, etc.
+  [key: string]: any // Allow other method-specific fields
+}
+
+/**
+ * Payment integration configuration
+ */
+export interface PaymentIntegration {
+  active: boolean
+  methods: PaymentMethodConfig[]
+  defaultMethod?: string // Method ID to use by default
+  metadata?: Record<string, any>
+}
+
 export interface StoreIntegrations {
   [key: string]: any
   metadata?: Record<string, any>
@@ -705,6 +772,7 @@ export interface StoreIntegrations {
   ai?: AiIntegration
   orderdz?: OrderdzIntegration
   webhooks?: WebhooksIntegration
+  payment?: PaymentIntegration
 
   sms?: any
   telegram?: any

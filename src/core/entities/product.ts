@@ -85,12 +85,13 @@ export interface ProductEntity {
 // function that generate public data from the integrations data
 export function generatePublicIntegrationsData(data: IntegrationsData | null | null): any {
   if (!data) return data
-  const { metaPixelData, tiktokPixelData, googleAnalyticsData, googleTagsData } = data
+  const { metaPixelData, tiktokPixelData, googleAnalyticsData, googleTagsData, paymentMethodData } = data
   return {
     metaPixelData: generatePublicIntegrationsDataMetaPixel(metaPixelData),
     tiktokPixelData: generatePublicIntegrationsDataTiktokPixel(tiktokPixelData),
     googleAnalyticsData: generatePublicIntegrationsDataGoogleAnalytics(googleAnalyticsData),
     googleTagsData: generatePublicIntegrationsDataGoogleTag(googleTagsData),
+    paymentMethodData: generatePublicIntegrationsDataPaymentMethod(paymentMethodData),
   }
 }
 // function that generate public data from the meta pixel data
@@ -145,6 +146,7 @@ export interface IntegrationsData {
   googleAnalyticsData?: GoogleAnalyticsData | null
   googleTagsData?: GoogleTagData | null
   googleSheetsData?: GoogleSheetsData | null
+  paymentMethodData?: PaymentMethodData | null
 }
 
 export enum MetaPixelEvent {
@@ -218,6 +220,33 @@ export interface PublicGoogleAnalyticsData {}
 export interface PublicGoogleTagData {}
 // public google sheets data
 export interface PublicGoogleSheetsData {}
+
+/**
+ * Payment method data for product-level override
+ */
+export interface PaymentMethodData {
+  methodId?: string // Which payment method ID to use (optional, falls back to store default)
+  enabled: boolean
+}
+
+/**
+ * Public payment method data (same structure, no sensitive data)
+ */
+export interface PublicPaymentMethodData {
+  methodId?: string
+  enabled: boolean
+}
+
+// function that generate public data from the payment method data
+export function generatePublicIntegrationsDataPaymentMethod(
+  data: PaymentMethodData | null | undefined
+): PublicPaymentMethodData | null | undefined {
+  if (!data) return data
+  return {
+    methodId: data.methodId,
+    enabled: data.enabled,
+  }
+}
 
 export interface ProductAddon {
   photoUrl?: string
