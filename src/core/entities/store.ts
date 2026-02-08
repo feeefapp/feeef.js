@@ -664,6 +664,10 @@ export interface SecurityIntegrationOrdersProtection {
     ipTtl: number
     blockDirectOrders: boolean
     adsOnlyMode: boolean
+    // fingerprint
+    fingerprintTtl?: number | null
+    minFormLoadTime?: number | null
+    requireFingerprint?: boolean | null
   }
 }
 export interface PublicSecurityIntegrationOrdersProtection {

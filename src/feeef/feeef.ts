@@ -14,6 +14,9 @@ import { CurrencyRepository } from './repositories/currencies.js'
 import { ShippingPriceRepository } from './repositories/shipping_prices.js'
 import { ShippingMethodRepository } from './repositories/shipping_methods.js'
 import { FeedbackRepository } from './repositories/feedbacks.js'
+// Product landing pages
+import { ProductLandingPageTemplatesRepository } from './repositories/product_landing_page_templates.js'
+import { ProductLandingPagesRepository } from './repositories/product_landing_pages.js'
 // Services
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
@@ -72,6 +75,16 @@ export class FeeeF {
    * The repository for managing products.
    */
   products: ProductRepository
+
+  /**
+   * The repository for managing product landing pages.
+   */
+  productLandingPages: ProductLandingPagesRepository
+
+  /**
+   * The repository for managing product landing page templates.
+   */
+  productLandingPageTemplates: ProductLandingPageTemplatesRepository
 
   /**
    * The repository for managing users.
@@ -181,6 +194,8 @@ export class FeeeF {
     // Initialize repositories
     this.stores = new StoreRepository(this.client)
     this.products = new ProductRepository(this.client)
+    this.productLandingPages = new ProductLandingPagesRepository(this.client)
+    this.productLandingPageTemplates = new ProductLandingPageTemplatesRepository(this.client)
     this.users = new UserRepository(this.client)
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
