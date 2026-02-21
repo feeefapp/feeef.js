@@ -760,6 +760,49 @@ export interface PaymentIntegration {
   metadata?: Record<string, any>
 }
 
+/**
+ * Orders dispatch strategy for assigning orders to confirmers.
+ * Discriminated union by `type` (freezed convention with unionKey: 'type').
+ * Values match Dart constructor names.
+ */
+export type OrdersDispatchStrategy =
+  | { type: 'firstUpdate' }
+  | { type: 'random' }
+  | {
+      type: 'weightedRandom'
+      weights?: Record<string, number>
+    }
+  | {
+      type: 'roundRobin'
+      lastAssignedConfirmerId?: string
+      sortBy?: string
+    }
+  | { type: 'manualOnly' }
+  | {
+      type: 'priority'
+      confirmerIds: string[]
+    }
+
+/**
+ * Dispatcher integration configuration.
+ * Controls how new orders are assigned to confirmers.
+ */
+export interface DispatcherIntegration {
+  active: boolean
+  strategy?: OrdersDispatchStrategy | null
+  metadata?: Record<string, any>
+}
+
+/**
+ * Confirmer-specific permissions (in StoreMember.metadata).
+ */
+export interface ConfermerPermissions {
+  canSeeAllOrders?: boolean
+  canAssignOrder?: boolean
+  canReAssignOrder?: boolean
+  metadata?: Record<string, any>
+}
+
 export interface StoreIntegrations {
   [key: string]: any
   metadata?: Record<string, any>
@@ -791,6 +834,7 @@ export interface StoreIntegrations {
   zrexpress?: ZrexpressIntegration
 
   security?: SecurityIntegration
+  dispatcher?: DispatcherIntegration
 }
 
 export enum StoreSubscriptionStatus {
