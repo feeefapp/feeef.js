@@ -530,14 +530,15 @@ export class CartService extends NotifiableService {
    * @param shippingType - The shipping type enum.
    * @returns The corresponding shipping price type.
    */
+  /** Maps order ShippingType to shipping price key. store = pickup (from store), pickup = desk (from relay/desk). */
   private mapShippingTypeToPriceType(shippingType: ShippingType): ShippingPriceType {
     switch (shippingType) {
       case ShippingType.home:
         return 'home'
       case ShippingType.pickup:
-        return 'pickup'
-      case ShippingType.store:
         return 'desk'
+      case ShippingType.store:
+        return 'pickup'
       default:
         return 'home'
     }
@@ -696,8 +697,9 @@ export class CartService extends NotifiableService {
    *
    * Note: Shipping prices must be loaded and set via setShippingPrice() for the new system to work.
    * If shipping prices are not loaded, the method falls back to the legacy system.
+   * In the new system: price key "desk" → ShippingType.pickup, price key "pickup" → ShippingType.store.
    *
-   * @returns An array of available shipping types.
+   * @returns An array of available shipping types. With prices e.g. { desk: 550, home: 800, pickup: null }, returns [home, pickup].
    */
   getAvailableShippingTypes(): ShippingType[] {
     if (!this.shippingAddress.state) return []
@@ -739,9 +741,9 @@ export class CartService extends NotifiableService {
               switch (a.type) {
                 case 'home':
                   return ShippingType.home
-                case 'pickup':
-                  return ShippingType.pickup
                 case 'desk':
+                  return ShippingType.pickup
+                case 'pickup':
                   return ShippingType.store
                 default:
                   return ShippingType.home
@@ -753,7 +755,7 @@ export class CartService extends NotifiableService {
       }
     }
 
-    // 2. Try store shippingPriceId (new system) - only if countryCode is available
+    // 2. Try store shippingPriceId (new system)
     if (
       countryCode &&
       this.store?.shippingPriceId &&
@@ -770,9 +772,9 @@ export class CartService extends NotifiableService {
           switch (a.type) {
             case 'home':
               return ShippingType.home
-            case 'pickup':
-              return ShippingType.pickup
             case 'desk':
+              return ShippingType.pickup
+            case 'pickup':
               return ShippingType.store
             default:
               return ShippingType.home

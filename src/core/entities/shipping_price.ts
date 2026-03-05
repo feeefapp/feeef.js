@@ -167,13 +167,26 @@ export function getAvailableShippingTypes(
 
   const available: Array<{ type: ShippingPriceType; price: number }> = []
 
-  if (stateRates.home !== null) {
+  // Only include types with a defined, finite price (null/undefined = not available; 0 = free)
+  if (
+    stateRates.home !== null &&
+    stateRates.home !== undefined &&
+    Number.isFinite(stateRates.home)
+  ) {
     available.push({ type: 'home', price: stateRates.home })
   }
-  if (stateRates.desk !== null) {
+  if (
+    stateRates.desk !== null &&
+    stateRates.desk !== undefined &&
+    Number.isFinite(stateRates.desk)
+  ) {
     available.push({ type: 'desk', price: stateRates.desk })
   }
-  if (stateRates.pickup !== null) {
+  if (
+    stateRates.pickup !== null &&
+    stateRates.pickup !== undefined &&
+    Number.isFinite(stateRates.pickup)
+  ) {
     available.push({ type: 'pickup', price: stateRates.pickup })
   }
 
