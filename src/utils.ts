@@ -1,22 +1,23 @@
 /**
- * Converts a Dart color (0xffXXXXXX) to a CSS-compatible number (0xXXXXXXFF).
+ * Converts a Dart color (AARRGGBB — alpha in high byte) to a CSS-compatible number (RRGGBBAA).
+ * Flutter/Dart uses 32-bit color with alpha first; CSS and the editor use alpha last.
  *
- * @param dartColor - The Dart color represented as a 32-bit integer (0xffXXXXXX).
- * @returns A number representing the color in CSS format (0xXXXXXXFF).
+ * @param dartColor - The Dart color as a 32-bit integer (AARRGGBB).
+ * @returns A number in CSS format (0xRRGGBBAA).
  */
 export const convertDartColorToCssNumber = (dartColor: number): number => {
   const alpha = (dartColor >> 24) & 0xff // Extract alpha (high 8 bits)
   const rgb = dartColor & 0xffffff // Extract RGB (low 24 bits)
 
-  // Return color as 0xXXXXXXFF (CSS format: RGB + alpha)
+  // Return color as 0xRRGGBBAA (CSS format: RGB then alpha)
   return (rgb << 8) | alpha
 }
 
 /**
- * Converts a CSS color (0xXXXXXXFF) to HSL format.
+ * Converts a CSS color number (0xRRGGBBAA) to an HSL component string "h, s%, l%".
  *
- * @param cssColor - The CSS color represented as a 32-bit integer (0xXXXXXXFF).
- * @returns An object with HSL values {h, s, l}.
+ * @param cssColor - The CSS color as a 32-bit integer (0xRRGGBBAA).
+ * @returns A string suitable for hsl(): e.g. "120, 50%, 50%".
  */
 export const cssColorToHslString = (cssColor: number): string => {
   const r = ((cssColor >> 24) & 0xff) / 255 // Extract red channel
@@ -27,7 +28,7 @@ export const cssColorToHslString = (cssColor: number): string => {
   const min = Math.min(r, g, b)
   let h = 0
   let s = 0
-  let l = (max + min) / 2
+  const l = (max + min) / 2
 
   if (max !== min) {
     const d = max - min
@@ -47,6 +48,21 @@ export const cssColorToHslString = (cssColor: number): string => {
   }
 
   return `${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%`
+}
+
+/**
+ * Converts a Dart color (AARRGGBB) from props to a CSS color string for inline styles.
+ * Use this for any color prop that comes from the Flutter dashboard (e.g. backgroundColor, color).
+ * Raw number must not be used in style — CSS expects a string and byte order differs (Dart: alpha first; CSS: alpha last).
+ *
+ * @param dartColor - Color from props (Dart AARRGGBB format), or undefined/null.
+ * @returns A CSS color string (e.g. "hsl(120, 50%, 50%)") or empty string if no color.
+ */
+export const dartColorToCssColor = (dartColor: number | null | undefined): string => {
+  if (dartColor === null || dartColor === undefined || typeof dartColor !== 'number') return ''
+  const cssNum = convertDartColorToCssNumber(dartColor)
+  const hsl = cssColorToHslString(cssNum)
+  return hsl ? `hsl(${hsl})` : ''
 }
 
 /**
