@@ -444,17 +444,16 @@ export class CartService extends NotifiableService {
   updateCurrentItemOffer(offer?: ProductOffer): void {
     if (!this.currentItem) return
 
-    const updatedItem = { ...this.currentItem }
-    updatedItem.offer = offer
+    const updatedItem = { ...this.currentItem, offer }
 
     // If applying an offer, ensure quantity is within limits
     if (offer) {
       updatedItem.quantity = this.clampQuantityToOfferLimits(offer, this.currentItem.quantity)
     }
 
-    this.updateCurrentItem(updatedItem)
+    this.updateCurrentItem(updatedItem, true)
     this.cachedSubtotal = null
-    this.notifyIfChanged()
+    this.notify()
   }
 
   /**
