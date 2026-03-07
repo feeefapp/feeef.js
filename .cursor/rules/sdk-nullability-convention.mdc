@@ -1,0 +1,42 @@
+---
+description: Node SDK update payload nullability convention
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Node SDK Nullability Convention
+
+When designing or updating `feeefjs` request/update types:
+
+- In the Node.js/TypeScript SDK, use `undefined` to mean "do not send this field".
+- Use `null` only when the API should explicitly clear a nullable field.
+- Do not add Dart-style `setToNull` helpers to the Node.js SDK unless there is a backend requirement that cannot be expressed with normal JS `undefined`/`null` semantics.
+
+Examples:
+
+```typescript
+// GOOD: leave unchanged
+await ff.imagePromptTemplates.update({
+  id: templateId,
+  data: {
+    name: 'Updated name',
+    description: undefined,
+  },
+})
+
+// GOOD: explicitly clear nullable field
+await ff.imagePromptTemplates.update({
+  id: templateId,
+  data: {
+    previewImageUrl: null,
+  },
+})
+
+// BAD: adding setToNull just because Dart uses it
+await ff.imagePromptTemplates.update({
+  id: templateId,
+  data: {
+    setToNull: ['previewImageUrl'],
+  },
+})
+```

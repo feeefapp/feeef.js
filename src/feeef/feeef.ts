@@ -17,6 +17,8 @@ import { FeedbackRepository } from './repositories/feedbacks.js'
 // Product landing pages
 import { ProductLandingPageTemplatesRepository } from './repositories/product_landing_page_templates.js'
 import { ProductLandingPagesRepository } from './repositories/product_landing_pages.js'
+import { ImagePromptTemplatesRepository } from './repositories/image_prompt_templates.js'
+import { ImageGenerationsRepository } from './repositories/image_generations.js'
 // Services
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
@@ -85,6 +87,16 @@ export class FeeeF {
    * The repository for managing product landing page templates.
    */
   productLandingPageTemplates: ProductLandingPageTemplatesRepository
+
+  /**
+   * The repository for managing image prompt templates.
+   */
+  imagePromptTemplates: ImagePromptTemplatesRepository
+
+  /**
+   * The repository for managing async image generations.
+   */
+  imageGenerations: ImageGenerationsRepository
 
   /**
    * The repository for managing users.
@@ -196,6 +208,8 @@ export class FeeeF {
     this.products = new ProductRepository(this.client)
     this.productLandingPages = new ProductLandingPagesRepository(this.client)
     this.productLandingPageTemplates = new ProductLandingPageTemplatesRepository(this.client)
+    this.imagePromptTemplates = new ImagePromptTemplatesRepository(this.client)
+    this.imageGenerations = new ImageGenerationsRepository(this.client)
     this.users = new UserRepository(this.client)
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
