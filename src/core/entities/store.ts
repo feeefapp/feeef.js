@@ -394,6 +394,35 @@ export interface StoreMember {
   metadata: Record<string, any>
 }
 
+export enum StoreInviteStatus {
+  pending = 'pending',
+  accepted = 'accepted',
+  revoked = 'revoked',
+  expired = 'expired',
+}
+
+export interface StoreInvite {
+  id: string
+  storeId: string
+  email: string
+  role: StoreMemberRole
+  invitedBy: string
+  status: StoreInviteStatus
+  acceptedAt: any | null
+  expiresAt: any
+  metadata: Record<string, any>
+  createdAt: any
+  updatedAt: any
+  store?: { id: string; name: string; iconUrl?: string }
+}
+
+export interface CreateStoreInviteInput {
+  email: string
+  role: StoreMemberRole
+  expiresAt?: string
+  metadata?: Record<string, any>
+}
+
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
   selectedCurrency: string
