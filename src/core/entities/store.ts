@@ -139,6 +139,7 @@ export const generatePublicStoreIntegrationMetaPixel = (
     active: metaPixel.active,
     objective: metaPixel.objective,
     draftObjective: metaPixel.draftObjective,
+    mode: metaPixel.mode,
   }
 }
 export const generatePublicStoreIntegrationTiktokPixel = (
@@ -152,6 +153,7 @@ export const generatePublicStoreIntegrationTiktokPixel = (
     active: tiktokPixel.active,
     objective: tiktokPixel.objective,
     draftObjective: tiktokPixel.draftObjective,
+    mode: tiktokPixel.mode,
   }
 }
 export const generatePublicStoreIntegrationGoogleAnalytics = (
@@ -298,12 +300,14 @@ export interface PublicMetaPixelIntegration {
   active: boolean
   objective?: MetaPixelEvent | null
   draftObjective?: MetaPixelEvent | null
+  mode?: PixelReportMode | null
 }
 export interface PublicTiktokPixelIntegration {
   pixels: { id: string }[]
   active: boolean
   objective?: TiktokPixelEvent | null
   draftObjective?: TiktokPixelEvent | null
+  mode?: PixelReportMode | null
 }
 export interface PublicGoogleAnalyticsIntegration {
   id: string
@@ -519,6 +523,15 @@ export enum StoreActionType {
   telegram = 'telegram',
   phone = 'phone',
 }
+/**
+ * Controls where pixel conversion events are sent: server-only (CAPI), client-only (store frontend), or both.
+ * When unset (auto), server is used if an API key is configured; otherwise client-only.
+ */
+export enum PixelReportMode {
+  server = 'server',
+  client = 'client',
+  both = 'both',
+}
 export interface MetaPixel {
   name?: string
   id: string
@@ -553,6 +566,8 @@ export interface MetaPixelIntegration {
   metadata: Record<string, any>
   /** Facebook Marketing OAuth data - for accessing pixels via API */
   oauth2?: FacebookMarketingOAuth | null
+  /** Where to send events: server (CAPI), client (store frontend), or both. Omit for auto (prefer server if key set). */
+  mode?: PixelReportMode | null
 }
 // tiktok pixel integration
 export interface TiktokPixelIntegration {
@@ -562,6 +577,8 @@ export interface TiktokPixelIntegration {
   draftObjective?: TiktokPixelEvent | null
   active: boolean
   metadata: Record<string, any>
+  /** Where to send events: server, client, or both. Omit for auto (prefer server if accessToken set). */
+  mode?: PixelReportMode | null
 }
 
 export interface GoogleAnalyticsIntegration {

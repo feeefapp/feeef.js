@@ -171,10 +171,7 @@ export class StoreRepository extends ModelRepository<
    * @param params - Optional filters (e.g. status).
    * @returns A Promise that resolves to the list of invites.
    */
-  async listInvites(
-    storeId: string,
-    params?: { status?: string }
-  ): Promise<StoreInvite[]> {
+  async listInvites(storeId: string, params?: { status?: string }): Promise<StoreInvite[]> {
     const res = await this.client.get(`/${this.resource}/${storeId}/invites`, { params })
     return res.data
   }
@@ -206,15 +203,10 @@ export class StoreRepository extends ModelRepository<
    * @param token - The invite token from the email link.
    * @returns A Promise that resolves to the created store member.
    */
-  async acceptInvite(
-    storeId: string,
-    inviteId: string,
-    token: string
-  ): Promise<StoreMember> {
-    const res = await this.client.post(
-      `/${this.resource}/${storeId}/invites/${inviteId}/accept`,
-      { token }
-    )
+  async acceptInvite(storeId: string, inviteId: string, token: string): Promise<StoreMember> {
+    const res = await this.client.post(`/${this.resource}/${storeId}/invites/${inviteId}/accept`, {
+      token,
+    })
     return res.data
   }
 
