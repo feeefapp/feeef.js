@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios'
-import { ModelRepository } from './repository.js'
+import { ModelRepository, ListResponse } from './repository.js'
 
 /**
  * Developer-registered app (OAuth client) returned by the apps API.
@@ -23,11 +23,13 @@ export interface AppEntity {
 
 /**
  * Input for creating a new app.
+ * userId is optional; admins may set it to create an app for another user.
  */
 export interface AppCreateInput {
   name: string
   redirectUris: string[]
   scopes: string[]
+  userId?: string
 }
 
 /**
@@ -41,6 +43,21 @@ export interface AppUpdateInput {
 }
 
 /**
+ * Options for listing apps (pagination, filterator, search).
+ * filterator: JSON string from dashboard advanced filter; backend applies filtering/ordering.
+ * q: optional search (backend may support free-text search on name/clientId).
+ */
+export interface AppListOptions {
+  page?: number
+  limit?: number
+  q?: string
+  filterator?: string
+  userId?: string
+  active?: boolean
+  params?: Record<string, any>
+}
+
+/**
  * Repository for developer-registered apps (CRUD and regenerate secret).
  * Requires an authenticated user (Bearer token).
  *
@@ -50,6 +67,23 @@ export interface AppUpdateInput {
 export class AppRepository extends ModelRepository<AppEntity, AppCreateInput, AppUpdateInput> {
   constructor(client: AxiosInstance) {
     super('apps', client)
+  }
+
+  /**
+   * Lists apps with optional pagination and filterator.
+   * @param options - Page, limit, filterator, q, and extra params forwarded to the API.
+   */
+  async list(options?: AppListOptions): Promise<ListResponse<AppEntity>> {
+    const params: Record<string, any> = { ...options?.params }
+    if (options) {
+      if (options.page !== undefined) params.page = options.page
+      if (options.limit !== undefined) params.limit = options.limit
+      if (options.q !== undefined) params.q = options.q
+      if (options.filterator !== undefined) params.filterator = options.filterator
+      if (options.userId !== undefined) params.userId = options.userId
+      if (options.active !== undefined) params.active = options.active
+    }
+    return super.list({ page: options?.page, limit: options?.limit, params })
   }
 
   /**
