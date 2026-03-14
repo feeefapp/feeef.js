@@ -4,6 +4,7 @@ import { OrderRepository } from './repositories/orders.js'
 import { ProductRepository } from './repositories/products.js'
 import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
+import { AppRepository } from './repositories/apps.js'
 import { DepositRepository } from './repositories/deposits.js'
 import { TransferRepository } from './repositories/transfers.js'
 import { CategoryRepository } from './repositories/categories.js'
@@ -102,6 +103,11 @@ export class FeeeF {
    * The repository for managing users.
    */
   users: UserRepository
+
+  /**
+   * The repository for managing developer-registered apps (OAuth clients).
+   */
+  apps: AppRepository
 
   /**
    * The repository for managing orders.
@@ -211,6 +217,7 @@ export class FeeeF {
     this.imagePromptTemplates = new ImagePromptTemplatesRepository(this.client)
     this.imageGenerations = new ImageGenerationsRepository(this.client)
     this.users = new UserRepository(this.client)
+    this.apps = new AppRepository(this.client)
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
     this.transfers = new TransferRepository(this.client)
