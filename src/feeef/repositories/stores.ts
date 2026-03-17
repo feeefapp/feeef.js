@@ -4,14 +4,13 @@ import {
   StoreEntity,
   StoreSummary,
   StoreMember,
-  StoreInvite,
-  CreateStoreInviteInput,
   StoreSubscriptionType,
   AddStoreMemberInput,
   UpdateStoreMemberInput,
   StoreCreateInput,
   StoreUpdateInput,
 } from '../../core/entities/store.js'
+import { StoreInvitesRepository } from './store_invites_repository.js'
 
 /**
  * Options for listing stores
@@ -155,59 +154,10 @@ export class StoreRepository extends ModelRepository<
   }
 
   /**
-   * Creates a store invite (sends email to invitee).
-   * @param storeId - The store ID.
-   * @param data - The invite data.
-   * @returns A Promise that resolves to the created invite.
+   * Repository for store invites. Use e.g. `ff.stores.invites.list(storeId)`, `ff.stores.invites.create(storeId, data)`.
    */
-  async createInvite(storeId: string, data: CreateStoreInviteInput): Promise<StoreInvite> {
-    const res = await this.client.post(`/${this.resource}/${storeId}/invites`, data)
-    return res.data
-  }
-
-  /**
-   * Lists invites for a store.
-   * @param storeId - The store ID.
-   * @param params - Optional filters (e.g. status).
-   * @returns A Promise that resolves to the list of invites.
-   */
-  async listInvites(storeId: string, params?: { status?: string }): Promise<StoreInvite[]> {
-    const res = await this.client.get(`/${this.resource}/${storeId}/invites`, { params })
-    return res.data
-  }
-
-  /**
-   * Revokes a pending invite.
-   * @param storeId - The store ID.
-   * @param inviteId - The invite ID.
-   */
-  async revokeInvite(storeId: string, inviteId: string): Promise<void> {
-    await this.client.delete(`/${this.resource}/${storeId}/invites/${inviteId}`)
-  }
-
-  /**
-   * Gets invite details (public or full if authorized).
-   * @param storeId - The store ID.
-   * @param inviteId - The invite ID.
-   * @returns A Promise that resolves to the invite.
-   */
-  async getInvite(storeId: string, inviteId: string): Promise<StoreInvite> {
-    const res = await this.client.get(`/${this.resource}/${storeId}/invites/${inviteId}`)
-    return res.data
-  }
-
-  /**
-   * Accepts an invite (authenticated user's email must match invite email).
-   * @param storeId - The store ID.
-   * @param inviteId - The invite ID.
-   * @param token - The invite token from the email link.
-   * @returns A Promise that resolves to the created store member.
-   */
-  async acceptInvite(storeId: string, inviteId: string, token: string): Promise<StoreMember> {
-    const res = await this.client.post(`/${this.resource}/${storeId}/invites/${inviteId}/accept`, {
-      token,
-    })
-    return res.data
+  get invites(): StoreInvitesRepository {
+    return new StoreInvitesRepository(this.client, this.resource)
   }
 
   /**
