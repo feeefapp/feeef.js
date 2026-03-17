@@ -1,9 +1,5 @@
 import { AxiosInstance } from 'axios'
-import {
-  StoreInvite,
-  CreateStoreInviteInput,
-  StoreMember,
-} from '../../core/entities/store.js'
+import { StoreInvite, CreateStoreInviteInput, StoreMember } from '../../core/entities/store.js'
 
 /**
  * Repository for store invites. Exposed as `ff.stores.invites`.
@@ -21,14 +17,8 @@ export class StoreInvitesRepository {
    * @param params - Optional filters (e.g. status).
    * @returns A Promise that resolves to the list of invites.
    */
-  async list(
-    storeId: string,
-    params?: { status?: string }
-  ): Promise<StoreInvite[]> {
-    const res = await this.client.get(
-      `/${this.resource}/${storeId}/invites`,
-      { params }
-    )
+  async list(storeId: string, params?: { status?: string }): Promise<StoreInvite[]> {
+    const res = await this.client.get(`/${this.resource}/${storeId}/invites`, { params })
     return res.data
   }
 
@@ -38,14 +28,8 @@ export class StoreInvitesRepository {
    * @param data - The invite data.
    * @returns A Promise that resolves to the created invite.
    */
-  async create(
-    storeId: string,
-    data: CreateStoreInviteInput
-  ): Promise<StoreInvite> {
-    const res = await this.client.post(
-      `/${this.resource}/${storeId}/invites`,
-      data
-    )
+  async create(storeId: string, data: CreateStoreInviteInput): Promise<StoreInvite> {
+    const res = await this.client.post(`/${this.resource}/${storeId}/invites`, data)
     return res.data
   }
 
@@ -56,9 +40,7 @@ export class StoreInvitesRepository {
    * @returns A Promise that resolves to the invite.
    */
   async get(storeId: string, inviteId: string): Promise<StoreInvite> {
-    const res = await this.client.get(
-      `/${this.resource}/${storeId}/invites/${inviteId}`
-    )
+    const res = await this.client.get(`/${this.resource}/${storeId}/invites/${inviteId}`)
     return res.data
   }
 
@@ -68,9 +50,7 @@ export class StoreInvitesRepository {
    * @param inviteId - The invite ID.
    */
   async revoke(storeId: string, inviteId: string): Promise<void> {
-    await this.client.delete(
-      `/${this.resource}/${storeId}/invites/${inviteId}`
-    )
+    await this.client.delete(`/${this.resource}/${storeId}/invites/${inviteId}`)
   }
 
   /**
@@ -80,15 +60,10 @@ export class StoreInvitesRepository {
    * @param token - The invite token from the email link.
    * @returns A Promise that resolves to the created store member.
    */
-  async accept(
-    storeId: string,
-    inviteId: string,
-    token: string
-  ): Promise<StoreMember> {
-    const res = await this.client.post(
-      `/${this.resource}/${storeId}/invites/${inviteId}/accept`,
-      { token }
-    )
+  async accept(storeId: string, inviteId: string, token: string): Promise<StoreMember> {
+    const res = await this.client.post(`/${this.resource}/${storeId}/invites/${inviteId}/accept`, {
+      token,
+    })
     return res.data
   }
 }

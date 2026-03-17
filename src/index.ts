@@ -27,6 +27,7 @@ export * from './core/entities/feedback.js'
 export * from './feeef/repositories/repository.js'
 export * from './feeef/repositories/apps.js'
 export * from './feeef/repositories/deposits.js'
+export * from './feeef/repositories/promos.js'
 export * from './feeef/repositories/transfers.js'
 export * from './feeef/repositories/shipping_prices.js'
 export * from './feeef/repositories/shipping_methods.js'
@@ -62,6 +63,12 @@ export type {
   PayPalOrderResponse,
   PayPalCaptureResponse,
 } from './feeef/repositories/deposits.js'
+export type {
+  PromoEntity,
+  PromoValidationResult,
+  PromoListResponse,
+  PromoCreateInput,
+} from './feeef/repositories/promos.js'
 
 // ============================================================================
 // Embedded Types

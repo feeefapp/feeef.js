@@ -6,6 +6,7 @@ import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
 import { AppRepository } from './repositories/apps.js'
 import { DepositRepository } from './repositories/deposits.js'
+import { PromoRepository } from './repositories/promos.js'
 import { TransferRepository } from './repositories/transfers.js'
 import { CategoryRepository } from './repositories/categories.js'
 import { CountryRepository } from './repositories/countries.js'
@@ -125,6 +126,11 @@ export class FeeeF {
   transfers: TransferRepository
 
   /**
+   * The repository for managing promo codes (list, validate, create).
+   */
+  promos: PromoRepository
+
+  /**
    * The repository for managing categories.
    */
   categories: CategoryRepository
@@ -221,6 +227,7 @@ export class FeeeF {
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
     this.transfers = new TransferRepository(this.client)
+    this.promos = new PromoRepository(this.client)
     this.categories = new CategoryRepository(this.client)
     this.countries = new CountryRepository(this.client)
     this.states = new StateRepository(this.client)

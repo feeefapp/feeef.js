@@ -165,12 +165,19 @@ export class StoreRepository extends ModelRepository<
    * @param id - The store ID.
    * @param plan - The plan type to upgrade to.
    * @param months - The number of months (1-12).
-   * @returns A Promise that resolves when the upgrade is complete.
+   * @param code - Optional promo code.
    */
-  async upgrade(id: string, plan: StoreSubscriptionType, months: number): Promise<void> {
+  async upgrade(
+    id: string,
+    plan: StoreSubscriptionType,
+    months: number,
+    options?: { code?: string }
+  ): Promise<void> {
     await this.client.post(`/${this.resource}/${id}/subscription/upgrade`, {
       plan,
       months,
+      // eslint-disable-next-line eqeqeq
+      ...(options?.code != null && options.code !== '' && { code: options.code }),
     })
   }
 
