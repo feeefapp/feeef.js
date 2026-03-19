@@ -96,7 +96,10 @@ export interface OrderListOptions {
   page?: number
   offset?: number
   limit?: number
+  /** Single store (legacy). Ignored when storeIds is non-empty. */
   storeId?: string
+  /** Multiple stores for unified order list. Takes precedence over storeId when non-empty. */
+  storeIds?: string[]
   status?: OrderStatus | OrderStatus[]
   deliveryStatus?: DeliveryStatus
   paymentStatus?: PaymentStatus
@@ -142,7 +145,13 @@ export class OrderRepository extends ModelRepository<
       if (options.page) params.page = options.page
       if (options.offset) params.offset = options.offset
       if (options.limit) params.limit = options.limit
-      if (options.storeId) params.store_id = options.storeId
+      // eslint-disable-next-line eqeqeq
+      const useMultiStore = options.storeIds != null && options.storeIds.length > 0
+      if (useMultiStore) {
+        params.store_ids = options.storeIds
+      } else if (options.storeId) {
+        params.store_id = options.storeId
+      }
       if (options.status) {
         params.status = Array.isArray(options.status) ? options.status : [options.status]
       }
