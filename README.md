@@ -213,3 +213,76 @@ interface ProductOffer {
 ## Contributing
 
 Feel free to fork this repository and contribute improvements, bug fixes, or additional features. Open a pull request for any major changes!
+
+## Developer OAuth (Authorization Code)
+
+Use this flow when a third-party app (created in `apps`) needs user authorization.
+
+### Endpoints
+
+- Authorize: `GET /v1/oauth/authorize`
+- Token: `POST /v1/oauth/token`
+- Revoke: `POST /v1/oauth/revoke`
+- Introspect: `POST /v1/oauth/introspect`
+
+### Step-by-step (Google-like)
+
+1. Build authorize URL:
+
+```ts
+import { FeeeF, OAuthRepository } from 'feeef'
+
+const feeef = new FeeeF({
+  apiKey: '<your_api_key>',
+  baseURL: 'https://api.feeef.org/v1',
+})
+
+const authorizeUrl = OAuthRepository.buildAuthorizeUrl({
+  baseUrl: 'https://api.feeef.org/v1',
+  clientId: '<client_id>',
+  redirectUri: 'https://your-app.com/oauth/callback',
+  scope: ['*'], // or explicit scopes
+  state: crypto.randomUUID(),
+})
+```
+
+2. Open `authorizeUrl` in browser.
+3. If user is not signed in, API may return `401` with:
+   - `error: "login_required"`
+   - `login_url` (accounts sign-in URL with `next`)
+4. Redirect user to `login_url`.
+5. After sign-in + authorization, user is redirected to your callback with `code` (and `state`).
+6. Exchange `code` for token:
+
+```ts
+const tokenResponse = await feeef.oauth.exchangeAuthorizationCode({
+  code: '<code_from_callback>',
+  redirectUri: 'https://your-app.com/oauth/callback',
+  clientId: '<client_id>',
+  clientSecret: '<client_secret>',
+})
+
+await feeef.oauth.revokeToken(tokenResponse.access_token)
+
+const introspection = await feeef.oauth.introspectToken(tokenResponse.access_token)
+console.log(introspection.active)
+```
+
+Alternative static helper:
+
+```ts
+import { OAuthRepository } from 'feeef'
+
+const authorizeUrl = OAuthRepository.buildAuthorizeUrl({
+  baseUrl: 'https://api.feeef.org/v1',
+  clientId: '<client_id>',
+  redirectUri: 'https://your-app.com/oauth/callback',
+})
+```
+
+### Important
+
+- `redirect_uri` must exactly match one of the app's registered redirect URIs.
+- Keep `client_secret` server-side only.
+- Always validate `state` on callback.
+- Prefer PKCE (`code_challenge`, `code_verifier`) for public clients.

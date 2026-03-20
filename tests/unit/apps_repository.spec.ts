@@ -5,7 +5,12 @@
  */
 
 import { test } from '@japa/runner'
-import { AppRepository } from '../../src/feeef/repositories/apps.js'
+import {
+  AppRepository,
+  type AppCreateInput,
+  type AppEntity,
+  type AppUpdateInput,
+} from '../../src/feeef/repositories/apps.js'
 
 test.group('AppRepository.buildAuthorizeUrl', () => {
   test('builds URL with required params', ({ assert }) => {
@@ -78,5 +83,36 @@ test.group('AppRepository.buildAuthorizeUrl', () => {
     })
     assert.include(url, 'redirect_uri=')
     assert.include(url, encodeURIComponent('https://myapp.com/callback?foo=bar'))
+  })
+})
+
+test.group('AppRepository.logoUrl typing', () => {
+  test('supports logoUrl on app entity and create/update payloads', ({ assert }) => {
+    const createPayload: AppCreateInput = {
+      name: 'My app',
+      logoUrl: 'https://cdn.example.com/logo.png',
+      redirectUris: ['https://example.com/cb'],
+      scopes: ['auth'],
+    }
+    const updatePayload: AppUpdateInput = {
+      logoUrl: null,
+    }
+    const app: AppEntity = {
+      id: 'app_1',
+      userId: 'user_1',
+      name: 'My app',
+      logoUrl: 'https://cdn.example.com/logo.png',
+      clientId: 'client_1',
+      redirectUris: ['https://example.com/cb'],
+      scopes: ['auth'],
+      active: true,
+      lastUsedAt: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: null,
+    }
+
+    assert.equal(createPayload.logoUrl, 'https://cdn.example.com/logo.png')
+    assert.isNull(updatePayload.logoUrl)
+    assert.equal(app.logoUrl, 'https://cdn.example.com/logo.png')
   })
 })

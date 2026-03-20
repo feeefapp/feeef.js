@@ -10,6 +10,8 @@ export interface AppEntity {
   /** Owner user id. Always present from API. */
   userId?: string
   name: string
+  /** Optional app logo URL for OAuth consent and dashboard UI. */
+  logoUrl?: string | null
   clientId: string
   redirectUris: string[]
   scopes: string[]
@@ -27,6 +29,8 @@ export interface AppEntity {
  */
 export interface AppCreateInput {
   name: string
+  /** Optional app logo URL. */
+  logoUrl?: string
   redirectUris: string[]
   scopes: string[]
   userId?: string
@@ -37,6 +41,8 @@ export interface AppCreateInput {
  */
 export interface AppUpdateInput {
   name?: string
+  /** Optional app logo URL; pass null to clear. */
+  logoUrl?: string | null
   redirectUris?: string[]
   scopes?: string[]
   active?: boolean
@@ -100,6 +106,14 @@ export class AppRepository extends ModelRepository<AppEntity, AppCreateInput, Ap
 
   /**
    * Builds the OAuth authorize URL to which the user should be redirected.
+   * This is the first step of the authorization-code flow (similar UX to Google OAuth).
+   *
+   * If the user is not logged in yet, API `GET /oauth/authorize` returns:
+   * - `401 login_required`
+   * - `login_url` (accounts sign-in URL with `next=...`)
+   *
+   * The client should navigate to `login_url`, let the user sign in, and then
+   * continue by opening the original authorize URL again (or rely on `next`).
    *
    * @param params - Parameters for the authorize URL.
    * @param params.baseUrl - API base URL (e.g. https://api.feeef.org/api/v1).

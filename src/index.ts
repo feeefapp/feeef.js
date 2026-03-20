@@ -26,6 +26,7 @@ export * from './core/entities/feedback.js'
 // ============================================================================
 export * from './feeef/repositories/repository.js'
 export * from './feeef/repositories/apps.js'
+export * from './feeef/repositories/oauth.js'
 export * from './feeef/repositories/deposits.js'
 export * from './feeef/repositories/promos.js'
 export * from './feeef/repositories/transfers.js'

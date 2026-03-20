@@ -5,6 +5,7 @@ import { ProductRepository } from './repositories/products.js'
 import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
 import { AppRepository } from './repositories/apps.js'
+import { OAuthRepository } from './repositories/oauth.js'
 import { DepositRepository } from './repositories/deposits.js'
 import { PromoRepository } from './repositories/promos.js'
 import { TransferRepository } from './repositories/transfers.js'
@@ -109,6 +110,11 @@ export class FeeeF {
    * The repository for managing developer-registered apps (OAuth clients).
    */
   apps: AppRepository
+
+  /**
+   * The repository for OAuth2 authorize/token/revoke/introspect operations.
+   */
+  oauth: OAuthRepository
 
   /**
    * The repository for managing orders.
@@ -224,6 +230,7 @@ export class FeeeF {
     this.imageGenerations = new ImageGenerationsRepository(this.client)
     this.users = new UserRepository(this.client)
     this.apps = new AppRepository(this.client)
+    this.oauth = new OAuthRepository(this.client)
     this.orders = new OrderRepository(this.client)
     this.deposits = new DepositRepository(this.client)
     this.transfers = new TransferRepository(this.client)
