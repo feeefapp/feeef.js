@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios'
+import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { ModelRepository, ListResponse } from './repository.js'
 
 /**
@@ -151,5 +151,90 @@ export class AppRepository extends ModelRepository<AppEntity, AppCreateInput, Ap
       url.searchParams.set('code_challenge_method', params.codeChallengeMethod)
     }
     return url.toString()
+  }
+
+  /**
+   * Public `apps.public_data` (no auth). Pass [config] to skip Authorization if your axios instance adds it globally.
+   */
+  async getPublicData(
+    id: string,
+    config?: AxiosRequestConfig
+  ): Promise<{
+    public: Record<string, Record<string, unknown>>
+  }> {
+    const res = await this.client.get(`/${this.resource}/${id}/public-data`, config)
+    return res.data
+  }
+
+  async getPrivateData(id: string): Promise<{ private: Record<string, Record<string, unknown>> }> {
+    const res = await this.client.get(`/${this.resource}/${id}/private-data`)
+    return res.data
+  }
+
+  async putPublicData(
+    id: string,
+    publicNamespaces: Record<string, Record<string, unknown>>
+  ): Promise<{ public: Record<string, Record<string, unknown>> }> {
+    const res = await this.client.put(`/${this.resource}/${id}/public-data`, {
+      public: publicNamespaces,
+    })
+    return res.data
+  }
+
+  async putPrivateData(
+    id: string,
+    privateNamespaces: Record<string, Record<string, unknown>>
+  ): Promise<{ private: Record<string, Record<string, unknown>> }> {
+    const res = await this.client.put(`/${this.resource}/${id}/private-data`, {
+      private: privateNamespaces,
+    })
+    return res.data
+  }
+
+  async getUserDataMe(id: string): Promise<{
+    public: Record<string, Record<string, unknown>>
+    protected: Record<string, Record<string, unknown>>
+  }> {
+    const res = await this.client.get(`/${this.resource}/${id}/user-data/me`)
+    return res.data
+  }
+
+  async putUserDataMe(
+    id: string,
+    publicNamespaces: Record<string, Record<string, unknown>>
+  ): Promise<{ public: Record<string, Record<string, unknown>> }> {
+    const res = await this.client.put(`/${this.resource}/${id}/user-data/me`, {
+      public: publicNamespaces,
+    })
+    return res.data
+  }
+
+  async getUserDataForUser(
+    appId: string,
+    userId: string
+  ): Promise<{
+    public: Record<string, Record<string, unknown>>
+    private: Record<string, Record<string, unknown>>
+    protected: Record<string, Record<string, unknown>>
+  }> {
+    const res = await this.client.get(`/${this.resource}/${appId}/user-data/users/${userId}`)
+    return res.data
+  }
+
+  async putUserDataForUser(
+    appId: string,
+    userId: string,
+    body: {
+      public?: Record<string, Record<string, unknown>>
+      private?: Record<string, Record<string, unknown>>
+      protected?: Record<string, Record<string, unknown>>
+    }
+  ): Promise<{
+    public: Record<string, Record<string, unknown>>
+    private: Record<string, Record<string, unknown>>
+    protected: Record<string, Record<string, unknown>>
+  }> {
+    const res = await this.client.put(`/${this.resource}/${appId}/user-data/users/${userId}`, body)
+    return res.data
   }
 }

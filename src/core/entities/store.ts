@@ -454,6 +454,8 @@ export interface CustomStatusMapping {
   deliveryStatus?: DeliveryStatus | null
   /** Payment status to map to (null means no change) */
   paymentStatus?: PaymentStatus | null
+  /** Codes (or names) of other mappings suggested as the next workflow step */
+  next?: string[]
 }
 
 export interface StoreCurrencyConfig {

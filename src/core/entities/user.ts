@@ -78,6 +78,8 @@ export interface UpdateUserOptions {
  */
 export interface AccessToken {
   id: string
+  /** Opaque id used with `DELETE users/auth/tokens/:identifier` (Adonis access token identifier). */
+  identifier?: string
   type: string
   name: string | null
   token: string
@@ -147,7 +149,7 @@ export interface TransferMoneyResponse {
  * Options for linking a social account.
  */
 export interface LinkSocialAccountOptions {
-  provider: 'google' | 'github' | 'apple'
+  provider: 'google' | 'github' | 'apple' | 'facebook'
   code: string
 }
 

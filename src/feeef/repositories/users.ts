@@ -201,6 +201,23 @@ export class UserRepository extends ModelRepository<
   }
 
   /**
+   * Revokes an access token (session) by opaque identifier from {@link tokens}.
+   */
+  async revokeAccessToken(identifier: string): Promise<void> {
+    await this.client.delete(`/${this.resource}/auth/tokens/${encodeURIComponent(identifier)}`)
+  }
+
+  /**
+   * Lists OAuth apps that have per-user stored data for the current user (`app_user` rows).
+   */
+  async connectedApps(): Promise<
+    Array<{ appId: string; name: string; logoUrl: string | null; connectedAt: string | null }>
+  > {
+    const res = await this.client.get(`/${this.resource}/auth/connected-apps`)
+    return res.data
+  }
+
+  /**
    * Signs in with Google OAuth.
    * @param options - The OAuth code and optional FCM token.
    * @returns A promise that resolves to the authentication response.
@@ -266,7 +283,9 @@ export class UserRepository extends ModelRepository<
    * @param provider - The social provider to unlink.
    * @returns A promise that resolves to the updated user entity.
    */
-  async unlinkSocialAccount(provider: 'google' | 'github' | 'apple'): Promise<UserEntity> {
+  async unlinkSocialAccount(
+    provider: 'google' | 'github' | 'apple' | 'facebook'
+  ): Promise<UserEntity> {
     const res = await this.client.post('/social/unlink', { provider })
     // Update local auth state if it's the current user
     if (this.auth && this.auth.user.id === res.data.user.id) {

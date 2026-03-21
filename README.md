@@ -6,6 +6,10 @@
 
 Use `OAuthRepository.buildAuthorizeUrl` (point `baseUrl` at the **accounts** host, e.g. `https://accounts.feeef.org`) and `FeeeF` client `oauth.exchangeAuthorizationCode` / `revokeToken` / `introspectToken` against the **API** base (`.../v1`). Full flow, scopes, and troubleshooting: Feeef backend **`docs/OAUTH2_DEVELOPER.md`** (in the Adonis API repo).
 
+## Realtime (AdonisJS Transmit)
+
+Server-Sent Events use the same **API origin** as the REST client, but **without** the `/v1` or `/api/v1` prefix (e.g. `https://api.feeef.org/__transmit/events`). Use `createFeeefTransmit({ apiBaseUrl, getAccessToken })` so subscribe/unsubscribe POSTs get a proper `Authorization: Bearer …` header. The underlying client is the official [`@adonisjs/transmit-client`](https://www.npmjs.com/package/@adonisjs/transmit-client) (`Transmit`, `Subscription` are re-exported).
+
 ---
 
 # CartService & NotifiableService
