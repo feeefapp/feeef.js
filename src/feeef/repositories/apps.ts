@@ -108,6 +108,9 @@ export class AppRepository extends ModelRepository<AppEntity, AppCreateInput, Ap
    * Builds the OAuth authorize URL to which the user should be redirected.
    * This is the first step of the authorization-code flow (similar UX to Google OAuth).
    *
+   * Production: opening this URL on the **API** host (`api.*`) issues a redirect to the same path on
+   * **accounts.*** so the consent screen appears on the trusted accounts domain; query params are preserved.
+   *
    * If the user is not logged in yet, API `GET /oauth/authorize` returns:
    * - `401 login_required`
    * - `login_url` (accounts sign-in URL with `next=...`)
