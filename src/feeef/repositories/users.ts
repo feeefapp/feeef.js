@@ -204,7 +204,16 @@ export class UserRepository extends ModelRepository<
    * Revokes an access token (session) by opaque identifier from {@link tokens}.
    */
   async revokeAccessToken(identifier: string): Promise<void> {
+    if (!identifier || identifier === 'undefined') {
+      throw new Error('Missing access token identifier')
+    }
     await this.client.delete(`/${this.resource}/auth/tokens/${encodeURIComponent(identifier)}`)
+  }
+
+  /** Revokes every access token for the current user (sign out everywhere). */
+  async revokeAllAccessTokens(): Promise<{ revoked: number; total: number }> {
+    const res = await this.client.post(`/${this.resource}/auth/tokens/revoke-all`)
+    return res.data
   }
 
   /**

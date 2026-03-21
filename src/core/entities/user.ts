@@ -77,16 +77,19 @@ export interface UpdateUserOptions {
  * Represents an access token (returned from tokens endpoint).
  */
 export interface AccessToken {
-  id: string
-  /** Opaque id used with `DELETE users/auth/tokens/:identifier` (Adonis access token identifier). */
+  /** Same value as `identifier` when the API sends both (legacy / convenience). */
+  id?: string
+  /** Opaque id for `DELETE users/auth/tokens/:identifier` (DB access token id, string or number in JSON). */
   identifier?: string
   type: string
   name: string | null
-  token: string
+  /** Present only when a secret was just minted; omitted on session list responses. */
+  token?: string
   abilities: string[]
   lastUsedAt: any | null
   expiresAt: any | null
-  createdAt: any
+  createdAt?: any
+  updatedAt?: any
 }
 
 /**
