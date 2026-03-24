@@ -2,6 +2,10 @@
 
 `feeefjs` is a TypeScript library for managing feeef e-commerce platforms for self-hosted stores. It provides a wrapper for feeef rest api such like send order..., also have frontend srvices like the `CartService` class for managing cart items, shipping methods, and calculating totals. The library also includes a `NotifiableService` base class for handling listeners that react to changes in the service state.
 
+## Delivery parcel types
+
+Canonical shipment shapes mirror the API domain in `feeefapps/backend/services/delivery/domain/parcel.ts`. In this package they live under `src/delivery/parcel.ts` and are exported from the main entry (`ParcelCreate`, `ParcelUpdate`, `DeliveryCarrierClient`, …). Keep them in sync when the backend parcel model changes; published npm `feeef` should re-export the same definitions after each release.
+
 ## Developer OAuth (third-party apps)
 
 Use `OAuthRepository.buildAuthorizeUrl` (point `baseUrl` at the **accounts** host, e.g. `https://accounts.feeef.org`) and `FeeeF` client `oauth.exchangeAuthorizationCode` / `revokeToken` / `introspectToken` against the **API** base (`.../v1`). Full flow, scopes, and troubleshooting: Feeef backend **`docs/OAUTH2_DEVELOPER.md`** (in the Adonis API repo).

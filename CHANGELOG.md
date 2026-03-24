@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Delivery**: exported canonical `ParcelCreate` / `ParcelUpdate` / related types (`src/delivery/parcel.ts`) and `DeliveryCarrierClient` (`src/delivery/delivery_carrier_client.ts`), aligned with the Feeef API parcel domain.
+
+### Changed
+
+- **Delivery / `ParcelCreate`**: breaking rename — `codAmount` → `total`, `productsSummary` → `summary`, `parcelType` → `type`; added `pickupId`, `freeShipping`; `shippingType` typed as platform `ShippingType`. HTTP bridge still accepts legacy keys (`codAmount`, `productsSummary`, `parcelType`, `centerId`) server-side via `normalizeLegacyParcelCreatePatch`.
+
 ## [0.8.7] - 2025-03-21
 
 ### Added
