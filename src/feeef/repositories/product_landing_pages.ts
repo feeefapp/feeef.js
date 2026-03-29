@@ -5,6 +5,7 @@ import {
   ProductLandingPageCreate,
   ProductLandingPageUpdate,
 } from '../../core/entities/product_landing_page.js'
+import type { LiteOrdersReport } from '../../core/entities/order.js'
 
 /**
  * Options for listing product landing pages
@@ -42,5 +43,18 @@ export class ProductLandingPagesRepository extends ModelRepository<
   async list(options?: ProductLandingPageListOptions): Promise<ListResponse<ProductLandingPage>> {
     const params: Record<string, any> = { ...options?.params }
     return super.list({ params })
+  }
+
+  /**
+   * Lite orders report for a product landing page in a store.
+   */
+  async liteOrdersReport(
+    storeId: string,
+    landingPageId: string
+  ): Promise<{ lor: LiteOrdersReport }> {
+    const res = await this.client.get(
+      `/stores/${storeId}/product_landing_pages/${landingPageId}/analytics/lor`
+    )
+    return res.data
   }
 }

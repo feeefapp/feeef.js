@@ -10,6 +10,7 @@ import {
   StoreCreateInput,
   StoreUpdateInput,
 } from '../../core/entities/store.js'
+import type { LiteOrdersReport } from '../../core/entities/order.js'
 import { StoreInvitesRepository } from './store_invites_repository.js'
 
 /**
@@ -105,6 +106,14 @@ export class StoreRepository extends ModelRepository<
     }
 
     return chartData
+  }
+
+  /**
+   * Lite orders report for the store (8 UTC days + total).
+   */
+  async liteOrdersReport(storeId: string): Promise<{ lor: LiteOrdersReport }> {
+    const res = await this.client.get(`/${this.resource}/${storeId}/analytics/lor`)
+    return res.data
   }
 
   /**

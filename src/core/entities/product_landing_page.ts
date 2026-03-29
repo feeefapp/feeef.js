@@ -39,3 +39,8 @@ export interface ProductLandingPageUpdate {
   productId: string | null
   storeId?: string
 }
+
+/** Token for `Order.references`. */
+export function formatProductLandingPageOrderReference(landingPageId: string): string {
+  return `product_landing_page:${landingPageId}`
+}

@@ -7,6 +7,7 @@ import {
   ProductReport,
   ProductStatus,
 } from '../../core/entities/product.js'
+import type { LiteOrdersReport } from '../../core/entities/order.js'
 
 /**
  * Options for listing products
@@ -121,6 +122,16 @@ export class ProductRepository extends ModelRepository<
    */
   async report(productId: string, storeId: string): Promise<ProductReport> {
     const res = await this.client.get(`/stores/${storeId}/${this.resource}/${productId}/report`)
+    return res.data
+  }
+
+  /**
+   * Lite orders report for a product in a store.
+   */
+  async liteOrdersReport(storeId: string, productId: string): Promise<{ lor: LiteOrdersReport }> {
+    const res = await this.client.get(
+      `/stores/${storeId}/${this.resource}/${productId}/analytics/lor`
+    )
     return res.data
   }
 }

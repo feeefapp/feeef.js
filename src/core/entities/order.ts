@@ -66,8 +66,21 @@ export interface OrderEntity {
   deliveryStatus: DeliveryStatus
   customStatus?: string | null
   tags: string[] | null
+  /**
+   * Attribution tokens: `product:…`, `product_landing_page:…`.
+   * JSON / API field name is always **`references`** (never `orderReferences`).
+   */
+  references?: string[]
   createdAt: any
   updatedAt: any
+}
+
+/** Lite orders report (8 UTC days + total), API key `lor`. */
+export interface LiteOrdersReport {
+  lastSync: string
+  lastItemDate: string
+  totalOrders: number
+  data: [number, number, number][]
 }
 export interface OrderItem {
   productId: string
@@ -172,6 +185,7 @@ export interface OrderCreateInput {
   metadata?: Record<string, any>
   storeId: string
   tags?: string[]
+  references?: string[]
 }
 
 /**
@@ -219,6 +233,7 @@ export interface OrderUpdateInput {
   customFields?: Record<string, any>
   metadata?: Record<string, any>
   tags?: string[]
+  references?: string[]
 }
 
 /**

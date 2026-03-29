@@ -45,6 +45,7 @@ export interface SendOrderSchema {
   storeId: string
   customFields?: Record<string, any>
   metadata?: any
+  references?: string[]
 }
 
 /**
@@ -114,6 +115,8 @@ export interface OrderListOptions {
   shippingState?: string
   shippingCity?: string
   deliveryService?: DeliveryServiceFilter
+  /** Filter orders whose `references` jsonb contains this token (repeat param or comma-separated). */
+  references?: string | string[]
   params?: Record<string, any>
 }
 
@@ -178,6 +181,7 @@ export class OrderRepository extends ModelRepository<
       if (options.shippingState) params.shippingState = options.shippingState
       if (options.shippingCity) params.shippingCity = options.shippingCity
       if (options.deliveryService) params.deliveryService = options.deliveryService
+      if (options.references !== undefined) params.references = options.references
     }
 
     return super.list({ params })

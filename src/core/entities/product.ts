@@ -396,3 +396,8 @@ export interface ProductReport {
   topVariants?: Array<{ path: string; sold: number }>
   salesByDate?: Record<string, number>
 }
+
+/** Token for `Order.references`. */
+export function formatProductOrderReference(productId: string): string {
+  return `product:${productId}`
+}

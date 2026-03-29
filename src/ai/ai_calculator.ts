@@ -1,4 +1,3 @@
-/* eslint-disable eqeqeq */
 /**
  * Pure utility class for estimating AI generation costs client-side.
  *
@@ -127,11 +126,9 @@ function mergeTts(
   if (!partial) return { ...base }
   return {
     whenScriptEmptyTokens: partial.whenScriptEmptyTokens ?? base.whenScriptEmptyTokens,
-    whenAttachmentsOnlyTokens:
-      partial.whenAttachmentsOnlyTokens ?? base.whenAttachmentsOnlyTokens,
+    whenAttachmentsOnlyTokens: partial.whenAttachmentsOnlyTokens ?? base.whenAttachmentsOnlyTokens,
     promptBaseTokens: partial.promptBaseTokens ?? base.promptBaseTokens,
-    promptPerAttachmentTokens:
-      partial.promptPerAttachmentTokens ?? base.promptPerAttachmentTokens,
+    promptPerAttachmentTokens: partial.promptPerAttachmentTokens ?? base.promptPerAttachmentTokens,
     outputMinimumTokens: partial.outputMinimumTokens ?? base.outputMinimumTokens,
     outputToTextTokenRatio: partial.outputToTextTokenRatio ?? base.outputToTextTokenRatio,
     maxTotalTokens: partial.maxTotalTokens ?? base.maxTotalTokens,
@@ -171,8 +168,7 @@ export function mergeAiModelsBilling(partial?: AIModelsBilling | null): Resolved
     },
     textGeneration: {
       freeTierMaxPromptTokens:
-        partial.textGeneration?.freeTierMaxPromptTokens ??
-        d.textGeneration.freeTierMaxPromptTokens,
+        partial.textGeneration?.freeTierMaxPromptTokens ?? d.textGeneration.freeTierMaxPromptTokens,
       estimatedPromptTokensDefault:
         partial.textGeneration?.estimatedPromptTokensDefault ??
         d.textGeneration.estimatedPromptTokensDefault,
@@ -187,8 +183,7 @@ export function mergeAiModelsBilling(partial?: AIModelsBilling | null): Resolved
       ttsTokenEstimate: tts,
     },
     landingPageImage: {
-      fixedChargeUsd:
-        partial.landingPageImage?.fixedChargeUsd ?? d.landingPageImage.fixedChargeUsd,
+      fixedChargeUsd: partial.landingPageImage?.fixedChargeUsd ?? d.landingPageImage.fixedChargeUsd,
     },
   }
 }
@@ -346,12 +341,14 @@ function pickTtsProviderOutputUsd(model: AiModelConfig | undefined): number | nu
   const voiceLike = modelHasVoiceCapability(model)
   for (const unit of ['audio', 'voice'] as const) {
     const row = model.pricing.find((p) => p.unit === unit)
+    // eslint-disable-next-line eqeqeq
     if (row?.output == null) continue
     const usd = row.output
     if (usd > 0) return usd
   }
   if (voiceLike) {
     const row = model.pricing.find((p) => p.unit === 'image')
+    // eslint-disable-next-line eqeqeq
     if (row?.output == null) return null
     const usd = row.output
     if (usd > 0) return usd
@@ -367,8 +364,7 @@ function ttsTokenEstimatesFromResolved(
   const t = b.voiceGeneration.ttsTokenEstimate
   let textTok = Math.round(scriptCharLength / 4)
   if (textTok <= 0) {
-    textTok =
-      attachmentCount > 0 ? t.whenAttachmentsOnlyTokens : t.whenScriptEmptyTokens
+    textTok = attachmentCount > 0 ? t.whenAttachmentsOnlyTokens : t.whenScriptEmptyTokens
   }
   const rawPrompt = t.promptBaseTokens + textTok + attachmentCount * t.promptPerAttachmentTokens
   const promptTokens = Math.min(t.maxTotalTokens, Math.max(0, rawPrompt))
@@ -382,7 +378,11 @@ export function defaultVoiceTtsTokenEstimates(
   scriptCharLength: number,
   attachmentCount: number
 ): { promptTokens: number; outputTokens: number } {
-  return ttsTokenEstimatesFromResolved(mergeAiModelsBilling(null), scriptCharLength, attachmentCount)
+  return ttsTokenEstimatesFromResolved(
+    mergeAiModelsBilling(null),
+    scriptCharLength,
+    attachmentCount
+  )
 }
 
 function pickVoiceTokenPricing(
@@ -406,7 +406,11 @@ function pickVoiceTokenPricing(
 
 type InternalConfig = Required<
   Pick<AiCalculatorConfig, 'exchangeRate' | 'defaultImageCost' | 'referenceImageCost'>
-> & { resolutionCosts: Record<string, number>; models: AiModelConfig[]; billing: ResolvedAiModelsBilling }
+> & {
+  resolutionCosts: Record<string, number>
+  models: AiModelConfig[]
+  billing: ResolvedAiModelsBilling
+}
 
 export class AiCalculator {
   private config: InternalConfig
@@ -443,6 +447,7 @@ export class AiCalculator {
       return { baseDzd: roundMoney(model.localCost), usedLocalCost: true }
     }
     const providerUsd = pickTtsProviderOutputUsd(model)
+    // eslint-disable-next-line eqeqeq
     if (providerUsd != null) {
       const providerDzd = providerUsd * exchangeRate
       return {
@@ -662,6 +667,7 @@ export class AiCalculator {
     const b = this.config.billing
     const cap = b.voiceGeneration.ttsTokenEstimate.maxTotalTokens
     const tokenEst =
+      // eslint-disable-next-line eqeqeq
       options.estimatedPromptTokens != null && options.estimatedOutputTokens != null
         ? {
             promptTokens: Math.max(0, Math.min(cap, options.estimatedPromptTokens)),
