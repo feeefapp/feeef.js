@@ -115,12 +115,16 @@ export function getShippingPrice(
   stateCode: string,
   type: ShippingPriceType
 ): number | null {
+  console.log('0 [getShippingPrice]', { prices, countryCode, stateCode, type })
   const countryRates = prices[countryCode]
+  console.log('1 [getShippingPrice] countryRates', countryRates)
   if (!countryRates) return null
 
   const stateRates = countryRates[stateCode]
+  console.log('2 [getShippingPrice] stateRates', stateRates)
   if (!stateRates) return null
 
+  console.log('3 [getShippingPrice] stateRates[type]', stateRates[type])
   return stateRates[type] ?? null
 }
 
