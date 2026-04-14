@@ -31,9 +31,9 @@
 export interface ShippingStateRates {
   /** Price for home delivery (nullable if unavailable) */
   home: number | null
-  /** Price for desk/office pickup (nullable if unavailable) */
+  /** Stopdesk / carrier relay office pickup in the region (nullable if unavailable) */
   desk: number | null
-  /** Price for store pickup (nullable if unavailable) */
+  /** Merchant store branch pickup — customer goes to the store (nullable if unavailable) */
   pickup: number | null
 }
 

@@ -22,11 +22,14 @@ export enum DeliveryStatus {
 }
 
 export enum ShippingType {
-  // delivery to customer home
+  /** Deliver to the customer's address (maps to shipping price `home`). */
   home = 'home',
-  // the customer picks up the order from the local shipping center
+  /**
+   * Stopdesk / carrier relay office in the region (not merchant store).
+   * Maps to shipping price key `desk`.
+   */
   pickup = 'pickup',
-  // the customer picks up the order from the store
+  /** Customer collects at the merchant's store branch. Maps to shipping price key `pickup`. */
   store = 'store',
 }
 

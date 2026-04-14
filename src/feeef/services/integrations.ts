@@ -5,7 +5,8 @@ import { AxiosInstance } from 'axios'
 // ============================================================================
 
 /**
- * Delivery fees structure - Array of [home, desk] prices per state
+ * Legacy delivery fees per state (wilaya order): `[desk, home]` (stopdesk vs home).
+ * Some sources may expose a third slot for in-store pickup; see cart legacy handling.
  */
 export type DeliveryFees = (number | null)[][]
 

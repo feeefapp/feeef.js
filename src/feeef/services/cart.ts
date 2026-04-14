@@ -26,10 +26,10 @@ export interface CartItem {
 }
 
 /**
- * Cart shipping types.
- * - `pickup`: The user will pick up the order from the closest desk.
- * - `home`: The order will be delivered to the user's home.
- * - `store`: The order will be delivered to the store.
+ * Cart shipping types (order `ShippingType`, distinct from {@link ShippingPriceType} keys).
+ * - `home`: deliver to the customer's address (price key `home`).
+ * - `pickup`: stopdesk / carrier relay office — customer collects there (price key `desk`).
+ * - `store`: merchant store branch pickup (price key `pickup`).
  */
 // export type CartShippingTypes = 'pickup' | 'home' | 'store'
 

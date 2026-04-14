@@ -655,7 +655,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     assert.deepEqual(availableTypes, [ShippingType.pickup, ShippingType.home, ShippingType.store])
   })
 
-  test('Shipping type mapping: store -> desk', (ctx) => {
+  test('Shipping type mapping: pickup -> desk, store -> pickup (price keys)', (ctx) => {
     const { assert } = ctx as any
     const cart = new CartService()
 
@@ -673,10 +673,11 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     cart.add({ product, quantity: 1 })
     cart.setStore(store, false)
     cart.setShippingPrice(shippingPrice, false)
-    cart.updateShippingAddress({ state: '01', country: 'dz', type: ShippingType.store }, false)
+    cart.updateShippingAddress({ state: '01', country: 'dz', type: ShippingType.pickup }, false)
+    assert.equal(cart.getShippingPriceForType(ShippingType.pickup), 400)
 
-    const price = cart.getShippingPriceForType(ShippingType.store)
-    assert.equal(price, 400) // store maps to desk
+    cart.updateShippingAddress({ state: '01', country: 'dz', type: ShippingType.store }, false)
+    assert.equal(cart.getShippingPriceForType(ShippingType.store), 0)
   })
 
   test('Returns null when no shipping address state', (ctx) => {
