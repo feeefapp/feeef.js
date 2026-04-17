@@ -549,7 +549,7 @@ export class AiCalculator {
       : 0
 
     let referenceResolutionExtraDzd = 0
-    if (referenceImageCount > 0 && resolution) {
+    if (resolution) {
       const low = this.config.resolutionCosts.MEDIA_RESOLUTION_LOW ?? 0
       const tier = this.config.resolutionCosts[resolution] ?? 0
       referenceResolutionExtraDzd = roundMoney(Math.max(0, tier - low))
