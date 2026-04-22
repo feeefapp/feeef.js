@@ -22,7 +22,10 @@ export interface OrderModelTrackOptions {
 }
 
 /**
- * Schema for sending an order from an anonymous user
+ * Body for `POST .../orders/send` (matches backend `SendOrderSchema`).
+ *
+ * **Do not** use `stateCode`, `cityCode`, or `address` — the API ignores them.
+ * Use `shippingState`, `shippingCity`, `shippingAddress` respectively.
  */
 export interface SendOrderSchema {
   id?: string
@@ -31,8 +34,11 @@ export interface SendOrderSchema {
   customerPhone: string
   customerEmail?: string
   source?: string
+  /** Street / address line (not `address`). */
   shippingAddress?: string
+  /** English-normalized city name (not `cityCode`). */
   shippingCity?: string
+  /** State wilaya code string, e.g. `"05"` (not `stateCode`). */
   shippingState?: string
   shippingCountry?: string
   shippingType: ShippingType
