@@ -65,6 +65,9 @@ export interface StoreEntity {
 
   // members
   members?: Record<string, StoreMember>
+
+  /** Active full-site template (`store_templates.id`) when set. */
+  templateId?: string | null
 }
 
 // function that generate public data from the integrations data

@@ -23,6 +23,7 @@ import { ProductLandingPagesRepository } from './repositories/product_landing_pa
 import { ImagePromptTemplatesRepository } from './repositories/image_prompt_templates.js'
 import { ImageGenerationsRepository } from './repositories/image_generations.js'
 import { TemplateComponentsRepository } from './repositories/template_components.js'
+import { StoreTemplatesRepository } from './repositories/store_templates.js'
 // Services
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
@@ -111,6 +112,11 @@ export class FeeeF {
    * @see ResolveComponentsResponse for the storefront resolver path.
    */
   templateComponents: TemplateComponentsRepository
+
+  /**
+   * Full-site template library rows (`store_templates`) + marketplace.
+   */
+  storeTemplates: StoreTemplatesRepository
 
   /**
    * The repository for managing users.
@@ -240,6 +246,7 @@ export class FeeeF {
     this.imagePromptTemplates = new ImagePromptTemplatesRepository(this.client)
     this.imageGenerations = new ImageGenerationsRepository(this.client)
     this.templateComponents = new TemplateComponentsRepository(this.client)
+    this.storeTemplates = new StoreTemplatesRepository(this.client)
     this.users = new UserRepository(this.client)
     this.apps = new AppRepository(this.client)
     this.oauth = new OAuthRepository(this.client)
