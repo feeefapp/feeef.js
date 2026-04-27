@@ -80,6 +80,7 @@ export const generatePublicStoreIntegrations = (
     tiktokPixel,
     googleAnalytics,
     googleTags,
+    clarity,
     orderdz,
     webhooks,
     ai,
@@ -92,6 +93,7 @@ export const generatePublicStoreIntegrations = (
     tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
     googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
     googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
+    clarity: generatePublicStoreIntegrationClarity(clarity) || null,
     googleSheet: null,
     ai: generatePublicStoreIntegrationAi(ai) || null,
     orderdz: generatePublicStoreIntegrationOrderdz(orderdz) || null,
@@ -182,6 +184,23 @@ export const generatePublicStoreIntegrationGoogleTags = (
   return {
     id,
     active,
+  }
+}
+
+/**
+ * Microsoft Clarity: only the project / tracking id is public (injected in storefront script).
+ * Optional apiKey is for Clarity APIs and is never exposed to the public store JSON.
+ */
+export const generatePublicStoreIntegrationClarity = (
+  clarity: ClarityIntegration | null | undefined
+): PublicClarityIntegration | null | undefined => {
+  if (!clarity) return null
+  if (!clarity.active) return null
+  const code = typeof clarity.trackingCode === 'string' ? clarity.trackingCode.trim() : ''
+  if (!code) return null
+  return {
+    active: true,
+    trackingCode: code,
   }
 }
 
@@ -325,6 +344,12 @@ export interface PublicGoogleTagsIntegration {
   active: boolean
 }
 
+/** Public Clarity data: project id for the tag script only */
+export interface PublicClarityIntegration {
+  active: boolean
+  trackingCode: string
+}
+
 export interface PublicAiIntegration {
   active: boolean
   textModel: string
@@ -376,6 +401,8 @@ export interface PublicStoreIntegrations {
   googleAnalytics: PublicGoogleAnalyticsIntegration | null
   googleSheet: PublicGoogleSheetsIntegration | null
   googleTags: PublicGoogleTagsIntegration | null
+  /** Clarity project id for client script only; apiKey is never public */
+  clarity: PublicClarityIntegration | null
   ai: PublicAiIntegration | null
   orderdz: PublicOrderdzIntegration | null
   webhooks: PublicWebhooksIntegration | null
@@ -623,6 +650,19 @@ export interface GoogleTagsIntegration {
 }
 
 /**
+ * Microsoft Clarity session analytics.
+ * trackingCode is the project id (public, used in storefront script).
+ * apiKey is optional and used for server-side Clarity APIs only — never sent in publicIntegrations.
+ */
+export interface ClarityIntegration {
+  active: boolean
+  /** Clarity project id (e.g. wi0wntig7s) */
+  trackingCode: string
+  apiKey?: string | null
+  metadata?: Record<string, any>
+}
+
+/**
  * AI integration configuration for Google AI Studio.
  */
 export interface AiIntegration {
@@ -867,6 +907,7 @@ export interface StoreIntegrations {
   googleAnalytics?: GoogleAnalyticsIntegration
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration
+  clarity?: ClarityIntegration
   ai?: AiIntegration
   orderdz?: OrderdzIntegration
   webhooks?: WebhooksIntegration
