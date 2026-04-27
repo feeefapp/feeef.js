@@ -67,6 +67,28 @@ export class CartService extends NotifiableService {
   private currentItem: CartItem | null = null
 
   /**
+   * Monotonic counter bumped in {@link CartService.notify} for React
+   * `useSyncExternalStore` — lets storefront UI subscribe to cart changes
+   * without re-rendering unrelated provider subtrees (see Lithium FeeefCartProvider).
+   */
+  private _reactSnapshotVersion = 0
+
+  /**
+   * @override
+   */
+  notify(): void {
+    this._reactSnapshotVersion++
+    super.notify()
+  }
+
+  /**
+   * Snapshot for React `useSyncExternalStore` (increments on every cart mutation).
+   */
+  getReactSnapshot(): number {
+    return this._reactSnapshotVersion
+  }
+
+  /**
    * Generates a unique key for a cart item based on product ID, variant path, offer code, and addons
    * @param item - The cart item to generate a key for
    * @returns A unique string key

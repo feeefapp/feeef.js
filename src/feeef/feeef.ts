@@ -22,6 +22,8 @@ import { ProductLandingPageTemplatesRepository } from './repositories/product_la
 import { ProductLandingPagesRepository } from './repositories/product_landing_pages.js'
 import { ImagePromptTemplatesRepository } from './repositories/image_prompt_templates.js'
 import { ImageGenerationsRepository } from './repositories/image_generations.js'
+import { TemplateComponentsRepository } from './repositories/template_components.js'
+import { StoreTemplatesRepository } from './repositories/store_templates.js'
 // Services
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
@@ -100,6 +102,21 @@ export class FeeeF {
    * The repository for managing async image generations.
    */
   imageGenerations: ImageGenerationsRepository
+
+  /**
+   * The repository for the per-store **library of reusable custom
+   * components** + the cross-store **marketplace**. Components live in
+   * `template_components` and are referenced from store templateData by
+   * `refId` so a single source can power many placements.
+   *
+   * @see ResolveComponentsResponse for the storefront resolver path.
+   */
+  templateComponents: TemplateComponentsRepository
+
+  /**
+   * Full-site template library rows (`store_templates`) + marketplace.
+   */
+  storeTemplates: StoreTemplatesRepository
 
   /**
    * The repository for managing users.
@@ -228,6 +245,8 @@ export class FeeeF {
     this.productLandingPageTemplates = new ProductLandingPageTemplatesRepository(this.client)
     this.imagePromptTemplates = new ImagePromptTemplatesRepository(this.client)
     this.imageGenerations = new ImageGenerationsRepository(this.client)
+    this.templateComponents = new TemplateComponentsRepository(this.client)
+    this.storeTemplates = new StoreTemplatesRepository(this.client)
     this.users = new UserRepository(this.client)
     this.apps = new AppRepository(this.client)
     this.oauth = new OAuthRepository(this.client)
