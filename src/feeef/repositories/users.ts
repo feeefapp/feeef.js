@@ -8,7 +8,10 @@ import {
   FinishPasskeyRegistrationOptions,
   LinkSocialAccountOptions,
   Passkey,
+  CreateAuthCodeOptions,
+  CreateAuthCodeResponse,
   SigninCredentials,
+  SigninWithCodeOptions,
   SigninWithSocialOptions,
   SignupCredentials,
   TransferMoneyOptions,
@@ -121,6 +124,31 @@ export class UserRepository extends ModelRepository<
       token: { ...res.data.token, token },
     }
 
+    return this.auth!
+  }
+
+  /**
+   * Generates a short-lived, single-use Feeef auth code for cross-device / QR login.
+   *
+   * POST `/users/auth/code` (auth required).
+   */
+  async createAuthCode(options: CreateAuthCodeOptions = {}): Promise<CreateAuthCodeResponse> {
+    const res = await this.client.post(`/${this.resource}/auth/code`, {
+      redirect: options.redirect,
+    })
+    return res.data
+  }
+
+  /**
+   * Signs in using a one-time Feeef auth code (OAuth-like semantics).
+   *
+   * POST `/users/auth/code/consume` (public). On success it returns a bearer token and user.
+   */
+  async signinWithCode(options: SigninWithCodeOptions): Promise<AuthResponse> {
+    const res = await this.client.post(`/${this.resource}/auth/code/consume`, {
+      authCode: options.authCode,
+    })
+    this.auth = res.data
     return this.auth!
   }
 

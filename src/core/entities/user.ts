@@ -165,6 +165,30 @@ export interface SigninWithSocialOptions {
 }
 
 /**
+ * Options for creating a short-lived, single-use Feeef auth code (QR / device login).
+ */
+export interface CreateAuthCodeOptions {
+  /** Optional deep-link destination to return alongside the code. */
+  redirect?: string
+}
+
+/**
+ * Response from creating an auth code.
+ */
+export interface CreateAuthCodeResponse {
+  authCode: string
+  expiresInSeconds: number
+  redirect: string | null
+}
+
+/**
+ * Options for signing in with a one-time Feeef auth code (OAuth-like semantics).
+ */
+export interface SigninWithCodeOptions {
+  authCode: string
+}
+
+/**
  * Options for passkey registration start.
  */
 export interface StartPasskeyRegistrationOptions {
