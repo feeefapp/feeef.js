@@ -282,8 +282,7 @@ function toPublicMinTimeInPage(
   }
   return {
     active: raw.active,
-    duration:
-      typeof raw.duration === 'number' && !Number.isNaN(raw.duration) ? raw.duration : 0,
+    duration: typeof raw.duration === 'number' && !Number.isNaN(raw.duration) ? raw.duration : 0,
     treatment: raw.treatment,
   }
 }
