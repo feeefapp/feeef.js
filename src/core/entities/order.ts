@@ -259,3 +259,37 @@ export interface CalculateOrderPricingOptions {
   shippingType?: ShippingType
   shippingAddress?: string
 }
+
+// ===================== SECURITY HELPERS =====================
+
+/**
+ * Check if an order ID indicates a fake/honeypot order
+ * Fake orders use the "FuHe3nf" prefix
+ */
+export function isFakeOrderId(orderId: string | undefined | null): boolean {
+  return !!orderId && orderId.startsWith('FuHe3nf')
+}
+
+/**
+ * Check if an order is a fake order (by ID or metadata flag)
+ */
+export function isFakeOrder(order: OrderEntity): boolean {
+  return isFakeOrderId(order.id) || order.metadata?._fake === true
+}
+
+/**
+ * Check if an order has warning treatment (created but flagged)
+ */
+export function isWarningOrder(order: OrderEntity): boolean {
+  return order.claims?.security?.treatment === 'warning'
+}
+
+/**
+ * Check if pixel events should be suppressed for this order
+ * Suppress for: fake orders, warning treatment, fake treatment
+ */
+export function shouldSuppressPixelEvents(order: OrderEntity): boolean {
+  if (isFakeOrder(order)) return true
+  const treatment = order.claims?.security?.treatment
+  return treatment === 'warning' || treatment === 'fake'
+}

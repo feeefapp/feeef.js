@@ -251,23 +251,109 @@ export const generatePublicStoreIntegrationWebhooks = (
     webhookUrls: activeWebhooks.map((webhook) => webhook.url),
   }
 }
+function toPublicSecurityOption(
+  raw: SecurityOption | null | undefined
+): PublicSecurityOption | undefined {
+  if (
+    !raw ||
+    typeof raw.active !== 'boolean' ||
+    raw.treatment === undefined ||
+    raw.treatment === null
+  ) {
+    return undefined
+  }
+  return {
+    active: raw.active,
+    ttl: typeof raw.ttl === 'number' && !Number.isNaN(raw.ttl) ? raw.ttl : 0,
+    treatment: raw.treatment,
+  }
+}
+
+function toPublicMinTimeInPage(
+  raw: SecurityMinTimeOption | null | undefined
+): PublicSecurityMinTimeOption | undefined {
+  if (
+    !raw ||
+    typeof raw.active !== 'boolean' ||
+    raw.treatment === undefined ||
+    raw.treatment === null
+  ) {
+    return undefined
+  }
+  return {
+    active: raw.active,
+    duration:
+      typeof raw.duration === 'number' && !Number.isNaN(raw.duration) ? raw.duration : 0,
+    treatment: raw.treatment,
+  }
+}
+
+function toPublicCountries(
+  raw: SecurityCountriesOption | null | undefined
+): PublicSecurityCountriesOption | undefined {
+  if (
+    !raw ||
+    typeof raw.active !== 'boolean' ||
+    raw.treatment === undefined ||
+    raw.treatment === null
+  ) {
+    return undefined
+  }
+  return {
+    active: raw.active,
+    treatment: raw.treatment,
+    allowed: raw.allowed ?? null,
+    blocked: Array.isArray(raw.blocked) ? [...raw.blocked] : [],
+  }
+}
+
+function toPublicSources(
+  raw: SecuritySourcesOption | null | undefined
+): PublicSecuritySourcesOption | undefined {
+  if (
+    !raw ||
+    typeof raw.active !== 'boolean' ||
+    raw.treatment === undefined ||
+    raw.treatment === null
+  ) {
+    return undefined
+  }
+  return {
+    active: raw.active,
+    treatment: raw.treatment,
+    allowed: raw.allowed ?? null,
+    blocked: Array.isArray(raw.blocked) ? [...raw.blocked] : [],
+  }
+}
+
 /**
  * Generates public security integration data from private integration data.
- * Only exposes non-sensitive information, keeping backend protection details private for security.
+ * Exposes storefront-safe rules: frontend, doubleSend, minTimeInPage, countries, sources.
+ * Fingerprint, ip, phone, and ads stay server-only.
  */
 export const generatePublicStoreIntegrationSecurity = (
   security: SecurityIntegration | null | undefined
 ): PublicSecurityIntegration | null | undefined => {
   if (!security) return null
 
+  const opts = security.options
+  const frontend = toPublicSecurityOption(opts?.frontend)
+  const doubleSend = toPublicSecurityOption(opts?.doubleSend)
+  const minTimeInPage = toPublicMinTimeInPage(opts?.minTimeInPage)
+  const countries = toPublicCountries(opts?.countries)
+  const sources = toPublicSources(opts?.sources)
+
+  const options: PublicSecurityOptions = {
+    ...(frontend ? { frontend } : {}),
+    ...(doubleSend ? { doubleSend } : {}),
+    ...(minTimeInPage ? { minTimeInPage } : {}),
+    ...(countries ? { countries } : {}),
+    ...(sources ? { sources } : {}),
+  }
+
   return {
-    key: '[none]',
-    orders: security.orders
-      ? {
-          frontend: security.orders.frontend,
-        }
-      : undefined,
     active: security.active,
+    options,
   }
 }
 
@@ -745,43 +831,91 @@ export interface ZrexpressIntegration {
   metadata?: Record<string, any>
 }
 
-export interface SecurityIntegrationOrdersProtection {
-  frontend: {
-    active: boolean
-  }
-  backend: {
-    active: boolean
-    phoneTtl: number
-    ipTtl: number
-    blockDirectOrders: boolean
-    adsOnlyMode: boolean
-    // fingerprint
-    fingerprintTtl?: number | null
-    minFormLoadTime?: number | null
-    requireFingerprint?: boolean | null
-  }
+// Security Treatment enum
+export enum SecurityTreatment {
+  block = 'block',
+  warning = 'warning',
+  fake = 'fake',
 }
-export interface PublicSecurityIntegrationOrdersProtection {
-  frontend: {
-    active: boolean
-  }
+
+// Base security option with TTL and treatment (TTL optional when inactive / unset)
+export interface SecurityOption {
+  active: boolean
+  ttl?: number | null
+  treatment: SecurityTreatment
 }
+
+// Min-time-on-page option
+export interface SecurityMinTimeOption {
+  active: boolean
+  duration: number // seconds
+  treatment: SecurityTreatment
+}
+
+// Country filtering option
+export interface SecurityCountriesOption {
+  active: boolean
+  treatment: SecurityTreatment
+  allowed: string[] | null // ISO codes; null = allow all
+  blocked: string[]
+}
+
+// Traffic source filtering option
+export interface SecuritySourcesOption {
+  active: boolean
+  treatment: SecurityTreatment
+  allowed: string[] | null // e.g., ["ads", "organic"]
+  blocked: string[]
+}
+
+/** Storefront-safe min-time rule (same shape as private; no secrets). */
+export type PublicSecurityMinTimeOption = SecurityMinTimeOption
+/** Storefront-safe country allow/block lists (policy only). */
+export type PublicSecurityCountriesOption = SecurityCountriesOption
+/** Storefront-safe traffic-source allow/block lists (policy only). */
+export type PublicSecuritySourcesOption = SecuritySourcesOption
+
+// All security options (private). Keys match API / Vine: each block is optional.nullable.
+export interface SecurityOptions {
+  fingerprint?: SecurityOption | null
+  ip?: SecurityOption | null
+  phone?: SecurityOption | null
+  ads?: SecurityOption | null
+  frontend?: SecurityOption | null
+  doubleSend?: SecurityOption | null
+  minTimeInPage?: SecurityMinTimeOption | null
+  countries?: SecurityCountriesOption | null
+  sources?: SecuritySourcesOption | null
+}
+
+// Private security integration (merchant app)
 export interface SecurityIntegration {
-  orders?: SecurityIntegrationOrdersProtection
-
-  /** Whether this integration is currently active */
   active: boolean
-  /** Additional metadata for the integration */
+  options?: SecurityOptions | null
   metadata?: Record<string, any>
 }
-export interface PublicSecurityIntegration {
-  key?: string | null
-  orders?: PublicSecurityIntegrationOrdersProtection
 
-  /** Whether this integration is currently active */
+// Public security option - only active, ttl, treatment (ttl normalized for clients)
+export interface PublicSecurityOption {
   active: boolean
-  /** Additional metadata for the integration */
-  metadata?: Record<string, any>
+  ttl: number
+  treatment: SecurityTreatment
+}
+
+// Public security options for storefronts (client-enforceable / policy visibility).
+// Fingerprint, ip, phone, and ads remain server-only.
+export interface PublicSecurityOptions {
+  frontend?: PublicSecurityOption
+  doubleSend?: PublicSecurityOption
+  minTimeInPage?: PublicSecurityMinTimeOption
+  countries?: PublicSecurityCountriesOption
+  sources?: PublicSecuritySourcesOption
+}
+
+// Public security integration (storefront)
+export interface PublicSecurityIntegration {
+  active: boolean
+  options: PublicSecurityOptions
 }
 
 /**
