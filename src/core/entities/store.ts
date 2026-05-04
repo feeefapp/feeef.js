@@ -649,6 +649,29 @@ export enum PixelReportMode {
   client = 'client',
   both = 'both',
 }
+
+/** Which order field to compare for [PixelStatusRule] (server-side CAPI on transition). */
+export enum PixelStatusDimension {
+  orderStatus = 'orderStatus',
+  deliveryStatus = 'deliveryStatus',
+  paymentStatus = 'paymentStatus',
+  customStatus = 'customStatus',
+}
+
+/**
+ * When the order transitions so `dimension` becomes `equals`, send configured Meta/TikTok server events.
+ * `id` must be stable (UUID) — used for idempotency in `order.claims.pixelStatusEvents`.
+ */
+export interface PixelStatusRule {
+  id: string
+  dimension: PixelStatusDimension
+  equals: string
+  metaEvent?: MetaPixelEvent | null
+  tiktokEvent?: TiktokPixelEvent | null
+  /** When set, overrides `metaEvent` (Meta CAPI custom event name). */
+  metaCustomEvent?: string | null
+  tiktokCustomEvent?: string | null
+}
 export interface MetaPixel {
   name?: string
   id: string
@@ -679,6 +702,8 @@ export interface MetaPixelIntegration {
   pixels: MetaPixel[]
   objective?: MetaPixelEvent | null
   draftObjective?: MetaPixelEvent | null
+  /** Server-only lifecycle rules; never exposed on public storefront JSON. */
+  statusRules?: PixelStatusRule[]
   active: boolean
   metadata: Record<string, any>
   /** Facebook Marketing OAuth data - for accessing pixels via API */
@@ -692,6 +717,8 @@ export interface TiktokPixelIntegration {
   pixels: TiktokPixel[]
   objective?: TiktokPixelEvent | null
   draftObjective?: TiktokPixelEvent | null
+  /** Server-only lifecycle rules; never exposed on public storefront JSON. */
+  statusRules?: PixelStatusRule[]
   active: boolean
   metadata: Record<string, any>
   /** Where to send events: server, client, or both. Omit for auto (prefer server if accessToken set). */
