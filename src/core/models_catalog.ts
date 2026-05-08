@@ -31,9 +31,36 @@ export interface ProviderRegistryRow {
   name?: string
 }
 
+/**
+ * Feeef catalog extensions (not from OpenRouter Models API).
+ * Optional `capabilities.image_generation` drives aspect/output tiers and pricing add-ons.
+ */
+export interface ImageGenerationCapabilitiesWire {
+  allowed_aspect_ratios?: string[]
+  output_size_tiers?: string[]
+  input_resolution_tiers?: string[]
+  params?: {
+    background?: string[]
+    quality?: string[]
+    output_format?: string[]
+  }
+  toggles?: {
+    google_search?: boolean
+    image_search?: boolean
+  }
+  pricing_addons_dzd?: {
+    transparent_background?: number
+  }
+}
+
+export interface FeeefModelCapabilities {
+  image_generation?: ImageGenerationCapabilitiesWire
+}
+
 /** `GET /v1/models` row + `provider_slug` for Feeef's registry lookup. */
 export type ModelCatalogRow = import('@openrouter/sdk/models').Model & {
   provider_slug: string
+  capabilities?: FeeefModelCapabilities
 }
 
 export interface ModelsCatalogConfig {
