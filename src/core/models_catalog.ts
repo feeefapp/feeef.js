@@ -21,7 +21,7 @@ export type {
 } from '@openrouter/sdk/models'
 
 /** Feeef routing — not part of OpenRouter's schema. */
-export type AiProviderKind = 'google' | 'openai' | 'openrouter'
+export type AiProviderKind = 'google' | 'openai' | 'azure' | 'openrouter'
 
 export interface ProviderRegistryRow {
   slug: string
@@ -61,6 +61,8 @@ export interface FeeefModelCapabilities {
 export type ModelCatalogRow = import('@openrouter/sdk/models').Model & {
   provider_slug: string
   capabilities?: FeeefModelCapabilities
+  /** Azure OpenAI deployment name when it differs from catalog `id`. */
+  azure_deployment?: string
 }
 
 export interface ModelsCatalogConfig {
