@@ -10,6 +10,8 @@
  * feeef `lib/core/app_config.dart`, admins_dashboard `src/lib/hooks/useOptions.ts`.
  */
 
+import { ModelsCatalogConfig } from '../core/models_catalog.js'
+
 /** Fallback DZD per USD when `aiModels.exchangeRate` is missing (mirror backend). */
 export const FALLBACK_AI_EXCHANGE_RATE = 260
 
@@ -293,6 +295,8 @@ export interface AiCalculatorConfig {
   referenceImageCost?: number
   resolutionCosts?: Record<string, number>
   models?: AiModelConfig[]
+  /** Optional model catalog (`models` option): allows pricing.prompt/completion to price text models without aiModels rows. */
+  modelsCatalog?: ModelsCatalogConfig
   /** Optional `aiModels.billing` overrides (merged over [mergeAiModelsBilling] defaults). */
   billing?: AIModelsBilling | null
 }
@@ -315,6 +319,22 @@ function findModel(
   return (
     models.find((m) => m.id === modelId) || models.find((m) => m.id === fallbackId) || models[0]
   )
+}
+
+function pickCatalogTokenPricingPerM(
+  catalog: ModelsCatalogConfig | undefined,
+  modelId: string
+): { input: number; output: number } | null {
+  if (!catalog?.data?.length) return null
+  const row = catalog.data.find((r) => (r as any)?.id === modelId)
+  const p = (row as any)?.pricing
+  const promptPerToken = Number(p?.prompt)
+  const completionPerToken = Number(p?.completion)
+  if (!Number.isFinite(promptPerToken) && !Number.isFinite(completionPerToken)) return null
+  const inTok = Number.isFinite(promptPerToken) ? promptPerToken : 0
+  const outTok = Number.isFinite(completionPerToken) ? completionPerToken : 0
+  if (inTok <= 0 && outTok <= 0) return null
+  return { input: inTok * 1_000_000, output: outTok * 1_000_000 }
 }
 
 function modelHasVoiceCapability(model: AiModelConfig | undefined): boolean {
@@ -409,6 +429,8 @@ type InternalConfig = Required<
 > & {
   resolutionCosts: Record<string, number>
   models: AiModelConfig[]
+  /** Optional catalog for text pricing when `models` rows lack token rows. */
+  modelsCatalog: ModelsCatalogConfig | undefined
   billing: ResolvedAiModelsBilling
 }
 
@@ -429,6 +451,7 @@ export class AiCalculator {
         MEDIA_RESOLUTION_HIGH: 10,
       },
       models: config.models ?? [],
+      modelsCatalog: config.modelsCatalog,
       billing,
     }
   }
@@ -604,8 +627,11 @@ export class AiCalculator {
     const { exchangeRate } = this.config
     const model = findModel(this.config.models, modelId, 'gemini-3-flash-preview')
     const tokenPricing = model?.pricing?.find((p) => p.unit === 'tokens')
+    const catalogPricing = tokenPricing
+      ? null
+      : pickCatalogTokenPricingPerM(this.config.modelsCatalog, modelId)
 
-    if (!tokenPricing || totalTokens < tg.freeTierMaxPromptTokens) {
+    if ((!tokenPricing && !catalogPricing) || totalTokens < tg.freeTierMaxPromptTokens) {
       return {
         providerCostUsd: 0,
         providerCostDzd: 0,
@@ -621,8 +647,8 @@ export class AiCalculator {
       }
     }
 
-    const inputPrice = tokenPricing.input ?? 0
-    const outputPrice = tokenPricing.output ?? 0
+    const inputPrice = tokenPricing?.input ?? catalogPricing?.input ?? 0
+    const outputPrice = tokenPricing?.output ?? catalogPricing?.output ?? 0
     const providerCostUsd =
       (estimatedPromptTokens / 1_000_000) * inputPrice +
       (estimatedOutputTokens / 1_000_000) * outputPrice

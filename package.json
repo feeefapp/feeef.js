@@ -1,7 +1,7 @@
 {
   "name": "feeef",
   "description": "feeef sdk for javascript",
-  "version": "0.9.7",
+  "version": "0.10.0",
   "main": "build/index.js",
   "type": "module",
   "files": [
@@ -38,6 +38,7 @@
     "@japa/snapshot": "^2.0.5",
     "@swc/core": "^1.5.3",
     "@types/dlv": "^1.1.4",
+    "@types/luxon": "^3.4.2",
     "@types/node": "^20.12.10",
     "ajv": "^8.13.0",
     "benchmark": "^2.1.4",
@@ -51,11 +52,11 @@
     "release-it": "^17.2.1",
     "ts-node": "^10.9.2",
     "tsup": "^8.0.2",
-    "typescript": "^5.4.5",
-    "@types/luxon": "^3.4.2"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@adonisjs/transmit-client": "^1.0.0",
+    "@openrouter/sdk": "^0.12.26",
     "axios": "^1.6.8",
     "axios-cache-interceptor": "^1.5.1",
     "luxon": "^3.5.0"

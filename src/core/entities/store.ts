@@ -857,6 +857,25 @@ export interface ZrexpressIntegration {
   metadata?: Record<string, any>
 }
 
+/**
+ * MDM Express (api.mdm.express) — `x-api-key` and/or Bearer JWT, MDM store `trackingId` (`mdmStoreId` on orders),
+ * and MDM seller id (`mdmSellerId`) for service-fees.
+ */
+export interface MdmExpressIntegration {
+  id: string
+  apiKey?: string
+  bearerToken?: string
+  /** Store tracking id (e.g. STR-…) — `storeId` on `POST /api/v2/orders`. */
+  mdmStoreId: string
+  /** Seller id (e.g. SLR-…) — `GET /api/sellers/{id}/service-fees`. */
+  mdmSellerId?: string
+  active: boolean
+  silentMode?: boolean
+  autoSend?: boolean
+  webhookSecret?: string | null
+  metadata?: Record<string, any>
+}
+
 // Security Treatment enum
 export enum SecurityTreatment {
   block = 'block',
@@ -1084,6 +1103,7 @@ export interface StoreIntegrations {
   noest?: any
   zimou?: ZimouIntegration
   zrexpress?: ZrexpressIntegration
+  mdmExpress?: MdmExpressIntegration
 
   security?: SecurityIntegration
   dispatcher?: DispatcherIntegration
