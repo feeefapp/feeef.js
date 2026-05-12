@@ -10,6 +10,8 @@
  * feeef `lib/core/app_config.dart`, admins_dashboard `src/lib/hooks/useOptions.ts`.
  */
 
+import { ModelsCatalogConfig } from '../core/models_catalog.js'
+
 /** Fallback DZD per USD when `aiModels.exchangeRate` is missing (mirror backend). */
 export const FALLBACK_AI_EXCHANGE_RATE = 260
 
@@ -294,7 +296,7 @@ export interface AiCalculatorConfig {
   resolutionCosts?: Record<string, number>
   models?: AiModelConfig[]
   /** Optional model catalog (`models` option): allows pricing.prompt/completion to price text models without aiModels rows. */
-  modelsCatalog?: import('../core/models_catalog').ModelsCatalogConfig
+  modelsCatalog?: ModelsCatalogConfig
   /** Optional `aiModels.billing` overrides (merged over [mergeAiModelsBilling] defaults). */
   billing?: AIModelsBilling | null
 }
@@ -320,7 +322,7 @@ function findModel(
 }
 
 function pickCatalogTokenPricingPerM(
-  catalog: import('../core/models_catalog').ModelsCatalogConfig | undefined,
+  catalog: ModelsCatalogConfig | undefined,
   modelId: string
 ): { input: number; output: number } | null {
   if (!catalog?.data?.length) return null
@@ -427,6 +429,8 @@ type InternalConfig = Required<
 > & {
   resolutionCosts: Record<string, number>
   models: AiModelConfig[]
+  /** Optional catalog for text pricing when `models` rows lack token rows. */
+  modelsCatalog: ModelsCatalogConfig | undefined
   billing: ResolvedAiModelsBilling
 }
 
@@ -447,6 +451,7 @@ export class AiCalculator {
         MEDIA_RESOLUTION_HIGH: 10,
       },
       models: config.models ?? [],
+      modelsCatalog: config.modelsCatalog,
       billing,
     }
   }
