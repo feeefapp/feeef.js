@@ -68,6 +68,9 @@ export interface StoreEntity {
 
   /** Active full-site template (`store_templates.id`) when set. */
   templateId?: string | null
+
+  /** Linked inventory project ID for stock management. */
+  projectId?: string | null
 }
 
 // function that generate public data from the integrations data
@@ -542,6 +545,12 @@ export interface CreateStoreInviteInput {
   metadata?: Record<string, any>
 }
 
+export interface InventoryIntegration {
+  reserve_on: OrderStatus[]
+  unreserve_on: OrderStatus[]
+  consume_on: OrderStatus[]
+}
+
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
   selectedCurrency: string
@@ -552,6 +561,7 @@ export interface StoreConfigs {
   customStatusMappings?: CustomStatusMapping[]
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
+  inventory_integration?: InventoryIntegration
 }
 
 export interface CustomStatusMapping {
@@ -1159,6 +1169,7 @@ export interface StoreCreateInput {
   tiktokPixelIds?: string[]
   googleAnalyticsId?: string
   googleTagsId?: string
+  projectId?: string
 }
 
 /**
@@ -1188,6 +1199,7 @@ export interface StoreUpdateInput {
   googleAnalyticsId?: string
   googleTagsId?: string
   integrations?: StoreIntegrations
+  projectId?: string
 }
 
 /**

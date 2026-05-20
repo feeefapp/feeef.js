@@ -266,4 +266,22 @@ export class OrderRepository extends ModelRepository<
     const res = await this.client.post(`/${this.resource}/assignMany`, data)
     return res.data
   }
+
+  /**
+   * Returns items from an order to inventory.
+   * @param data - The return data including orderId, reason, and deltas.
+   */
+  async returnOrder(data: {
+    orderId: string
+    reason: string
+    correlationRef?: string
+    deltas: {
+      objectId: string
+      quantityDelta: number
+      storageClass?: string
+    }[]
+  }): Promise<{ message: string }> {
+    const res = await this.client.post(`/${this.resource}/return`, data)
+    return res.data
+  }
 }
