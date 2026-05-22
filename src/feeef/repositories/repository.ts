@@ -1,4 +1,13 @@
-import { AxiosInstance } from 'axios'
+import { AxiosInstance, isAxiosError } from 'axios'
+import {
+  type BatchCreateManyRequest,
+  type BatchDeleteRequest,
+  type BatchResult,
+  type BatchUpdateManyRequest,
+  batchDeleteBody,
+  batchUpdateManyBody,
+  parseBatchResult,
+} from '../../core/batch.js'
 
 /**
  * Represents a generic model repository.
@@ -121,6 +130,84 @@ export abstract class ModelRepository<T, C, U> {
         ...params,
       },
     })
+  }
+
+  /**
+   * Batch delete by resource name/id (`POST /{resource}:batchDelete`).
+   * Override on repositories that support batch delete.
+   */
+  async deleteMany(_request: BatchDeleteRequest): Promise<BatchResult<T>> {
+    throw new Error(`deleteMany is not supported for ${this.resource}`)
+  }
+
+  /**
+   * Batch update with field mask (`POST /{resource}:batchUpdate`).
+   */
+  async updateMany(_request: BatchUpdateManyRequest): Promise<BatchResult<T>> {
+    throw new Error(`updateMany is not supported for ${this.resource}`)
+  }
+
+  /**
+   * Batch create (`POST /{resource}:batchCreate`).
+   */
+  async createMany(_request: BatchCreateManyRequest): Promise<BatchResult<T>> {
+    throw new Error(`createMany is not supported for ${this.resource}`)
+  }
+
+  /**
+   * POST `/{resource}:batchDelete` — used by inventory resource repositories.
+   */
+  protected async postBatchDelete(request: BatchDeleteRequest): Promise<BatchResult<T>> {
+    return this.postBatch(`/${this.resource}:batchDelete`, batchDeleteBody(request))
+  }
+
+  /**
+   * POST `/{resource}:batchUpdate`.
+   */
+  protected async postBatchUpdate(request: BatchUpdateManyRequest): Promise<BatchResult<T>> {
+    return this.postBatch(`/${this.resource}:batchUpdate`, batchUpdateManyBody(request))
+  }
+
+  /**
+   * POST `/{resource}:batchCreate`.
+   */
+  protected async postBatchCreate(request: BatchCreateManyRequest): Promise<BatchResult<T>> {
+    const body = {
+      projectId: request.projectId,
+      items: request.items,
+      returnPartialSuccess: request.returnPartialSuccess ?? true,
+      ...(request.requestId ? { requestId: request.requestId } : {}),
+    }
+    return this.postBatch(`/${this.resource}:batchCreate`, body)
+  }
+
+  /** `POST /{resource}:{action}` for custom batch endpoints (e.g. `:batchRelease`). */
+  protected async postBatchAction(
+    action: string,
+    body: Record<string, unknown>
+  ): Promise<BatchResult<T>> {
+    return this.postBatch(`/${this.resource}:${action}`, body)
+  }
+
+  /**
+   * Parses batch envelope from 200 or 400 ABORTED responses.
+   *
+   * Use `postBatch<void>(...)` when the API returns no `resources` array.
+   */
+  protected async postBatch<R = T>(
+    path: string,
+    body: Record<string, unknown>,
+    resourceFromJson?: (json: Record<string, unknown>) => R
+  ): Promise<BatchResult<R>> {
+    try {
+      const res = await this.client.post(path, body)
+      return parseBatchResult<R>(res.data, resourceFromJson)
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data) {
+        return parseBatchResult<R>(error.response.data, resourceFromJson)
+      }
+      throw error
+    }
   }
 }
 

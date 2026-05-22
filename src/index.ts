@@ -32,6 +32,7 @@ export * from './core/entities/city.js'
 export * from './core/entities/currency.js'
 export * from './core/entities/feedback.js'
 export * from './core/entities/inventory.js'
+export * from './core/batch.js'
 
 // ============================================================================
 // Repositories
