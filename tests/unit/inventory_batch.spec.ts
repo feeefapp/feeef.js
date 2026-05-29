@@ -3,11 +3,7 @@
  */
 
 import { test } from '@japa/runner'
-import {
-  parseBatchResult,
-  batchDeleteBody,
-  batchUpdateManyBody,
-} from '../../src/core/batch.js'
+import { parseBatchResult, batchDeleteBody, batchUpdateManyBody } from '../../src/core/batch.js'
 import { InventoryBatchUpdateObjectsRequest } from '../../src/feeef/repositories/inventory.js'
 
 test.group('parseBatchResult', () => {

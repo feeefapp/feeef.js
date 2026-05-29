@@ -1128,7 +1128,27 @@ export enum StoreSubscriptionType {
   free = 'free',
   premium = 'premium',
   vip = 'vip',
+  ultra = 'ultra',
   custom = 'custom',
+}
+
+/** Per-integration billing lifecycle (stored on store.subscription.integrations). */
+export enum IntegrationBillingStatus {
+  active = 'active',
+  grace = 'grace',
+  past_due = 'past_due',
+  canceled = 'canceled',
+}
+
+export interface StoreIntegrationSubscription {
+  startAt: DateTime
+  expiresAt: DateTime | null
+  status: IntegrationBillingStatus
+  /** Price snapshot from last successful charge (DZD). */
+  price: number
+  autoRenew: boolean
+  failedAttempts: number
+  nextRetryAt: DateTime | null
 }
 
 export interface StoreSubscription {
@@ -1141,6 +1161,8 @@ export interface StoreSubscription {
   consumed: number
   remaining: number
   metadata: Record<string, any>
+  /** Per-integration paid subscriptions (billing only; credentials stay in store.integrations). */
+  integrations?: Record<string, StoreIntegrationSubscription>
 }
 
 /**

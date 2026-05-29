@@ -109,10 +109,7 @@ export function parseBatchResult<T = void>(
     resources,
     failedRequests,
     summary: parseBatchSummary(
-      (map.summary && typeof map.summary === 'object' ? map.summary : {}) as Record<
-        string,
-        unknown
-      >
+      (map.summary && typeof map.summary === 'object' ? map.summary : {}) as Record<string, unknown>
     ),
     code: map.code as string | undefined,
     message: map.message as string | undefined,
@@ -128,11 +125,8 @@ export function batchDeleteBody(request: BatchDeleteRequest): Record<string, unk
   }
 }
 
-export function batchUpdateManyBody(
-  request: BatchUpdateManyRequest
-): Record<string, unknown> {
-  const { projectId, names, updateMask, returnPartialSuccess, requestId, fields } =
-    request
+export function batchUpdateManyBody(request: BatchUpdateManyRequest): Record<string, unknown> {
+  const { projectId, names, updateMask, returnPartialSuccess, requestId, fields } = request
   return {
     projectId,
     names,

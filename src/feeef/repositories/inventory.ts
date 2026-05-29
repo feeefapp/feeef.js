@@ -318,7 +318,7 @@ export class InventoryRepository {
     })
     const raw = res.data as { data?: Record<string, number> } | Record<string, number>
     if (raw && typeof raw === 'object' && 'data' in raw && raw.data) {
-      return raw.data
+      return raw.data as Record<string, number>
     }
     return (raw as Record<string, number>) ?? {}
   }
@@ -347,7 +347,7 @@ export class InventoryRepository {
     const res = await this.client.post('/inventory/public/availability', data)
     const raw = res.data as { data?: Record<string, number> } | Record<string, number>
     if (raw && typeof raw === 'object' && 'data' in raw && raw.data) {
-      return raw.data
+      return raw.data as Record<string, number>
     }
     return (raw as Record<string, number>) ?? {}
   }
