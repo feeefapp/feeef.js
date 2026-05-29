@@ -316,7 +316,11 @@ export class InventoryRepository {
     const res = await this.client.get('/inventory/availability', {
       params: { projectId: params.projectId, skus: params.skus.join(',') },
     })
-    return res.data
+    const raw = res.data as { data?: Record<string, number> } | Record<string, number>
+    if (raw && typeof raw === 'object' && 'data' in raw && raw.data) {
+      return raw.data
+    }
+    return (raw as Record<string, number>) ?? {}
   }
 
   async reservationsByHolder(params: {
@@ -341,6 +345,10 @@ export class InventoryRepository {
     skus: string[]
   }): Promise<Record<string, number>> {
     const res = await this.client.post('/inventory/public/availability', data)
-    return res.data
+    const raw = res.data as { data?: Record<string, number> } | Record<string, number>
+    if (raw && typeof raw === 'object' && 'data' in raw && raw.data) {
+      return raw.data
+    }
+    return (raw as Record<string, number>) ?? {}
   }
 }
