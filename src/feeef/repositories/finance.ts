@@ -60,7 +60,7 @@ export class PurchaseOrderRepository extends ModelRepository<
 
   /** Transition the PO to `sent`. */
   async send(options: { projectId: string; id: string }): Promise<PurchaseOrder> {
-    const res = await this.client.post(`/${this.resource}/${options.id}:send`, null, {
+    const res = await this.client.post(`/${this.resource}/${options.id}/send`, null, {
       params: { projectId: options.projectId },
     })
     return res.data
@@ -68,7 +68,7 @@ export class PurchaseOrderRepository extends ModelRepository<
 
   /** Transition the PO to `cancelled`. */
   async cancel(options: { projectId: string; id: string }): Promise<PurchaseOrder> {
-    const res = await this.client.post(`/${this.resource}/${options.id}:cancel`, null, {
+    const res = await this.client.post(`/${this.resource}/${options.id}/cancel`, null, {
       params: { projectId: options.projectId },
     })
     return res.data
@@ -81,7 +81,7 @@ export class PurchaseOrderRepository extends ModelRepository<
     status: PurchaseOrderStatus
   }): Promise<PurchaseOrder> {
     const res = await this.client.post(
-      `/${this.resource}/${options.id}:status`,
+      `/${this.resource}/${options.id}/status`,
       { status: options.status },
       { params: { projectId: options.projectId } }
     )
