@@ -146,3 +146,244 @@ export interface CreatePurchaseReceiptInput {
   notes?: string
   lines: PurchaseReceiptLineInput[]
 }
+
+// --- Phase 2: payables, receivables, cash, expenses -----------------------
+
+export type FinancialAccountType = 'cash' | 'bank' | 'ewallet'
+export type SupplierBillStatus = 'draft' | 'open' | 'partial' | 'paid' | 'void'
+export type ExpenseStatus = 'draft' | 'recorded' | 'voided'
+
+export interface FinancialAccount {
+  id: string
+  projectId: string
+  name: string
+  type: FinancialAccountType
+  currency?: string | null
+  openingBalance: number
+  isDefault: boolean
+  metadata?: Record<string, any>
+  /** Present on `show` (derived). */
+  balance?: number
+  createdAt: string
+  updatedAt: string
+  deletedAt?: string | null
+}
+
+export interface CreateFinancialAccountInput {
+  projectId: string
+  name: string
+  type?: FinancialAccountType
+  currency?: string
+  openingBalance?: number
+  isDefault?: boolean
+  metadata?: Record<string, any>
+}
+
+export interface UpdateFinancialAccountInput {
+  name?: string
+  type?: FinancialAccountType
+  currency?: string | null
+  openingBalance?: number
+  isDefault?: boolean
+  metadata?: Record<string, any>
+}
+
+export interface SupplierBill {
+  id: string
+  projectId: string
+  supplierId: string
+  purchaseReceiptId?: string | null
+  reference?: string | null
+  billDate: string
+  dueDate?: string | null
+  currency?: string | null
+  totalAmount: number
+  paidAmount: number
+  balanceDue?: number
+  status: SupplierBillStatus
+  notes?: string | null
+  createdByUserId?: string | null
+  createdAt: string
+  updatedAt: string
+  payments?: SupplierPayment[]
+}
+
+export interface CreateSupplierBillInput {
+  projectId: string
+  supplierId: string
+  purchaseReceiptId?: string | null
+  reference?: string
+  billDate: string
+  dueDate?: string | null
+  currency?: string
+  totalAmount: number
+  notes?: string
+}
+
+export interface SupplierPayment {
+  id: string
+  projectId: string
+  supplierBillId: string
+  financialAccountId: string
+  amount: number
+  paidAt: string
+  method?: string | null
+  reference?: string | null
+  createdByUserId?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PaySupplierBillInput {
+  projectId: string
+  financialAccountId: string
+  amount: number
+  paidAt?: string | null
+  method?: string | null
+  reference?: string | null
+  allowOverpay?: boolean
+}
+
+export interface CustomerPayment {
+  id: string
+  projectId: string
+  orderId: string
+  financialAccountId: string
+  amount: number
+  receivedAt: string
+  method?: string | null
+  reference?: string | null
+  createdByUserId?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CollectCustomerPaymentInput {
+  projectId: string
+  financialAccountId: string
+  amount: number
+  receivedAt?: string | null
+  method?: string | null
+  reference?: string | null
+  allowOverpay?: boolean
+}
+
+export interface Receivable {
+  orderId: string
+  storeId: string
+  total: number
+  paid: number
+  balanceDue: number
+  status: string
+  deliveryStatus: string
+  codInTransit: boolean
+}
+
+export interface ExpenseCategory {
+  id: string
+  projectId: string
+  name: string
+  parentId?: string | null
+  metadata?: Record<string, any>
+  createdAt: string
+  updatedAt: string
+  deletedAt?: string | null
+}
+
+export interface CreateExpenseCategoryInput {
+  projectId: string
+  name: string
+  parentId?: string | null
+  metadata?: Record<string, any>
+}
+
+export interface UpdateExpenseCategoryInput {
+  name?: string
+  parentId?: string | null
+  metadata?: Record<string, any>
+}
+
+export interface Expense {
+  id: string
+  projectId: string
+  categoryId?: string | null
+  supplierId?: string | null
+  financialAccountId?: string | null
+  amount: number
+  currency?: string | null
+  spentAt: string
+  paymentMethod?: string | null
+  status: ExpenseStatus
+  reference?: string | null
+  note?: string | null
+  attachments: any[]
+  createdByUserId?: string | null
+  createdAt: string
+  updatedAt: string
+  deletedAt?: string | null
+}
+
+export interface CreateExpenseInput {
+  projectId: string
+  categoryId?: string | null
+  supplierId?: string | null
+  financialAccountId?: string | null
+  amount: number
+  currency?: string
+  spentAt: string
+  paymentMethod?: string | null
+  status?: ExpenseStatus
+  reference?: string | null
+  note?: string | null
+  attachments?: any[]
+}
+
+export interface UpdateExpenseInput {
+  categoryId?: string | null
+  supplierId?: string | null
+  financialAccountId?: string | null
+  amount?: number
+  currency?: string | null
+  spentAt?: string
+  paymentMethod?: string | null
+  status?: ExpenseStatus
+  reference?: string | null
+  note?: string | null
+  attachments?: any[]
+}
+
+// --- Phase 2: reports -----------------------------------------------------
+
+export interface FinanceOverview {
+  cash: number
+  inventoryValuation: number
+  accountsReceivable: number
+  accountsPayable: number
+  netPosition: number
+}
+
+export interface AgingResult {
+  buckets: { label: string; amount: number }[]
+  total: number
+}
+
+export interface CashPosition {
+  accounts: {
+    id: string
+    name: string
+    type: FinancialAccountType
+    currency?: string | null
+    balance: number
+  }[]
+  total: number
+}
+
+export interface PnlReport {
+  from: string | null
+  to: string | null
+  revenue: number
+  cogs: number
+  grossProfit: number
+  expenses: number
+  netProfit: number
+}

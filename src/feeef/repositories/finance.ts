@@ -10,6 +10,26 @@ import {
   PurchaseOrderStatus,
   PurchaseReceipt,
   CreatePurchaseReceiptInput,
+  FinancialAccount,
+  CreateFinancialAccountInput,
+  UpdateFinancialAccountInput,
+  SupplierBill,
+  CreateSupplierBillInput,
+  PaySupplierBillInput,
+  SupplierPayment,
+  CustomerPayment,
+  CollectCustomerPaymentInput,
+  Receivable,
+  Expense,
+  CreateExpenseInput,
+  UpdateExpenseInput,
+  ExpenseCategory,
+  CreateExpenseCategoryInput,
+  UpdateExpenseCategoryInput,
+  FinanceOverview,
+  AgingResult,
+  CashPosition,
+  PnlReport,
 } from '../../core/entities/finance.js'
 import { ModelRepository, ListResponse } from './repository.js'
 
@@ -100,13 +120,120 @@ export class PurchaseReceiptRepository extends ModelRepository<
   }
 }
 
+/** Financial accounts — cash / bank / e-wallet (`/finance/financial-accounts`). */
+export class FinancialAccountRepository extends ModelRepository<
+  FinancialAccount,
+  CreateFinancialAccountInput,
+  UpdateFinancialAccountInput
+> {
+  constructor(client: AxiosInstance) {
+    super('finance/financial-accounts', client)
+  }
+
+  override async deleteMany(request: BatchDeleteRequest): Promise<BatchResult<FinancialAccount>> {
+    return this.postBatchDelete(request)
+  }
+}
+
+/** Supplier bills — Accounts Payable (`/finance/supplier-bills`). */
+export class SupplierBillRepository extends ModelRepository<
+  SupplierBill,
+  CreateSupplierBillInput,
+  never
+> {
+  constructor(client: AxiosInstance) {
+    super('finance/supplier-bills', client)
+  }
+
+  override async update(): Promise<SupplierBill> {
+    throw new Error('Supplier bills are managed via payments; bill totals are not edited.')
+  }
+
+  /** Record a (partial) payment against a bill. */
+  async pay(options: { id: string } & PaySupplierBillInput): Promise<{
+    bill: SupplierBill
+    payment: SupplierPayment
+  }> {
+    const { id, projectId, ...body } = options
+    const res = await this.client.post(
+      `/${this.resource}/${id}:pay`,
+      { projectId, ...body },
+      { params: { projectId } }
+    )
+    return res.data
+  }
+}
+
+/** Supplier payments (`/finance/supplier-payments`). */
+export class SupplierPaymentRepository extends ModelRepository<SupplierPayment, never, never> {
+  constructor(client: AxiosInstance) {
+    super('finance/supplier-payments', client)
+  }
+
+  /** Void a payment and recompute the parent bill. */
+  async void(options: { projectId: string; id: string }): Promise<SupplierBill> {
+    const res = await this.client.post(`/${this.resource}/${options.id}:void`, null, {
+      params: { projectId: options.projectId },
+    })
+    return res.data
+  }
+}
+
+/** Customer payments — Accounts Receivable collection (`/finance/customer-payments`). */
+export class CustomerPaymentRepository extends ModelRepository<CustomerPayment, never, never> {
+  constructor(client: AxiosInstance) {
+    super('finance/customer-payments', client)
+  }
+
+  /** Void a customer payment. */
+  async void(options: { projectId: string; id: string }): Promise<{ success: boolean }> {
+    const res = await this.client.post(`/${this.resource}/${options.id}:void`, null, {
+      params: { projectId: options.projectId },
+    })
+    return res.data
+  }
+}
+
+/** Expenses (`/finance/expenses`). */
+export class ExpenseRepository extends ModelRepository<
+  Expense,
+  CreateExpenseInput,
+  UpdateExpenseInput
+> {
+  constructor(client: AxiosInstance) {
+    super('finance/expenses', client)
+  }
+
+  override async deleteMany(request: BatchDeleteRequest): Promise<BatchResult<Expense>> {
+    return this.postBatchDelete(request)
+  }
+}
+
+/** Expense categories (`/finance/expense-categories`). */
+export class ExpenseCategoryRepository extends ModelRepository<
+  ExpenseCategory,
+  CreateExpenseCategoryInput,
+  UpdateExpenseCategoryInput
+> {
+  constructor(client: AxiosInstance) {
+    super('finance/expense-categories', client)
+  }
+}
+
 /**
- * Finance API facade (Phase 1). Use sub-repositories for CRUD and document ops.
+ * Finance API facade. Use sub-repositories for CRUD and document ops; top-level
+ * helpers cover AR collection and reports.
  */
 export class FinanceRepository {
   readonly suppliers: SupplierRepository
   readonly purchaseOrders: PurchaseOrderRepository
   readonly purchaseReceipts: PurchaseReceiptRepository
+  readonly financialAccounts: FinancialAccountRepository
+  readonly supplierBills: SupplierBillRepository
+  readonly supplierPayments: SupplierPaymentRepository
+  readonly customerPayments: CustomerPaymentRepository
+  readonly expenses: ExpenseRepository
+  readonly expenseCategories: ExpenseCategoryRepository
   readonly client: AxiosInstance
 
   constructor(client: AxiosInstance) {
@@ -114,6 +241,12 @@ export class FinanceRepository {
     this.suppliers = new SupplierRepository(client)
     this.purchaseOrders = new PurchaseOrderRepository(client)
     this.purchaseReceipts = new PurchaseReceiptRepository(client)
+    this.financialAccounts = new FinancialAccountRepository(client)
+    this.supplierBills = new SupplierBillRepository(client)
+    this.supplierPayments = new SupplierPaymentRepository(client)
+    this.customerPayments = new CustomerPaymentRepository(client)
+    this.expenses = new ExpenseRepository(client)
+    this.expenseCategories = new ExpenseCategoryRepository(client)
   }
 
   listSuppliers(options?: {
@@ -124,5 +257,63 @@ export class FinanceRepository {
   }): Promise<ListResponse<Supplier>> {
     const { projectId, page, limit, params } = options ?? ({} as any)
     return this.suppliers.list({ page, limit, params: { projectId, ...params } })
+  }
+
+  /** Open order receivables (derived, read-only). */
+  async listReceivables(options: { projectId: string }): Promise<Receivable[]> {
+    const res = await this.client.get('/finance/receivables', {
+      params: { projectId: options.projectId },
+    })
+    return res.data.data ?? res.data
+  }
+
+  /** Record a customer / COD payment against an order. */
+  async collectPayment(
+    options: { orderId: string } & CollectCustomerPaymentInput
+  ): Promise<CustomerPayment> {
+    const { orderId, projectId, ...body } = options
+    const res = await this.client.post(
+      `/finance/orders/${orderId}:collect`,
+      { projectId, ...body },
+      { params: { projectId } }
+    )
+    return res.data
+  }
+
+  // --- Reports ------------------------------------------------------------
+
+  async overview(options: { projectId: string }): Promise<FinanceOverview> {
+    const res = await this.client.get('/finance/reports/overview', {
+      params: { projectId: options.projectId },
+    })
+    return res.data
+  }
+
+  async cashPosition(options: { projectId: string }): Promise<CashPosition> {
+    const res = await this.client.get('/finance/reports/cash-position', {
+      params: { projectId: options.projectId },
+    })
+    return res.data
+  }
+
+  async apAging(options: { projectId: string }): Promise<AgingResult> {
+    const res = await this.client.get('/finance/reports/ap-aging', {
+      params: { projectId: options.projectId },
+    })
+    return res.data
+  }
+
+  async arAging(options: { projectId: string }): Promise<AgingResult> {
+    const res = await this.client.get('/finance/reports/ar-aging', {
+      params: { projectId: options.projectId },
+    })
+    return res.data
+  }
+
+  async pnl(options: { projectId: string; from?: string; to?: string }): Promise<PnlReport> {
+    const res = await this.client.get('/finance/reports/pnl', {
+      params: { projectId: options.projectId, from: options.from, to: options.to },
+    })
+    return res.data
   }
 }

@@ -551,6 +551,12 @@ export interface InventoryIntegration {
   consume_on: OrderStatus[]
 }
 
+/** Order → finance behavior: when revenue/COGS are recognized for an order. */
+export interface FinanceIntegration {
+  /** Order statuses at which revenue + COGS are recognized (receivable opens). */
+  recognize_on: OrderStatus[]
+}
+
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
   selectedCurrency: string
@@ -562,6 +568,7 @@ export interface StoreConfigs {
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
   inventory_integration?: InventoryIntegration
+  finance_integration?: FinanceIntegration
 }
 
 export interface CustomStatusMapping {
