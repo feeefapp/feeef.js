@@ -68,6 +68,9 @@ export interface StoreEntity {
 
   /** Active full-site template (`store_templates.id`) when set. */
   templateId?: string | null
+
+  /** Linked inventory project ID for stock management. */
+  projectId?: string | null
 }
 
 // function that generate public data from the integrations data
@@ -542,6 +545,12 @@ export interface CreateStoreInviteInput {
   metadata?: Record<string, any>
 }
 
+export interface InventoryIntegration {
+  reserve_on: OrderStatus[]
+  unreserve_on: OrderStatus[]
+  consume_on: OrderStatus[]
+}
+
 export interface StoreConfigs {
   currencies: StoreCurrencyConfig[]
   selectedCurrency: string
@@ -552,6 +561,7 @@ export interface StoreConfigs {
   customStatusMappings?: CustomStatusMapping[]
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
+  inventory_integration?: InventoryIntegration
 }
 
 export interface CustomStatusMapping {
@@ -1107,6 +1117,13 @@ export interface StoreIntegrations {
 
   security?: SecurityIntegration
   dispatcher?: DispatcherIntegration
+  inventory?: StoreInventoryIntegration
+}
+
+/** Marketplace inventory module (billing + active toggle). */
+export interface StoreInventoryIntegration {
+  active: boolean
+  metadata?: Record<string, any>
 }
 
 export enum StoreSubscriptionStatus {
@@ -1118,7 +1135,27 @@ export enum StoreSubscriptionType {
   free = 'free',
   premium = 'premium',
   vip = 'vip',
+  ultra = 'ultra',
   custom = 'custom',
+}
+
+/** Per-integration billing lifecycle (stored on store.subscription.integrations). */
+export enum IntegrationBillingStatus {
+  active = 'active',
+  grace = 'grace',
+  past_due = 'past_due',
+  canceled = 'canceled',
+}
+
+export interface StoreIntegrationSubscription {
+  startAt: DateTime
+  expiresAt: DateTime | null
+  status: IntegrationBillingStatus
+  /** Price snapshot from last successful charge (DZD). */
+  price: number
+  autoRenew: boolean
+  failedAttempts: number
+  nextRetryAt: DateTime | null
 }
 
 export interface StoreSubscription {
@@ -1131,6 +1168,8 @@ export interface StoreSubscription {
   consumed: number
   remaining: number
   metadata: Record<string, any>
+  /** Per-integration paid subscriptions (billing only; credentials stay in store.integrations). */
+  integrations?: Record<string, StoreIntegrationSubscription>
 }
 
 /**
@@ -1159,6 +1198,7 @@ export interface StoreCreateInput {
   tiktokPixelIds?: string[]
   googleAnalyticsId?: string
   googleTagsId?: string
+  projectId?: string
 }
 
 /**
@@ -1188,6 +1228,7 @@ export interface StoreUpdateInput {
   googleAnalyticsId?: string
   googleTagsId?: string
   integrations?: StoreIntegrations
+  projectId?: string
 }
 
 /**

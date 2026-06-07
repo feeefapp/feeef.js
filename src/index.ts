@@ -31,6 +31,8 @@ export * from './core/entities/state.js'
 export * from './core/entities/city.js'
 export * from './core/entities/currency.js'
 export * from './core/entities/feedback.js'
+export * from './core/entities/inventory.js'
+export * from './core/batch.js'
 
 // ============================================================================
 // Repositories
@@ -58,6 +60,7 @@ export * from './feeef/repositories/countries.js'
 export * from './feeef/repositories/states.js'
 export * from './feeef/repositories/cities.js'
 export * from './feeef/repositories/currencies.js'
+export * from './feeef/repositories/inventory.js'
 
 // Transfer and Deposit entities are also exported from their repositories
 export type { AppEntity, AppCreateInput, AppUpdateInput } from './feeef/repositories/apps.js'

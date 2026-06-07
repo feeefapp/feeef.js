@@ -11,6 +11,7 @@ export type TransferType =
   | 'store_due'
   | 'user_transfer'
   | 'ai_generation'
+  | 'integration_subscription'
   | 'refund'
   | 'adjustment'
 
