@@ -1118,10 +1118,17 @@ export interface StoreIntegrations {
   security?: SecurityIntegration
   dispatcher?: DispatcherIntegration
   inventory?: StoreInventoryIntegration
+  finance?: StoreFinanceIntegration
 }
 
 /** Marketplace inventory module (billing + active toggle). */
 export interface StoreInventoryIntegration {
+  active: boolean
+  metadata?: Record<string, any>
+}
+
+/** Finance module (procurement + accounting) billing + active toggle. */
+export interface StoreFinanceIntegration {
   active: boolean
   metadata?: Record<string, any>
 }
