@@ -1117,6 +1117,13 @@ export interface StoreIntegrations {
 
   security?: SecurityIntegration
   dispatcher?: DispatcherIntegration
+  inventory?: StoreInventoryIntegration
+}
+
+/** Marketplace inventory module (billing + active toggle). */
+export interface StoreInventoryIntegration {
+  active: boolean
+  metadata?: Record<string, any>
 }
 
 export enum StoreSubscriptionStatus {
