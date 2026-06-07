@@ -105,7 +105,7 @@ export class PurchaseReceiptRepository extends ModelRepository<
 
   /** Post the receipt: stock goods into inventory at batch cost (idempotent). */
   async post(options: { projectId: string; id: string }): Promise<PurchaseReceipt> {
-    const res = await this.client.post(`/${this.resource}/${options.id}:post`, null, {
+    const res = await this.client.post(`/${this.resource}/${options.id}/post`, null, {
       params: { projectId: options.projectId },
     })
     return res.data
@@ -113,7 +113,7 @@ export class PurchaseReceiptRepository extends ModelRepository<
 
   /** Void a posted receipt: reverse its stock-in. */
   async void(options: { projectId: string; id: string }): Promise<PurchaseReceipt> {
-    const res = await this.client.post(`/${this.resource}/${options.id}:void`, null, {
+    const res = await this.client.post(`/${this.resource}/${options.id}/void`, null, {
       params: { projectId: options.projectId },
     })
     return res.data
@@ -156,7 +156,7 @@ export class SupplierBillRepository extends ModelRepository<
   }> {
     const { id, projectId, ...body } = options
     const res = await this.client.post(
-      `/${this.resource}/${id}:pay`,
+      `/${this.resource}/${id}/pay`,
       { projectId, ...body },
       { params: { projectId } }
     )
@@ -172,7 +172,7 @@ export class SupplierPaymentRepository extends ModelRepository<SupplierPayment, 
 
   /** Void a payment and recompute the parent bill. */
   async void(options: { projectId: string; id: string }): Promise<SupplierBill> {
-    const res = await this.client.post(`/${this.resource}/${options.id}:void`, null, {
+    const res = await this.client.post(`/${this.resource}/${options.id}/void`, null, {
       params: { projectId: options.projectId },
     })
     return res.data
@@ -187,7 +187,7 @@ export class CustomerPaymentRepository extends ModelRepository<CustomerPayment, 
 
   /** Void a customer payment. */
   async void(options: { projectId: string; id: string }): Promise<{ success: boolean }> {
-    const res = await this.client.post(`/${this.resource}/${options.id}:void`, null, {
+    const res = await this.client.post(`/${this.resource}/${options.id}/void`, null, {
       params: { projectId: options.projectId },
     })
     return res.data
@@ -273,7 +273,7 @@ export class FinanceRepository {
   ): Promise<CustomerPayment> {
     const { orderId, projectId, ...body } = options
     const res = await this.client.post(
-      `/finance/orders/${orderId}:collect`,
+      `/finance/orders/${orderId}/collect`,
       { projectId, ...body },
       { params: { projectId } }
     )
