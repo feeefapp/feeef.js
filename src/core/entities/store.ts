@@ -545,10 +545,19 @@ export interface CreateStoreInviteInput {
   metadata?: Record<string, any>
 }
 
+/** How order sync handles line items with no inventory bucket for their SKU. */
+export type MissingInventoryBucketPolicy = 'ignore' | 'reject'
+
 export interface InventoryIntegration {
   reserve_on: OrderStatus[]
   unreserve_on: OrderStatus[]
   consume_on: OrderStatus[]
+  /**
+   * `ignore` — skip untracked SKUs and continue the order save.
+   * `reject` — block the order with a stock validation error.
+   * @default ignore
+   */
+  missing_bucket_policy?: MissingInventoryBucketPolicy
 }
 
 export type FinancePdfPaperSize = 'a4' | 'letter' | 'a5' | 'legal'
@@ -572,6 +581,8 @@ export interface FinancePdfSettings {
 export interface FinanceIntegration {
   /** Order statuses at which revenue + COGS are recognized (receivable opens). */
   recognize_on: OrderStatus[]
+  /** Cash-basis metrics cutoff — payments/expenses before this are ignored. */
+  activated_at?: string | null
   pdf?: FinancePdfSettings
 }
 
