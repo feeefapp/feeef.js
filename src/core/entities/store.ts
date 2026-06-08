@@ -548,10 +548,20 @@ export interface CreateStoreInviteInput {
 /** How order sync handles line items with no inventory bucket for their SKU. */
 export type MissingInventoryBucketPolicy = 'ignore' | 'reject'
 
+/** When an order field equals `equals`, apply the parent lifecycle list (reserve / release / consume). */
+export interface InventoryLifecycleRule {
+  id: string
+  dimension: PixelStatusDimension
+  equals: string
+}
+
 export interface InventoryIntegration {
   reserve_on: OrderStatus[]
   unreserve_on: OrderStatus[]
   consume_on: OrderStatus[]
+  reserve_rules?: InventoryLifecycleRule[]
+  unreserve_rules?: InventoryLifecycleRule[]
+  consume_rules?: InventoryLifecycleRule[]
   /**
    * `ignore` — skip untracked SKUs and continue the order save.
    * `reject` — block the order with a stock validation error.
