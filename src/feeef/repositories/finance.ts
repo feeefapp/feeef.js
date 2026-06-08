@@ -316,4 +316,39 @@ export class FinanceRepository {
     })
     return res.data
   }
+
+  // --- Phase 3 GL ---------------------------------------------------------
+
+  async listGlAccounts(options: { projectId: string; type?: string }) {
+    const res = await this.client.get('/finance/gl-accounts', {
+      params: { projectId: options.projectId, type: options.type },
+    })
+    return res.data?.data ?? res.data
+  }
+
+  async listJournalEntries(options: {
+    projectId: string
+    status?: string
+    from?: string
+    to?: string
+  }) {
+    const res = await this.client.get('/finance/journal-entries', {
+      params: options,
+    })
+    return res.data?.data ?? res.data
+  }
+
+  async trialBalance(options: { projectId: string; asOf?: string }) {
+    const res = await this.client.get('/finance/reports/trial-balance', {
+      params: { projectId: options.projectId, asOf: options.asOf },
+    })
+    return res.data
+  }
+
+  async balanceSheet(options: { projectId: string; asOf?: string }) {
+    const res = await this.client.get('/finance/reports/balance-sheet', {
+      params: { projectId: options.projectId, asOf: options.asOf },
+    })
+    return res.data
+  }
 }

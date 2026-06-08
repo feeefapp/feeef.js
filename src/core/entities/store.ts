@@ -551,10 +551,28 @@ export interface InventoryIntegration {
   consume_on: OrderStatus[]
 }
 
+export type FinancePdfPaperSize = 'a4' | 'letter' | 'a5' | 'legal'
+
+/** Layout and content options for finance PDF documents. */
+export interface FinancePdfSettings {
+  paperSize: FinancePdfPaperSize
+  showQrCode: boolean
+  showLogo: boolean
+  showStoreContact: boolean
+  showSupplierDetails: boolean
+  showDocumentId: boolean
+  showFooter: boolean
+  showStatusBadge: boolean
+  showSignatureLines: boolean
+  showPaymentHistory: boolean
+  footerNote: string
+}
+
 /** Order → finance behavior: when revenue/COGS are recognized for an order. */
 export interface FinanceIntegration {
   /** Order statuses at which revenue + COGS are recognized (receivable opens). */
   recognize_on: OrderStatus[]
+  pdf?: FinancePdfSettings
 }
 
 export interface StoreConfigs {
