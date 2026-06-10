@@ -90,6 +90,10 @@ export interface EcotrackSyncResult {
   totalFetched?: number
   totalUpdated?: number
   totalSkipped?: number
+  /** COD payout batches processed from Ecotrack cash-in history. */
+  totalCashinTransactions?: number
+  /** Orders marked payment_status received from cash-in sync. */
+  totalPaymentReceived?: number
   syncedAt?: string
   errors?: string[]
 }
@@ -100,6 +104,8 @@ export interface EcotrackSyncResult {
 export interface EcotrackSyncStatus {
   canSync: boolean
   lastSyncAt?: string
+  /** Latest Ecotrack cash-in transaction archived-at processed (integration metadata). */
+  lastCashinSyncAt?: string
   nextSyncAvailableAt?: string
   minutesUntilNextSync?: number
 }
