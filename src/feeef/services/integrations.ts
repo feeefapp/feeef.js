@@ -90,6 +90,14 @@ export interface EcotrackSyncResult {
   totalFetched?: number
   totalUpdated?: number
   totalSkipped?: number
+  /** COD payout batches processed from Ecotrack cash-in history. */
+  totalCashinTransactions?: number
+  /** Orders marked payment_status received from cash-in sync. */
+  totalPaymentReceived?: number
+  /** Customer payments created in Finance from cash-in sync. */
+  totalFinancePaymentsCreated?: number
+  /** Total amount collected into Finance from cash-in sync. */
+  totalFinanceAmountCollected?: number
   syncedAt?: string
   errors?: string[]
 }
@@ -100,6 +108,8 @@ export interface EcotrackSyncResult {
 export interface EcotrackSyncStatus {
   canSync: boolean
   lastSyncAt?: string
+  /** Latest Ecotrack cash-in transaction archived-at processed (integration metadata). */
+  lastCashinSyncAt?: string
   nextSyncAvailableAt?: string
   minutesUntilNextSync?: number
 }
@@ -207,6 +217,17 @@ export class EcotrackDeliveryIntegrationApi {
         options?.startDate instanceof Date ? options.startDate.toISOString() : options?.startDate,
       endDate: options?.endDate instanceof Date ? options.endDate.toISOString() : options?.endDate,
     })
+    return res.data
+  }
+
+  /**
+   * Sync only COD payouts received by the merchant (Ecotrack cash-in history).
+   */
+  async triggerCashinSync(options?: { forceAll?: boolean }): Promise<EcotrackSyncResult> {
+    const res = await this.client.post(
+      `/stores/${this.storeId}/integrations/ecotrack/sync/cashin`,
+      options?.forceAll ? { forceAll: true } : undefined
+    )
     return res.data
   }
 }

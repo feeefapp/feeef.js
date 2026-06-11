@@ -545,10 +545,55 @@ export interface CreateStoreInviteInput {
   metadata?: Record<string, any>
 }
 
+/** How order sync handles line items with no inventory bucket for their SKU. */
+export type MissingInventoryBucketPolicy = 'ignore' | 'reject'
+
+/** When an order field equals `equals`, apply the parent lifecycle list (reserve / release / consume). */
+export interface InventoryLifecycleRule {
+  id: string
+  dimension: PixelStatusDimension
+  equals: string
+}
+
 export interface InventoryIntegration {
   reserve_on: OrderStatus[]
   unreserve_on: OrderStatus[]
   consume_on: OrderStatus[]
+  reserve_rules?: InventoryLifecycleRule[]
+  unreserve_rules?: InventoryLifecycleRule[]
+  consume_rules?: InventoryLifecycleRule[]
+  /**
+   * `ignore` — skip untracked SKUs and continue the order save.
+   * `reject` — block the order with a stock validation error.
+   * @default ignore
+   */
+  missing_bucket_policy?: MissingInventoryBucketPolicy
+}
+
+export type FinancePdfPaperSize = 'a4' | 'letter' | 'a5' | 'legal'
+
+/** Layout and content options for finance PDF documents. */
+export interface FinancePdfSettings {
+  paperSize: FinancePdfPaperSize
+  showQrCode: boolean
+  showLogo: boolean
+  showStoreContact: boolean
+  showSupplierDetails: boolean
+  showDocumentId: boolean
+  showFooter: boolean
+  showStatusBadge: boolean
+  showSignatureLines: boolean
+  showPaymentHistory: boolean
+  footerNote: string
+}
+
+/** Order → finance behavior: when revenue/COGS are recognized for an order. */
+export interface FinanceIntegration {
+  /** Order statuses at which revenue + COGS are recognized (receivable opens). */
+  recognize_on: OrderStatus[]
+  /** Cash-basis metrics cutoff — payments/expenses before this are ignored. */
+  activated_at?: string | null
+  pdf?: FinancePdfSettings
 }
 
 export interface StoreConfigs {
@@ -562,6 +607,7 @@ export interface StoreConfigs {
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
   inventory_integration?: InventoryIntegration
+  finance_integration?: FinanceIntegration
 }
 
 export interface CustomStatusMapping {
@@ -1118,10 +1164,17 @@ export interface StoreIntegrations {
   security?: SecurityIntegration
   dispatcher?: DispatcherIntegration
   inventory?: StoreInventoryIntegration
+  finance?: StoreFinanceIntegration
 }
 
 /** Marketplace inventory module (billing + active toggle). */
 export interface StoreInventoryIntegration {
+  active: boolean
+  metadata?: Record<string, any>
+}
+
+/** Finance module (procurement + accounting) billing + active toggle. */
+export interface StoreFinanceIntegration {
   active: boolean
   metadata?: Record<string, any>
 }

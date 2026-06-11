@@ -18,6 +18,7 @@ import { ShippingPriceRepository } from './repositories/shipping_prices.js'
 import { ShippingMethodRepository } from './repositories/shipping_methods.js'
 import { FeedbackRepository } from './repositories/feedbacks.js'
 import { InventoryRepository } from './repositories/inventory.js'
+import { FinanceRepository } from './repositories/finance.js'
 // Product landing pages
 import { ProductLandingPageTemplatesRepository } from './repositories/product_landing_page_templates.js'
 import { ProductLandingPagesRepository } from './repositories/product_landing_pages.js'
@@ -200,6 +201,11 @@ export class FeeeF {
   inventory: InventoryRepository
 
   /**
+   * The repository for managing finance (procurement: suppliers, POs, receipts).
+   */
+  finance: FinanceRepository
+
+  /**
    * The cart service for managing the cart.
    */
   cart: CartService
@@ -269,6 +275,7 @@ export class FeeeF {
     this.shippingMethods = new ShippingMethodRepository(this.client)
     this.feedbacks = new FeedbackRepository(this.client)
     this.inventory = new InventoryRepository(this.client)
+    this.finance = new FinanceRepository(this.client)
 
     // Initialize services
     this.cart = new CartService()
