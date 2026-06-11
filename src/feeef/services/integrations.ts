@@ -94,6 +94,10 @@ export interface EcotrackSyncResult {
   totalCashinTransactions?: number
   /** Orders marked payment_status received from cash-in sync. */
   totalPaymentReceived?: number
+  /** Customer payments created in Finance from cash-in sync. */
+  totalFinancePaymentsCreated?: number
+  /** Total amount collected into Finance from cash-in sync. */
+  totalFinanceAmountCollected?: number
   syncedAt?: string
   errors?: string[]
 }
@@ -213,6 +217,17 @@ export class EcotrackDeliveryIntegrationApi {
         options?.startDate instanceof Date ? options.startDate.toISOString() : options?.startDate,
       endDate: options?.endDate instanceof Date ? options.endDate.toISOString() : options?.endDate,
     })
+    return res.data
+  }
+
+  /**
+   * Sync only COD payouts received by the merchant (Ecotrack cash-in history).
+   */
+  async triggerCashinSync(options?: { forceAll?: boolean }): Promise<EcotrackSyncResult> {
+    const res = await this.client.post(
+      `/stores/${this.storeId}/integrations/ecotrack/sync/cashin`,
+      options?.forceAll ? { forceAll: true } : undefined
+    )
     return res.data
   }
 }
