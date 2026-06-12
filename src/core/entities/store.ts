@@ -245,10 +245,11 @@ export const generatePublicStoreIntegrationWebhooks = (
 ): PublicWebhooksIntegration | null | undefined => {
   if (!webhooks) return null
 
-  const activeWebhooks = webhooks.webhooks.filter((webhook) => webhook.active)
+  const webhookList = webhooks.webhooks ?? []
+  const activeWebhooks = webhookList.filter((webhook) => webhook.active)
 
   return {
-    webhookCount: webhooks.webhooks.length,
+    webhookCount: webhookList.length,
     activeWebhookCount: activeWebhooks.length,
     active: webhooks.active,
     webhookUrls: activeWebhooks.map((webhook) => webhook.url),
