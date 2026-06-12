@@ -141,7 +141,7 @@ export const generatePublicStoreIntegrationMetaPixel = (
   if (!metaPixel) return null
   // NOTE: oauth2, pixel.key, and metadata are intentionally excluded for security
   return {
-    pixels: metaPixel.pixels.map((pixel) => ({
+    pixels: (metaPixel.pixels || []).map((pixel) => ({
       id: pixel.id,
     })),
     active: metaPixel.active,
@@ -155,7 +155,7 @@ export const generatePublicStoreIntegrationTiktokPixel = (
 ): PublicTiktokPixelIntegration | null | undefined => {
   if (!tiktokPixel) return null
   return {
-    pixels: tiktokPixel.pixels.map((pixel) => ({
+    pixels: (tiktokPixel.pixels || []).map((pixel) => ({
       id: pixel.id,
     })),
     active: tiktokPixel.active,
