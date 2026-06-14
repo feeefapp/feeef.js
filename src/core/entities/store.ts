@@ -90,6 +90,7 @@ export const generatePublicStoreIntegrations = (
     security,
     customFields,
     payment,
+    connectors,
   } = integrations
   return {
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
@@ -104,6 +105,30 @@ export const generatePublicStoreIntegrations = (
     security: generatePublicStoreIntegrationSecurity(security) || null,
     customFields: generatePublicStoreIntegrationCustomFields(customFields) || null,
     payment: generatePublicStoreIntegrationPayment(payment) || null,
+    connectors: generatePublicStoreIntegrationConnectors(connectors) || null,
+  }
+}
+
+/** Strips connector auth secrets from public store JSON. */
+export const generatePublicStoreIntegrationConnectors = (
+  connectors: ConnectorsIntegration | null | undefined
+): PublicConnectorsIntegration | null | undefined => {
+  if (!connectors) return null
+  return {
+    active: connectors.active,
+    metadata: connectors.metadata,
+    connectors: (connectors.connectors || []).map((c) => ({
+      id: c.id,
+      type: c.type,
+      active: c.active,
+      name: c.name,
+      status: c.status,
+      externalId: c.externalId,
+      fieldMapping: c.fieldMapping,
+      syncState: c.syncState,
+      createdAt: c.createdAt,
+      metadata: c.metadata,
+    })),
   }
 }
 
@@ -498,6 +523,7 @@ export interface PublicStoreIntegrations {
   security: PublicSecurityIntegration | null
   customFields: PublicCustomFieldsIntegration | null
   payment: PublicPaymentIntegration | null
+  connectors: PublicConnectorsIntegration | null
 }
 
 export enum StoreMemberRole {
@@ -1130,6 +1156,76 @@ export interface ConfermerPermissions {
   metadata?: Record<string, any>
 }
 
+/** Inbound platform connector auth (polymorphic by authType). */
+export type ConnectorAuthType = 'oauth2' | 'apiKey' | 'public'
+
+export type ConnectorAuth =
+  | {
+      authType: 'oauth2'
+      accessToken?: string
+      refreshToken?: string
+      scopes?: string[]
+      expiresAt?: string | null
+    }
+  | { authType: 'apiKey'; apiKey?: string }
+  | { authType: 'public'; baseUrl?: string }
+
+export type ConnectorType = 'shopify' | 'youcan' | 'google_sheets'
+
+export type ConnectorStatus = 'connected' | 'reauth_needed' | 'uninstalled' | 'error'
+
+export interface ConnectorFieldMapping {
+  order?: Record<string, string>
+  product?: Record<string, string>
+}
+
+export interface ConnectorSyncStateEntry {
+  cursor?: string | null
+  lastSyncedAt?: string | null
+}
+
+/** Single linked external platform instance (Shopify shop, YouCan store, etc.). */
+export interface ConnectorConfig {
+  id: string
+  type: ConnectorType
+  active: boolean
+  name?: string
+  status?: ConnectorStatus
+  externalId?: string
+  fieldMapping?: ConnectorFieldMapping
+  syncState?: Record<string, ConnectorSyncStateEntry>
+  auth?: ConnectorAuth
+  metadata?: Record<string, any>
+  createdAt?: string
+}
+
+/** Inbound connectors integration (store.integrations.connectors). */
+export interface ConnectorsIntegration {
+  active: boolean
+  connectors: ConnectorConfig[]
+  metadata?: Record<string, any>
+}
+
+/** Public connector config (auth secrets stripped). */
+export interface PublicConnectorConfig {
+  id: string
+  type: ConnectorType
+  active: boolean
+  name?: string
+  status?: ConnectorStatus
+  externalId?: string
+  fieldMapping?: ConnectorFieldMapping
+  syncState?: Record<string, ConnectorSyncStateEntry>
+  createdAt?: string
+  metadata?: Record<string, any>
+}
+
+export interface PublicConnectorsIntegration {
+  active: boolean
+  connectors: PublicConnectorConfig[]
+  metadata?: Record<string, any>
+}
+
 export interface StoreIntegrations {
   [key: string]: any
   metadata?: Record<string, any>
@@ -1166,6 +1262,8 @@ export interface StoreIntegrations {
   dispatcher?: DispatcherIntegration
   inventory?: StoreInventoryIntegration
   finance?: StoreFinanceIntegration
+  /** Inbound platform connectors (Shopify, YouCan, Google Sheets, …). */
+  connectors?: ConnectorsIntegration
 }
 
 /** Marketplace inventory module (billing + active toggle). */
