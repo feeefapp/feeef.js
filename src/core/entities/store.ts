@@ -1170,7 +1170,7 @@ export type ConnectorAuth =
   | { authType: 'apiKey'; apiKey?: string }
   | { authType: 'public'; baseUrl?: string }
 
-export type ConnectorType = 'shopify' | 'youcan' | 'google_sheets'
+export type ConnectorType = 'shopify' | 'youcan' | 'google_sheets' | 'facebook_leads'
 
 export type ConnectorStatus = 'connected' | 'reauth_needed' | 'uninstalled' | 'error'
 
