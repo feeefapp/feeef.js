@@ -595,6 +595,11 @@ export interface InventoryIntegration {
    * @default ignore
    */
   missing_bucket_policy?: MissingInventoryBucketPolicy
+  /**
+   * When true, reservation may exceed on-hand quantity so availability can go negative.
+   * @default false
+   */
+  allow_backorder?: boolean
 }
 
 export type FinancePdfPaperSize = 'a4' | 'letter' | 'a5' | 'legal'
