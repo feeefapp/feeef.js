@@ -597,7 +597,7 @@ export interface InventoryIntegration {
   missing_bucket_policy?: MissingInventoryBucketPolicy
   /**
    * When true, reservation may exceed on-hand quantity so availability can go negative.
-   * @default false
+   * @default true
    */
   allow_backorder?: boolean
 }
