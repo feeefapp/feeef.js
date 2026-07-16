@@ -87,6 +87,7 @@ export interface AssignManyOrdersSchema {
  * Delivery service filter enum
  */
 export enum DeliveryServiceFilter {
+  none = 'none',
   yalidine = 'yalidine',
   ecotrack = 'ecotrack',
   procolis = 'procolis',
@@ -95,6 +96,9 @@ export enum DeliveryServiceFilter {
   maystro = 'maystro',
   ecomanager = 'ecomanager',
 }
+
+/** Reserved token for “any non-empty” variant/offer presence filters. */
+export const ORDER_FILTER_ANY = '$$any' as const
 
 /**
  * Options for listing orders
@@ -120,7 +124,11 @@ export interface OrderListOptions {
   products?: string[]
   shippingState?: string
   shippingCity?: string
-  deliveryService?: DeliveryServiceFilter
+  deliveryService?: DeliveryServiceFilter | string
+  /** Presence (`ORDER_FILTER_ANY`) or a specific variant path. */
+  variant?: string
+  /** Presence (`ORDER_FILTER_ANY`) or a specific offer code. */
+  offer?: string
   /** Filter orders whose `references` jsonb contains this token (repeat param or comma-separated). */
   references?: string | string[]
   params?: Record<string, any>
@@ -187,6 +195,8 @@ export class OrderRepository extends ModelRepository<
       if (options.shippingState) params.shippingState = options.shippingState
       if (options.shippingCity) params.shippingCity = options.shippingCity
       if (options.deliveryService) params.deliveryService = options.deliveryService
+      if (options.variant) params.variant = options.variant
+      if (options.offer) params.offer = options.offer
       if (options.references !== undefined) params.references = options.references
     }
 
