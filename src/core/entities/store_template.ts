@@ -76,3 +76,28 @@ export interface StoreTemplateUpdateInput {
   data?: Record<string, unknown>
   policy?: TemplateComponentPolicy
 }
+
+/** One row in `store_template_locales`. */
+export interface StoreTemplateLocaleEntity {
+  id: string
+  storeTemplateId: string
+  locale: string
+  messages: Record<string, unknown>
+  isDefault: boolean
+  createdAt?: unknown
+  updatedAt?: unknown | null
+}
+
+export interface StoreTemplateLocaleInput {
+  locale: string
+  messages: Record<string, unknown>
+  isDefault?: boolean
+}
+
+/** Storefront-friendly i18n bundle from GET/PUT locales. */
+export interface StoreTemplateLocalesBundle {
+  defaultLocale: string
+  locales: string[]
+  messages: Record<string, Record<string, unknown>>
+  rows?: StoreTemplateLocaleEntity[]
+}

@@ -70,7 +70,8 @@ export class StoreRepository extends ModelRepository<
       ...listOptions,
       params: {
         ...listOptions.params,
-        ...(userId && { user_id: userId }),
+        // StoreFilter.user() — owned by or member of this user
+        ...(userId && { user: userId, user_id: userId }),
       },
     })
   }
