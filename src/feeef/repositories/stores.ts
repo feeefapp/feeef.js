@@ -215,4 +215,40 @@ export class StoreRepository extends ModelRepository<
     })
     return res.data
   }
+
+  /**
+   * Upserts a draft theme preview (does not change live `metadata.templateData`).
+   */
+  async putTemplatePreview(
+    storeId: string,
+    body: { data: unknown; schema?: unknown }
+  ): Promise<{
+    previewUrl: string
+    previewToken: string
+    expiresAt: string
+  }> {
+    const res = await this.client.put(`/${this.resource}/${storeId}/template-preview`, body)
+    return res.data
+  }
+
+  /**
+   * Clears the draft theme preview for a store.
+   */
+  async clearTemplatePreview(storeId: string): Promise<{ cleared: boolean }> {
+    const res = await this.client.delete(`/${this.resource}/${storeId}/template-preview`)
+    return res.data
+  }
+
+  /**
+   * Fetches draft TemplateData with a signed preview token (public, token-gated).
+   */
+  async getTemplatePreview(
+    storeId: string,
+    token: string
+  ): Promise<{ data: unknown; schema?: unknown; updatedAt?: string | null }> {
+    const res = await this.client.get(`/${this.resource}/${storeId}/template-preview`, {
+      params: { token },
+    })
+    return res.data
+  }
 }

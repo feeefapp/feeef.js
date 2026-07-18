@@ -81,8 +81,15 @@ export abstract class ModelRepository<T, C, U> {
    * @returns A promise that resolves to the created model.
    */
   async create(dataOrOptions: C | ModelCreateOptions<C>, params?: Record<string, any>): Promise<T> {
-    // If dataOrOptions is already wrapped in ModelCreateOptions, use it directly
-    if (dataOrOptions && typeof dataOrOptions === 'object' && 'data' in dataOrOptions) {
+    // Options form is ONLY `{ data, params? }` — not create-inputs that happen to
+    // include a `data` field (e.g. StoreTemplateCreateInput.template data).
+    const looksLikeOptions =
+      dataOrOptions &&
+      typeof dataOrOptions === 'object' &&
+      'data' in dataOrOptions &&
+      Object.keys(dataOrOptions as object).every((k) => k === 'data' || k === 'params')
+
+    if (looksLikeOptions) {
       const options = dataOrOptions as ModelCreateOptions<C>
       const { data, params: optionsParams } = options
       const requestParams = optionsParams || params

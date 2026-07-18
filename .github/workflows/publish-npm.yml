@@ -1,0 +1,64 @@
+# Publish `feeef` to npm without interactive login / 2FA.
+#
+# Secrets:
+#   NPM_TOKEN — granular access token with Bypass 2FA (package: feeef)
+#     Create: https://www.npmjs.com/settings/~/tokens/granular-access-tokens/new
+#   Or configure Trusted Publishing (OIDC) on the package and drop NPM_TOKEN.
+#
+# Triggers: version tags (v*) or manual workflow_dispatch.
+
+name: Publish feeef to npm
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "npm publish --dry-run only"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  # Needed if you switch to npm Trusted Publishing (OIDC)
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NPM_TOKEN:-}" ]; then
+            echo "Missing secrets.NPM_TOKEN — create a granular token with Bypass 2FA (see PUBLISH.md)"
+            exit 1
+          fi
+          npm whoami
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            npm publish --access public --dry-run
+          else
+            npm publish --access public
+          fi

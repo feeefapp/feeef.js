@@ -44,12 +44,13 @@ export interface OAuthAuthorizeUrlParams {
 
 /**
  * Parameters for exchanging authorization code to access token.
+ * `clientSecret` is omitted for public PKCE clients (`token_endpoint_auth_method: none`).
  */
 export interface OAuthExchangeCodeParams {
   code: string
   redirectUri: string
   clientId: string
-  clientSecret: string
+  clientSecret?: string
   codeVerifier?: string
 }
 
@@ -88,6 +89,7 @@ export class OAuthRepository {
 
   /**
    * Exchanges an authorization code for an access token.
+   * Public clients omit `clientSecret` and must send `codeVerifier` (PKCE).
    */
   async exchangeAuthorizationCode(params: OAuthExchangeCodeParams): Promise<OAuthTokenResponse> {
     const body = new URLSearchParams({
@@ -95,8 +97,10 @@ export class OAuthRepository {
       code: params.code,
       redirect_uri: params.redirectUri,
       client_id: params.clientId,
-      client_secret: params.clientSecret,
     })
+    if (params.clientSecret) {
+      body.set('client_secret', params.clientSecret)
+    }
     if (params.codeVerifier) {
       body.set('code_verifier', params.codeVerifier)
     }

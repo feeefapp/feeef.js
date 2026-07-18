@@ -1,7 +1,7 @@
 {
   "name": "feeef",
   "description": "feeef sdk for javascript",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "main": "build/index.js",
   "type": "module",
   "files": [
@@ -21,6 +21,7 @@
     "compile": "tsup-node && tsc --emitDeclarationOnly --declaration",
     "build": "npm run compile",
     "release": "npx release-it",
+    "publish:npm": "bash ./scripts/publish.sh",
     "version": "npm run build",
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext=.ts",
@@ -96,6 +97,10 @@
       "release": true,
       "releaseName": "v${version}",
       "web": true
+    },
+    "npm": {
+      "publish": true,
+      "skipChecks": false
     }
   },
   "c8": {

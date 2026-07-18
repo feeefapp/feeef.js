@@ -2,6 +2,19 @@
 
 `feeefjs` is a TypeScript library for managing feeef e-commerce platforms for self-hosted stores. It provides a wrapper for feeef rest api such like send order..., also have frontend srvices like the `CartService` class for managing cart items, shipping methods, and calculating totals. The library also includes a `NotifiableService` base class for handling listeners that react to changes in the service state.
 
+## Publish to npm
+
+Non-interactive publish (no login / OTP each time): see **[PUBLISH.md](./PUBLISH.md)**.
+
+```bash
+# one-time: granular token + Bypass 2FA → ~/.config/feeef/npm_token or NPM_TOKEN
+npm run publish:npm
+# or version bump + tag + publish:
+npm run release
+```
+
+Related CLI package (separate publish): [`@feeef.dev/cli`](https://www.npmjs.com/package/@feeef.dev/cli) in monorepo `cli/`.
+
 ## Delivery parcel types
 
 Canonical shipment shapes mirror the API domain in `feeefapps/backend/services/delivery/domain/parcel.ts`. In this package they live under `src/delivery/parcel.ts` and are exported from the main entry (`ParcelCreate`, `ParcelUpdate`, `DeliveryCarrierClient`, …). Keep them in sync when the backend parcel model changes; published npm `feeef` should re-export the same definitions after each release.
