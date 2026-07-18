@@ -7,6 +7,9 @@ import {
   StoreTemplateLocaleEntity,
   StoreTemplateLocaleInput,
   StoreTemplateLocalesBundle,
+  StoreTemplateReleaseEntity,
+  StoreTemplatePurchaseResult,
+  StoreTemplateReleaseCreateInput,
 } from '../../core/entities/store_template.js'
 import { TemplateComponentPolicy } from '../../core/entities/template_component.js'
 
@@ -92,18 +95,134 @@ export class StoreTemplatesRepository extends ModelRepository<
   }
 
   /**
-   * Set `stores.template_id` to this template (same row in `store_templates`)
-   * and copy `data` into `store.metadata.templateData`. Does not create a new
-   * `store_templates` row — use [fork] to duplicate a template into a store.
+   * Set `stores.template_id` (+ optional release pin) and copy release/listing
+   * `data` into `store.metadata.templateData`. Paid listings require a license.
    */
-  async install(options: {
-    fromId: string
-    storeId: string
-  }): Promise<{ storeTemplate: StoreTemplateEntity; store: Record<string, unknown> }> {
+  async install(options: { fromId: string; storeId: string; releaseId?: string }): Promise<{
+    storeTemplate: StoreTemplateEntity
+    store: Record<string, unknown>
+    release?: StoreTemplateReleaseEntity | null
+    license?: Record<string, unknown> | null
+  }> {
     const res = await this.client.post(`/${this.resource}/${options.fromId}/install`, {
       storeId: options.storeId,
+      ...(options.releaseId ? { releaseId: options.releaseId } : {}),
     })
-    return res.data as { storeTemplate: StoreTemplateEntity; store: Record<string, unknown> }
+    return res.data as {
+      storeTemplate: StoreTemplateEntity
+      store: Record<string, unknown>
+      release?: StoreTemplateReleaseEntity | null
+      license?: Record<string, unknown> | null
+    }
+  }
+
+  /** One-time wallet purchase → forever store license. */
+  async purchase(options: {
+    fromId: string
+    storeId: string
+  }): Promise<StoreTemplatePurchaseResult> {
+    const res = await this.client.post(`/${this.resource}/${options.fromId}/purchase`, {
+      storeId: options.storeId,
+    })
+    return res.data as StoreTemplatePurchaseResult
+  }
+
+  /** List immutable releases (newest first). */
+  async listReleases(
+    templateId: string,
+    options?: { storeId?: string }
+  ): Promise<{ data: StoreTemplateReleaseEntity[] }> {
+    const res = await this.client.get(`/${this.resource}/${templateId}/releases`, {
+      params: options?.storeId ? { storeId: options.storeId } : undefined,
+    })
+    return res.data as { data: StoreTemplateReleaseEntity[] }
+  }
+
+  async getRelease(
+    templateId: string,
+    releaseId: string,
+    options?: { storeId?: string }
+  ): Promise<StoreTemplateReleaseEntity> {
+    const res = await this.client.get(`/${this.resource}/${templateId}/releases/${releaseId}`, {
+      params: options?.storeId ? { storeId: options.storeId } : undefined,
+    })
+    return res.data as StoreTemplateReleaseEntity
+  }
+
+  /** Author publishes a new immutable release. */
+  async createRelease(
+    templateId: string,
+    input: StoreTemplateReleaseCreateInput
+  ): Promise<StoreTemplateReleaseEntity> {
+    const res = await this.client.post(`/${this.resource}/${templateId}/releases`, input)
+    return res.data as StoreTemplateReleaseEntity
+  }
+
+  /** Public render payload for historical / marketing preview (no auth required for public listings). */
+  async renderRelease(
+    templateId: string,
+    releaseId: string
+  ): Promise<{
+    storeTemplateId: string
+    releaseId: string
+    version: string
+    changelog: string | null
+    data: Record<string, unknown>
+    schema?: Record<string, unknown>
+  }> {
+    const res = await this.client.get(
+      `/${this.resource}/${templateId}/releases/${releaseId}/render`
+    )
+    return res.data
+  }
+
+  async listReviews(
+    templateId: string,
+    options?: { page?: number; limit?: number }
+  ): Promise<{
+    data: Array<Record<string, unknown>>
+    meta: { total: number; page: number; limit: number }
+    ratingAvg: number
+    ratingCount: number
+  }> {
+    const res = await this.client.get(`/${this.resource}/${templateId}/reviews`, {
+      params: options,
+    })
+    return res.data
+  }
+
+  async upsertReview(options: {
+    templateId: string
+    storeId: string
+    rating: number
+    body?: string | null
+  }): Promise<{
+    review: Record<string, unknown>
+    ratingAvg: number
+    ratingCount: number
+  }> {
+    const res = await this.client.post(`/${this.resource}/${options.templateId}/reviews`, {
+      storeId: options.storeId,
+      rating: options.rating,
+      body: options.body ?? null,
+    })
+    return res.data
+  }
+
+  async earnings(): Promise<{
+    totalSales: number
+    totalAuthorAmount: number
+    totalPlatformAmount: number
+    byTemplate: Array<{
+      storeTemplateId: string
+      title: string
+      sales: number
+      authorAmount: number
+      platformAmount: number
+    }>
+  }> {
+    const res = await this.client.get(`/store_templates_earnings`)
+    return res.data
   }
 
   /** GET locales bundle (`defaultLocale`, `locales`, `messages`). */

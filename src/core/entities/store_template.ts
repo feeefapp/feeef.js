@@ -36,9 +36,50 @@ export interface StoreTemplateEntity {
   parentId: string | null
   version: number
 
+  /** Marketplace enrichment (when `storeId` query is sent). */
+  owned?: boolean
+  effectivePrice?: number
+  updateAvailable?: boolean
+  installedReleaseId?: string | null
+  latestRelease?: StoreTemplateReleaseEntity | null
+  ratingAvg?: number
+  ratingCount?: number
+  featured?: boolean
+  salesClosed?: boolean
+  moderationStatus?: 'approved' | 'pending' | 'rejected'
+
   createdAt: any
   updatedAt: any | null
   deletedAt: any | null
+}
+
+/** Immutable published snapshot (`store_template_releases`). */
+export interface StoreTemplateReleaseEntity {
+  id: string
+  storeTemplateId: string
+  version: string
+  versionCode: number
+  changelog: string | null
+  schema?: Record<string, unknown>
+  data?: Record<string, unknown>
+  locales?: Record<string, unknown>
+  publishedAt: any
+  publishedBy?: string | null
+  createdAt?: any
+  updatedAt?: any | null
+}
+
+export interface StoreTemplatePurchaseResult {
+  license: Record<string, unknown>
+  created: boolean
+  storeTemplate: StoreTemplateEntity
+}
+
+export interface StoreTemplateReleaseCreateInput {
+  version?: string
+  changelog?: string | null
+  schema?: Record<string, unknown>
+  data?: Record<string, unknown>
 }
 
 export interface StoreTemplateCreateInput {
@@ -58,6 +99,7 @@ export interface StoreTemplateCreateInput {
   discount?: number | null
   license?: string | null
   parentId?: string | null
+  salesClosed?: boolean
 }
 
 export interface StoreTemplateUpdateInput {
@@ -75,6 +117,8 @@ export interface StoreTemplateUpdateInput {
   schema?: Record<string, unknown>
   data?: Record<string, unknown>
   policy?: TemplateComponentPolicy
+  /** Author can close sales; `featured` / `moderationStatus` remain admin-only. */
+  salesClosed?: boolean
 }
 
 /** One row in `store_template_locales`. */
