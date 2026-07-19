@@ -1,6 +1,6 @@
 import { EmbaddedCategory } from '../embadded/category.js'
 import { ShippingMethodEntity } from './shipping_method.js'
-import { GoogleSheetsColumn, StoreEntity } from './store.js'
+import { GoogleSheetsColumn, PixelStatusRule, StoreEntity } from './store.js'
 import { CategoryEntity } from './category.js'
 
 export interface ProductEntity {
@@ -159,12 +159,20 @@ export enum MetaPixelEvent {
   initiateCheckout = 'InitiateCheckout',
 }
 export interface MetaPixelData {
+  /** When false, ignore product override and use store defaults. */
+  enabled?: boolean | null
   // active meta pixel ids
   ids: string[] | null
   // main objective
   objective: MetaPixelEvent | null
   // draft objective
   draftObjective: MetaPixelEvent | null
+  /**
+   * Optional product-level status transition rules (server CAPI).
+   * When non-empty on a single-product order, overrides store `statusRules`.
+   * Never exposed on public product JSON.
+   */
+  statusRules?: PixelStatusRule[] | null
 }
 
 export enum TiktokPixelEvent {
@@ -180,12 +188,20 @@ export enum TiktokPixelEvent {
   purchase = 'Purchase',
 }
 export interface TiktokPixelData {
+  /** When false, ignore product override and use store defaults. */
+  enabled?: boolean | null
   // active tiktok pixel ids
   ids: string[] | null
   // main objective
   objective: TiktokPixelEvent | null
   // draft objective
   draftObjective: TiktokPixelEvent | null
+  /**
+   * Optional product-level status transition rules (server Events API).
+   * When non-empty on a single-product order, overrides store `statusRules`.
+   * Never exposed on public product JSON.
+   */
+  statusRules?: PixelStatusRule[] | null
 }
 export interface GoogleAnalyticsData {}
 export interface GoogleTagData {}
