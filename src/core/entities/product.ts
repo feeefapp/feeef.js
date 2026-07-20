@@ -282,6 +282,8 @@ export interface ProductAddon {
   photoUrl?: string
   title: string
   subtitle?: string
+  /** Inventory bucket SKU (scoped under product root when inventory is enabled). */
+  sku?: string | null
   stock?: number
   price?: number
   min?: number
