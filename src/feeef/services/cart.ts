@@ -1,6 +1,11 @@
 import { ShippingType } from '../../core/entities/order.js'
 import { ProductEntity, ProductOffer } from '../../core/entities/product.js'
 import {
+  isProductOfferRequired,
+  resolveForcedProductOffer,
+  resolveInitialProductOffer,
+} from '../../core/entities/product_offer_policy.js'
+import {
   ShippingMethodEntity,
   ShippingMethodPolicy,
   ShippingMethodStatus,
@@ -120,10 +125,12 @@ export class CartService extends NotifiableService {
 
   /**
    * Sets the current item to be managed in the cart.
+   * Applies product [defaultOfferCode] when the item has no offer yet, and
+   * re-applies a forced offer when [forceOffer] locks selection.
    * @param item - The item to be set as current.
    */
   setCurrentItem(item: CartItem, notify = true): void {
-    this.currentItem = item
+    this.currentItem = this.applyProductOfferPolicy(item)
 
     const existingItemIndex = this.findItemIndex(this.currentItem)
     if (existingItemIndex !== -1) {
@@ -133,6 +140,27 @@ export class CartService extends NotifiableService {
     if (notify) {
       this.notify()
     }
+  }
+
+  /**
+   * Hydrates / locks offer from product policy without mutating unrelated fields.
+   * - Default: preselect when item has no offer
+   * - Forced+default: always keep the forced offer
+   */
+  private applyProductOfferPolicy(item: CartItem): CartItem {
+    const forced = resolveForcedProductOffer(item.product)
+    if (forced) {
+      const quantity = this.clampQuantityToOfferLimits(forced, item.quantity)
+      return { ...item, offer: forced, quantity }
+    }
+    if (!item.offer) {
+      const initial = resolveInitialProductOffer(item.product)
+      if (initial) {
+        const quantity = this.clampQuantityToOfferLimits(initial, item.quantity)
+        return { ...item, offer: initial, quantity }
+      }
+    }
+    return item
   }
 
   /**
@@ -448,10 +476,12 @@ export class CartService extends NotifiableService {
     const existingItem = this.findItem(item)
     if (!existingItem) return
 
-    const updatedItem = { ...existingItem, offer }
-    // If applying an offer, ensure quantity is within limits
-    if (offer) {
-      updatedItem.quantity = this.clampQuantityToOfferLimits(offer, existingItem.quantity)
+    const next = this.resolveOfferUpdate(existingItem.product, existingItem.offer, offer)
+    if (next === 'blocked') return
+
+    const updatedItem = { ...existingItem, offer: next }
+    if (next) {
+      updatedItem.quantity = this.clampQuantityToOfferLimits(next, existingItem.quantity)
     }
 
     this.updateItem(item, updatedItem)
@@ -466,16 +496,37 @@ export class CartService extends NotifiableService {
   updateCurrentItemOffer(offer?: ProductOffer): void {
     if (!this.currentItem) return
 
-    const updatedItem = { ...this.currentItem, offer }
+    const next = this.resolveOfferUpdate(this.currentItem.product, this.currentItem.offer, offer)
+    if (next === 'blocked') return
 
-    // If applying an offer, ensure quantity is within limits
-    if (offer) {
-      updatedItem.quantity = this.clampQuantityToOfferLimits(offer, this.currentItem.quantity)
+    const updatedItem = { ...this.currentItem, offer: next }
+    if (next) {
+      updatedItem.quantity = this.clampQuantityToOfferLimits(next, this.currentItem.quantity)
     }
 
     this.updateCurrentItem(updatedItem, true)
     this.cachedSubtotal = null
     this.notify()
+  }
+
+  /**
+   * Enforces product offer policy for a requested offer change.
+   * Returns `'blocked'` when the change is not allowed.
+   */
+  private resolveOfferUpdate(
+    product: ProductEntity,
+    _current: ProductOffer | undefined,
+    offer: ProductOffer | undefined
+  ): ProductOffer | undefined | 'blocked' {
+    const forced = resolveForcedProductOffer(product)
+    if (forced) {
+      // Locked to default: only that offer is allowed
+      if (!offer || offer.code !== forced.code) return 'blocked'
+      return forced
+    }
+    // forceOffer without a locked default: require some offer (block clear only)
+    if (!offer && isProductOfferRequired(product)) return 'blocked'
+    return offer
   }
 
   /**

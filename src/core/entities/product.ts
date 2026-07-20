@@ -57,6 +57,19 @@ export interface ProductEntity {
 
   offers?: ProductOffer[] | null
 
+  /**
+   * When true, the customer must keep an offer selected.
+   * If [defaultOfferCode] also resolves to a valid offer, that offer is locked
+   * (cannot switch or deselect). Independent of [defaultOfferCode] being set.
+   */
+  forceOffer?: boolean | null
+
+  /**
+   * Offer code to preselect on the storefront. Cleared (synced to null) when the
+   * code is missing from [offers] — callers should treat a stale code as unset.
+   */
+  defaultOfferCode?: string | null
+
   metadata: Record<string, any>
 
   status: ProductStatus
@@ -360,6 +373,10 @@ export interface ProductCreateInput {
   stock?: number
   variant?: ProductVariant
   offers?: ProductOffer[]
+  /** See [ProductEntity.forceOffer]. */
+  forceOffer?: boolean | null
+  /** See [ProductEntity.defaultOfferCode]. */
+  defaultOfferCode?: string | null
   addons?: ProductAddon[]
   metadata?: Record<string, any>
   status?: ProductStatus
@@ -390,6 +407,10 @@ export interface ProductUpdateInput {
   stock?: number
   variant?: ProductVariant
   offers?: ProductOffer[]
+  /** See [ProductEntity.forceOffer]. */
+  forceOffer?: boolean | null
+  /** See [ProductEntity.defaultOfferCode]. */
+  defaultOfferCode?: string | null
   addons?: ProductAddon[]
   metadata?: Record<string, any>
   status?: ProductStatus
