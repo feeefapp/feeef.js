@@ -4,7 +4,22 @@ import type { ProductEntity, ProductOffer } from './product.js'
 export type ProductOfferPolicySource = Pick<
   ProductEntity,
   'offers' | 'forceOffer' | 'defaultOfferCode'
->
+> & {
+  /** Defensive: some payloads / caches may still emit snake_case. */
+  force_offer?: boolean | null
+  default_offer_code?: string | null
+}
+
+function readForceOffer(product: ProductOfferPolicySource): boolean {
+  return product.forceOffer === true || product.force_offer === true
+}
+
+function readDefaultOfferCode(product: ProductOfferPolicySource): string | null {
+  const code = product.defaultOfferCode ?? product.default_offer_code
+  if (typeof code !== 'string') return null
+  const trimmed = code.trim()
+  return trimmed.length > 0 ? trimmed : null
+}
 
 /**
  * Returns [defaultOfferCode] only when it exists in [offers]; otherwise null.
@@ -25,7 +40,7 @@ export function syncDefaultOfferCode(
 export function resolveInitialProductOffer(
   product: ProductOfferPolicySource
 ): ProductOffer | undefined {
-  const code = syncDefaultOfferCode(product.offers, product.defaultOfferCode)
+  const code = syncDefaultOfferCode(product.offers, readDefaultOfferCode(product))
   if (!code || !product.offers?.length) return undefined
   return product.offers.find((o) => o.code === code)
 }
@@ -35,7 +50,7 @@ export function resolveInitialProductOffer(
  * Independent of whether a specific default code is set.
  */
 export function isProductOfferRequired(product: ProductOfferPolicySource): boolean {
-  return product.forceOffer === true
+  return readForceOffer(product)
 }
 
 /**
@@ -43,8 +58,8 @@ export function isProductOfferRequired(product: ProductOfferPolicySource): boole
  * (`forceOffer` + valid `defaultOfferCode`). Customer cannot switch offers.
  */
 export function isProductOfferLocked(product: ProductOfferPolicySource): boolean {
-  if (product.forceOffer !== true) return false
-  return syncDefaultOfferCode(product.offers, product.defaultOfferCode) !== null
+  if (!readForceOffer(product)) return false
+  return syncDefaultOfferCode(product.offers, readDefaultOfferCode(product)) !== null
 }
 
 /**
