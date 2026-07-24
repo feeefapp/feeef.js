@@ -161,6 +161,20 @@ export interface IntegrationsData {
   googleTagsData?: GoogleTagData | null
   googleSheetsData?: GoogleSheetsData | null
   paymentMethodData?: PaymentMethodData | null
+  /** Merchant-only Ecotrack warehouse stock mapping — never public. */
+  ecotrackData?: EcotrackData | null
+}
+
+/**
+ * Per-product Ecotrack stock mapping.
+ * When `stock: 1`, Ecotrack `produit` must be the warehouse product reference.
+ */
+export interface EcotrackData {
+  enabled?: boolean | null
+  /** Default Ecotrack stock product reference. */
+  produit?: string | null
+  /** Feeef inventory SKU → Ecotrack stock `produit` reference. */
+  skuProduitMap?: Record<string, string> | null
 }
 
 export enum MetaPixelEvent {
