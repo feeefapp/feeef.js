@@ -82,6 +82,27 @@ export class StoreTemplatesRepository extends ModelRepository<
     return toListResponse(res.data)
   }
 
+  /**
+   * Platform default Lithium theme (`GET /store_templates/default`).
+   * Configured via `templateMarketplace.defaultTemplateId`.
+   */
+  async getDefault(): Promise<{
+    id: string
+    schema: Record<string, unknown>
+    data: Record<string, unknown>
+    version: number
+    title: string
+  }> {
+    const res = await this.client.get(`/${this.resource}/default`)
+    return res.data as {
+      id: string
+      schema: Record<string, unknown>
+      data: Record<string, unknown>
+      version: number
+      title: string
+    }
+  }
+
   async fork(options: {
     fromId: string
     storeId: string
