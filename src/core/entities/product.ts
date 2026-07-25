@@ -360,9 +360,12 @@ export interface ProductOffer {
   code: string
   title: string
   subtitle?: string
-  price?: number
-  minQuantity?: number
-  maxQuantity?: number
+  /** Unit price override; API may emit `null` when unset. */
+  price?: number | null
+  /** Minimum qty for this offer; API may emit `null` when unset. */
+  minQuantity?: number | null
+  /** Maximum qty for this offer; API may emit `null` when unset. */
+  maxQuantity?: number | null
   freeShipping?: boolean
 }
 

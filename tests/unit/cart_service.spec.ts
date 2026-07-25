@@ -779,3 +779,75 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     assert.equal(price, 800) // Should work with default 'dz'
   })
 })
+
+test.group('CartService offer quantity clamp', () => {
+  test('null maxQuantity must not zero quantity when default offer applies', (ctx) => {
+    const { assert } = ctx as any
+    const cart = new CartService()
+    const product = createProduct({
+      price: 0,
+      defaultOfferCode: 'pack3',
+      forceOffer: true,
+      offers: [
+        {
+          code: 'pack3',
+          title: '3 pack',
+          price: 1400,
+          minQuantity: 3,
+          maxQuantity: null as unknown as number,
+        },
+      ],
+    })
+
+    cart.setCurrentItem({ product, quantity: 1 })
+    const item = cart.getCurrentItem()!
+    assert.equal(item.offer?.code, 'pack3')
+    assert.equal(item.quantity, 3)
+    assert.equal(cart.getItemTotal(item), 4200)
+  })
+
+  test('undefined maxQuantity still clamps to minQuantity', (ctx) => {
+    const { assert } = ctx as any
+    const cart = new CartService()
+    const product = createProduct({
+      price: 100,
+      defaultOfferCode: 'min2',
+      offers: [
+        {
+          code: 'min2',
+          title: 'Buy 2',
+          price: 90,
+          minQuantity: 2,
+        },
+      ],
+    })
+
+    cart.setCurrentItem({ product, quantity: 1 })
+    assert.equal(cart.getCurrentItem()!.quantity, 2)
+    assert.equal(cart.getItemTotal(cart.getCurrentItem()!), 180)
+  })
+
+  test('null offer.price must not wipe catalog price', (ctx) => {
+    const { assert } = ctx as any
+    const cart = new CartService()
+    const product = createProduct({
+      price: 500,
+      offers: [
+        {
+          code: 'ship',
+          title: 'Free ship',
+          price: null as unknown as number,
+          freeShipping: true,
+          minQuantity: 1,
+        },
+      ],
+    })
+
+    cart.setCurrentItem({
+      product,
+      quantity: 2,
+      offer: product.offers![0],
+    })
+    assert.equal(cart.getItemTotal(cart.getCurrentItem()!), 1000)
+  })
+})

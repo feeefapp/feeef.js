@@ -10,6 +10,47 @@ export type ProductOfferPolicySource = Pick<
   default_offer_code?: string | null
 }
 
+/**
+ * Coerce API offer quantity / price bounds.
+ *
+ * JSON often emits `null` for unset min/max. `Math.min(n, null)` is `0` in JS
+ * because `null` coerces to `0` — that zeroed cart qty after default/force offer
+ * apply. Only finite numbers are valid bounds; `null` / `undefined` / `NaN` mean
+ * "no limit" (or "no override" for price).
+ */
+export function finiteOfferNumber(value: number | string | null | undefined): number | undefined {
+  if (value === null || value === undefined || value === '') return undefined
+  const n = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(n) ? n : undefined
+}
+
+/**
+ * Clamp cart quantity to an offer's min/max, ignoring nullish/non-finite bounds.
+ */
+export function clampQuantityToOfferLimits(
+  offer: Pick<ProductOffer, 'minQuantity' | 'maxQuantity'>,
+  quantity: number
+): number {
+  let q = finiteOfferNumber(quantity)
+  if (q === undefined || q < 0) q = 1
+
+  const minQ = finiteOfferNumber(offer.minQuantity)
+  const maxQ = finiteOfferNumber(offer.maxQuantity)
+
+  if (minQ !== undefined && minQ > 0) {
+    q = Math.max(q, minQ)
+  }
+  // Ignore non-positive max (including 0 from null-coercion bugs / bad data).
+  if (maxQ !== undefined && maxQ > 0) {
+    q = Math.min(q, maxQ)
+  }
+  // Prefer merchant min when data is inconsistent (min > max).
+  if (minQ !== undefined && maxQ !== undefined && minQ > 0 && maxQ > 0 && minQ > maxQ) {
+    q = minQ
+  }
+  return q
+}
+
 function readForceOffer(product: ProductOfferPolicySource): boolean {
   return product.forceOffer === true || product.force_offer === true
 }

@@ -1,6 +1,8 @@
 import { ShippingType } from '../../core/entities/order.js'
 import { ProductEntity, ProductOffer } from '../../core/entities/product.js'
 import {
+  clampQuantityToOfferLimits,
+  finiteOfferNumber,
   isProductOfferRequired,
   resolveForcedProductOffer,
   resolveInitialProductOffer,
@@ -150,33 +152,17 @@ export class CartService extends NotifiableService {
   private applyProductOfferPolicy(item: CartItem): CartItem {
     const forced = resolveForcedProductOffer(item.product)
     if (forced) {
-      const quantity = this.clampQuantityToOfferLimits(forced, item.quantity)
+      const quantity = clampQuantityToOfferLimits(forced, item.quantity)
       return { ...item, offer: forced, quantity }
     }
     if (!item.offer) {
       const initial = resolveInitialProductOffer(item.product)
       if (initial) {
-        const quantity = this.clampQuantityToOfferLimits(initial, item.quantity)
+        const quantity = clampQuantityToOfferLimits(initial, item.quantity)
         return { ...item, offer: initial, quantity }
       }
     }
     return item
-  }
-
-  /**
-   * Clamps the quantity to be within the offer's min/max range
-   * @param offer - The offer containing quantity constraints
-   * @param quantity - The quantity to clamp
-   * @returns The clamped quantity value
-   */
-  private clampQuantityToOfferLimits(offer: ProductOffer, quantity: number): number {
-    if (offer.minQuantity !== undefined) {
-      quantity = Math.max(quantity, offer.minQuantity)
-    }
-    if (offer.maxQuantity !== undefined) {
-      quantity = Math.min(quantity, offer.maxQuantity)
-    }
-    return quantity
   }
 
   /**
@@ -193,7 +179,7 @@ export class CartService extends NotifiableService {
 
       // Clamp quantity if there's an offer with constraints
       if (newItem.offer) {
-        newItem.quantity = this.clampQuantityToOfferLimits(newItem.offer, newItem.quantity)
+        newItem.quantity = clampQuantityToOfferLimits(newItem.offer, newItem.quantity)
       }
 
       this.items[index] = newItem
@@ -212,6 +198,12 @@ export class CartService extends NotifiableService {
     if (!this.currentItem) return
 
     this.currentItem = { ...this.currentItem, ...updates }
+    if (this.currentItem.offer) {
+      this.currentItem.quantity = clampQuantityToOfferLimits(
+        this.currentItem.offer,
+        this.currentItem.quantity
+      )
+    }
 
     const existingItemIndex = this.findItemIndex(this.currentItem)
     if (existingItemIndex !== -1) {
@@ -428,17 +420,18 @@ export class CartService extends NotifiableService {
       }
     }
 
-    // Apply offer if present
+    // Apply offer if present (ignore nullish / non-finite price from API)
     if (offer) {
-      if (offer.price !== undefined) {
-        // If offer has a fixed price, use it
-        price = offer.price
+      const offerPrice = finiteOfferNumber(offer.price)
+      if (offerPrice !== undefined) {
+        price = offerPrice
         discount = 0 // Reset discount since we're using a fixed price
       }
     }
 
     // Calculate base product price with quantity
-    let total = (price - discount) * quantity
+    const safeQty = finiteOfferNumber(quantity) ?? 0
+    let total = (price - discount) * safeQty
 
     // Add pricing for addons if present
     if (addons && product.addons) {
@@ -462,8 +455,10 @@ export class CartService extends NotifiableService {
    * @returns boolean indicating if the offer is valid for the quantity
    */
   isOfferValidForQuantity(offer: ProductOffer, quantity: number): boolean {
-    if (offer.minQuantity && quantity < offer.minQuantity) return false
-    if (offer.maxQuantity && quantity > offer.maxQuantity) return false
+    const minQ = finiteOfferNumber(offer.minQuantity)
+    const maxQ = finiteOfferNumber(offer.maxQuantity)
+    if (minQ !== undefined && minQ > 0 && quantity < minQ) return false
+    if (maxQ !== undefined && maxQ > 0 && quantity > maxQ) return false
     return true
   }
 
@@ -481,7 +476,7 @@ export class CartService extends NotifiableService {
 
     const updatedItem = { ...existingItem, offer: next }
     if (next) {
-      updatedItem.quantity = this.clampQuantityToOfferLimits(next, existingItem.quantity)
+      updatedItem.quantity = clampQuantityToOfferLimits(next, existingItem.quantity)
     }
 
     this.updateItem(item, updatedItem)
@@ -501,7 +496,7 @@ export class CartService extends NotifiableService {
 
     const updatedItem = { ...this.currentItem, offer: next }
     if (next) {
-      updatedItem.quantity = this.clampQuantityToOfferLimits(next, this.currentItem.quantity)
+      updatedItem.quantity = clampQuantityToOfferLimits(next, this.currentItem.quantity)
     }
 
     this.updateCurrentItem(updatedItem, true)
