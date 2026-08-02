@@ -74,6 +74,14 @@ export interface OrderEntity {
    * JSON / API field name is always **`references`** (never `orderReferences`).
    */
   references?: string[]
+  /**
+   * Optional schedule date. When set, list sort and day/range filters use
+   * `effectiveAt` (= COALESCE(scheduledAt, createdAt)) so the order appears
+   * as if created on this date. Null clears the schedule.
+   */
+  scheduledAt?: string | null
+  /** Server-computed COALESCE(scheduledAt, createdAt). Read-only. */
+  effectiveAt?: string
   createdAt: any
   updatedAt: any
 }
@@ -189,6 +197,8 @@ export interface OrderCreateInput {
   storeId: string
   tags?: string[]
   references?: string[]
+  /** Optional schedule date (ISO). Null clears. */
+  scheduledAt?: string | null
 }
 
 /**
@@ -237,11 +247,9 @@ export interface OrderUpdateInput {
   metadata?: Record<string, any>
   tags?: string[]
   references?: string[]
+  /** Optional schedule date (ISO). Null clears. */
+  scheduledAt?: string | null
 }
-
-/**
- * Order pricing calculation result
- */
 export interface OrderPricing {
   subtotal: number
   shippingPrice: number | null

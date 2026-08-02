@@ -638,6 +638,7 @@ export interface StoreConfigs {
   customStatusMappings?: CustomStatusMapping[]
   /** Feature flag to enable custom statuses across the app */
   customStatusEnabled?: boolean
+  confirmationQueue?: ConfirmationQueueConfig
   inventory_integration?: InventoryIntegration
   finance_integration?: FinanceIntegration
 }
@@ -659,6 +660,43 @@ export interface CustomStatusMapping {
   paymentStatus?: PaymentStatus | null
   /** Codes (or names) of other mappings suggested as the next workflow step */
   next?: string[]
+  /**
+   * Minutes to postpone the order when this status is set. The order's
+   * `scheduledAt` becomes `now + snoozeMinutes`, so it leaves the confirmation
+   * queue and re-enters it once the delay elapses (e.g. "not_respond_1" -> 180).
+   */
+  snoozeMinutes?: number | null
+  /** Plain-text reason presets offered to the confirmer when this status is set. */
+  reasons?: string[]
+  /** Whether the confirmer may type a reason that is not in `reasons`. */
+  allowOtherReason?: boolean
+  /**
+   * Whether a reason is mandatory. Always treated as `true` when `status` is
+   * `cancelled`, regardless of the stored value.
+   */
+  requiresReason?: boolean
+  /** Whether orders carrying this status may be served by the confirmation queue. */
+  queueEligible?: boolean
+}
+
+/** Store-level confirmation queue settings. */
+export interface ConfirmationQueueConfig {
+  enabled?: boolean
+  /**
+   * How long a `draft` order must age before it becomes eligible for
+   * confirmation. Gives the customer time to finish submitting.
+   */
+  draftDelayMinutes?: number
+  /**
+   * After a confirmer skips, how long before the order is due again
+   * (`scheduled_at` soft-snooze). Default 15.
+   */
+  skipDeferMinutes?: number
+  /**
+   * How long after `updated_at` a recent history order stays correctable
+   * in the confirmation feed. Default 5.
+   */
+  historyActionMinutes?: number
 }
 
 export interface StoreCurrencyConfig {
