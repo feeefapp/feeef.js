@@ -984,6 +984,31 @@ export interface ZrexpressIntegration {
 }
 
 /**
+ * Codpilot mini-ERP — push Feeef orders for confirmation / COD ops.
+ *
+ * Auth: subdomain + apiId + Bearer apiToken.
+ * Docs: https://codpilot.gitbook.io/codpilot-api
+ * Sync state: `order.metadata.codpilot` (not a delivery carrier).
+ */
+export interface CodpilotIntegration {
+  /** Business subdomain (`mystore` → mystore.codpilot.net) */
+  subdomain: string
+  apiId: string
+  apiToken: string
+  active: boolean
+  /**
+   * Auto-send when a status dimension transitions into `equals`.
+   * Default (client-seeded): `[{ id: 'default-pending', dimension: 'orderStatus', equals: 'pending' }]`.
+   */
+  statusRules?: Array<{
+    id: string
+    dimension: 'orderStatus' | 'deliveryStatus' | 'paymentStatus' | 'customStatus'
+    equals: string
+  }>
+  metadata?: Record<string, any>
+}
+
+/**
  * MDM Express (api.mdm.express) — `x-api-key` and/or Bearer JWT, MDM store `trackingId` (`mdmStoreId` on orders),
  * and MDM seller id (`mdmSellerId`) for service-fees.
  */
@@ -998,6 +1023,30 @@ export interface MdmExpressIntegration {
   active: boolean
   silentMode?: boolean
   autoSend?: boolean
+  webhookSecret?: string | null
+  metadata?: Record<string, any>
+}
+
+/**
+ * Feeef Delivery (Near Delivery white-label). Merchants never hold Near API keys —
+ * enable via `POST .../integrations/feeefDelivery/enable`.
+ */
+export interface FeeefDeliveryIntegration {
+  id: string
+  active: boolean
+  autoSend?: boolean
+  /** Near sender user id — required when active. */
+  nearSenderUserId: number
+  nearSenderUsername?: string | null
+  nearSenderEmail?: string | null
+  nearAccountType?: 'platform' | 'api' | 'both' | null
+  /** 0 = address pickup, 1 = center pickup. */
+  pickupLocationType?: 0 | 1 | null
+  pickupAddress?: string | null
+  senderCenterId?: number | null
+  defaultBuralistId?: number | null
+  /** Prefer Feeef-branded PDF labels (default true). */
+  useFeeefLabel?: boolean | null
   webhookSecret?: string | null
   metadata?: Record<string, any>
 }
@@ -1300,6 +1349,9 @@ export interface StoreIntegrations {
   zimou?: ZimouIntegration
   zrexpress?: ZrexpressIntegration
   mdmExpress?: MdmExpressIntegration
+  /** Feeef Delivery (Near white-label) — no merchant API keys. */
+  feeefDelivery?: FeeefDeliveryIntegration
+  codpilot?: CodpilotIntegration
 
   security?: SecurityIntegration
   dispatcher?: DispatcherIntegration
