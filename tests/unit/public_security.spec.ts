@@ -2,7 +2,10 @@
  * Public projection for store.integrations.security — storefront-safe subset only.
  */
 import { test } from '@japa/runner'
-import { generatePublicStoreIntegrationSecurity } from '../../src/core/entities/store.js'
+import {
+  generatePublicStoreIntegrationSecurity,
+  SecurityTreatment,
+} from '../../src/core/entities/store.js'
 
 test.group('generatePublicStoreIntegrationSecurity', () => {
   test('returns null when security is absent', ({ assert }) => {
@@ -14,16 +17,26 @@ test.group('generatePublicStoreIntegrationSecurity', () => {
     const pub = generatePublicStoreIntegrationSecurity({
       active: true,
       options: {
-        frontend: { active: true, ttl: 3600, treatment: 'block' },
-        doubleSend: { active: true, ttl: 300, treatment: 'fake' },
-        minTimeInPage: { active: true, duration: 10, treatment: 'warning' },
-        countries: { active: true, treatment: 'block', allowed: ['DZ'], blocked: [] },
-        sources: { active: true, treatment: 'block', allowed: ['ads'], blocked: [] },
+        frontend: { active: true, ttl: 3600, treatment: SecurityTreatment.block },
+        doubleSend: { active: true, ttl: 300, treatment: SecurityTreatment.fake },
+        minTimeInPage: { active: true, duration: 10, treatment: SecurityTreatment.warning },
+        countries: {
+          active: true,
+          treatment: SecurityTreatment.block,
+          allowed: ['DZ'],
+          blocked: [],
+        },
+        sources: {
+          active: true,
+          treatment: SecurityTreatment.block,
+          allowed: ['ads'],
+          blocked: [],
+        },
         // Server-only — must not appear on public payload
-        ip: { active: true, ttl: 86400, treatment: 'block' },
-        phone: { active: true, ttl: 86400, treatment: 'block' },
-        fingerprint: { active: true, ttl: 3600, treatment: 'block' },
-        ads: { active: true, ttl: 604800, treatment: 'block' },
+        ip: { active: true, ttl: 86400, treatment: SecurityTreatment.block },
+        phone: { active: true, ttl: 86400, treatment: SecurityTreatment.block },
+        fingerprint: { active: true, ttl: 3600, treatment: SecurityTreatment.block },
+        ads: { active: true, ttl: 604800, treatment: SecurityTreatment.block },
       },
     })
 
