@@ -91,6 +91,7 @@ export const generatePublicStoreIntegrations = (
     customFields,
     payment,
     connectors,
+    inventory,
   } = integrations
   return {
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
@@ -106,7 +107,19 @@ export const generatePublicStoreIntegrations = (
     customFields: generatePublicStoreIntegrationCustomFields(customFields) || null,
     payment: generatePublicStoreIntegrationPayment(payment) || null,
     connectors: generatePublicStoreIntegrationConnectors(connectors) || null,
+    inventory: generatePublicStoreIntegrationInventory(inventory) || null,
   }
+}
+
+/**
+ * Public inventory module flag (active only — no project credentials).
+ * Storefront uses this to decide whether to fetch live availability.
+ */
+export const generatePublicStoreIntegrationInventory = (
+  inventory: StoreInventoryIntegration | null | undefined
+): PublicInventoryIntegration | null | undefined => {
+  if (!inventory) return null
+  return { active: inventory.active === true }
 }
 
 /** Strips connector auth secrets from public store JSON. */
@@ -509,6 +522,14 @@ export interface PublicPaymentIntegration {
   defaultMethod?: string // Method ID to use by default
 }
 
+/**
+ * Public inventory module — active flag only (no project / warehouse secrets).
+ * Combined with effective-active (entitlement) on store serialization.
+ */
+export interface PublicInventoryIntegration {
+  active: boolean
+}
+
 export interface PublicStoreIntegrations {
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
@@ -524,6 +545,8 @@ export interface PublicStoreIntegrations {
   customFields: PublicCustomFieldsIntegration | null
   payment: PublicPaymentIntegration | null
   connectors: PublicConnectorsIntegration | null
+  /** When active (and entitled), storefront should use live inventory availability. */
+  inventory: PublicInventoryIntegration | null
 }
 
 export enum StoreMemberRole {
