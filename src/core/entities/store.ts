@@ -1108,7 +1108,8 @@ export interface SecurityOptions {
   sources?: SecuritySourcesOption | null
 }
 
-// Private security integration (merchant app)
+// Private security integration (merchant app) — checkout fraud / abuse protection
+// (not account 2FA). Enforced on public `POST .../orders/send`.
 export interface SecurityIntegration {
   active: boolean
   options?: SecurityOptions | null
