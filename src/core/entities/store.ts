@@ -75,7 +75,12 @@ export interface StoreEntity {
 
 // function that generate public data from the integrations data
 export const generatePublicStoreIntegrations = (
-  integrations: StoreIntegrations | null | undefined
+  integrations: StoreIntegrations | null | undefined,
+  /**
+   * Optional store configs — used to expose inventory storefront flags
+   * (`show_unavailable_on_frontend`) on {@link PublicInventoryIntegration}.
+   */
+  configs?: Pick<StoreConfigs, 'inventory_integration'> | StoreConfigs | null
 ): PublicStoreIntegrations | null => {
   if (!integrations) return null
   const {
@@ -107,19 +112,27 @@ export const generatePublicStoreIntegrations = (
     customFields: generatePublicStoreIntegrationCustomFields(customFields) || null,
     payment: generatePublicStoreIntegrationPayment(payment) || null,
     connectors: generatePublicStoreIntegrationConnectors(connectors) || null,
-    inventory: generatePublicStoreIntegrationInventory(inventory) || null,
+    inventory:
+      generatePublicStoreIntegrationInventory(inventory, {
+        showUnavailableOnFrontend:
+          configs?.inventory_integration?.show_unavailable_on_frontend === true,
+      }) || null,
   }
 }
 
 /**
- * Public inventory module flag (active only — no project credentials).
- * Storefront uses this to decide whether to fetch live availability.
+ * Public inventory module (no project credentials).
+ * Storefront OOS UI runs only when `active` and `showUnavailableOnFrontend`.
  */
 export const generatePublicStoreIntegrationInventory = (
-  inventory: StoreInventoryIntegration | null | undefined
+  inventory: StoreInventoryIntegration | null | undefined,
+  options?: { showUnavailableOnFrontend?: boolean }
 ): PublicInventoryIntegration | null | undefined => {
   if (!inventory) return null
-  return { active: inventory.active === true }
+  return {
+    active: inventory.active === true,
+    showUnavailableOnFrontend: options?.showUnavailableOnFrontend === true,
+  }
 }
 
 /** Strips connector auth secrets from public store JSON. */
@@ -523,11 +536,19 @@ export interface PublicPaymentIntegration {
 }
 
 /**
- * Public inventory module — active flag only (no project / warehouse secrets).
+ * Public inventory module — no project / warehouse secrets.
  * Combined with effective-active (entitlement) on store serialization.
+ *
+ * Storefront must only fetch/apply OOS when `active && showUnavailableOnFrontend`.
  */
 export interface PublicInventoryIntegration {
   active: boolean
+  /**
+   * When true, storefront shows unavailable variants (live qty / legacy stock).
+   * Opt-in via `configs.inventory_integration.show_unavailable_on_frontend`.
+   * @default false
+   */
+  showUnavailableOnFrontend: boolean
 }
 
 export interface PublicStoreIntegrations {
@@ -545,7 +566,10 @@ export interface PublicStoreIntegrations {
   customFields: PublicCustomFieldsIntegration | null
   payment: PublicPaymentIntegration | null
   connectors: PublicConnectorsIntegration | null
-  /** When active (and entitled), storefront should use live inventory availability. */
+  /**
+   * Inventory module. Storefront OOS checks require `active` and
+   * `showUnavailableOnFrontend` (merchant opt-in).
+   */
   inventory: PublicInventoryIntegration | null
 }
 
@@ -623,6 +647,12 @@ export interface InventoryIntegration {
    * @default true
    */
   allow_backorder?: boolean
+  /**
+   * When true (and inventory public integration is active), the storefront
+   * fetches live availability and marks out-of-stock variants.
+   * @default false
+   */
+  show_unavailable_on_frontend?: boolean
 }
 
 export type FinancePdfPaperSize = 'a4' | 'letter' | 'a5' | 'legal'
