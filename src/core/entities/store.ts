@@ -84,6 +84,7 @@ export const generatePublicStoreIntegrations = (
 ): PublicStoreIntegrations | null => {
   if (!integrations) return null
   const {
+    meta,
     metaPixel,
     tiktokPixel,
     googleAnalytics,
@@ -99,6 +100,7 @@ export const generatePublicStoreIntegrations = (
     inventory,
   } = integrations
   return {
+    meta: generatePublicStoreIntegrationMeta(meta),
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
     tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
     googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
@@ -552,6 +554,8 @@ export interface PublicInventoryIntegration {
 }
 
 export interface PublicStoreIntegrations {
+  /** Global Meta integration; credentials and ad accounts never included. */
+  meta: PublicMetaIntegration | null
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
   googleAnalytics: PublicGoogleAnalyticsIntegration | null
@@ -875,6 +879,88 @@ export interface TiktokPixel {
   id: string
   accessToken?: string
 }
+/**
+ * An ad account the merchant chose to manage from Feeef.
+ */
+export interface MetaAdAccountRef {
+  /** Graph node id, `act_123`. */
+  id: string
+  /** Bare numeric id, `123`. */
+  accountId: string
+  name?: string
+  currency?: string
+  timezoneName?: string
+  accountStatus?: number
+}
+
+/** Everything ads-related on the Meta integration. */
+export interface MetaAdsConfig {
+  active?: boolean
+  adAccounts?: MetaAdAccountRef[]
+  defaultAdAccountId?: string | null
+  /** Default insights window for the dashboard, e.g. `last_7d`. */
+  defaultDatePreset?: string | null
+  /** Extra hosts that count as this store's storefront when matching ad links. */
+  extraStoreHosts?: string[]
+  metadata?: Record<string, any>
+}
+
+/**
+ * Meta OAuth credentials.
+ *
+ * Server-side only — the token is encrypted at rest and written exclusively by
+ * the OAuth callback. It is stripped from every client-facing projection, and
+ * `mergeIntegrationsPatch` in the backend refuses to accept it from a client.
+ */
+export interface MetaOAuthCredentials {
+  /** AES-encrypted access token. Never present in API responses. */
+  accessTokenEnc: string
+  tokenType?: string
+  expiresAt?: string
+  /** Scopes Meta actually granted, from `debug_token`. */
+  scopes?: string[]
+  connectedAt?: string
+  connectedByUserId?: string
+  metaUserId?: string
+}
+
+/**
+ * Global Meta integration (`store.integrations.meta`).
+ *
+ * Credentials live at the top level and are shared by every Meta feature.
+ * Ads live under `ads`; pixels remain on the legacy {@link MetaPixelIntegration}
+ * key for now and may move here later.
+ */
+export interface MetaIntegration {
+  active: boolean
+  oauth2?: MetaOAuthCredentials | null
+  /** Meta identity the token belongs to, for display + reconnect detection. */
+  account?: { id: string; name?: string } | null
+  ads?: MetaAdsConfig | null
+  metadata?: Record<string, any>
+}
+
+/** Storefront-safe Meta integration — credentials and ad accounts excluded. */
+export interface PublicMetaIntegration {
+  active: boolean
+  ads: { active: boolean } | null
+}
+
+/**
+ * Generates public Meta integration data.
+ * `oauth2`, `account`, and the ad-account list are intentionally excluded — none
+ * of it belongs on a storefront page.
+ */
+export const generatePublicStoreIntegrationMeta = (
+  meta: MetaIntegration | null | undefined
+): PublicMetaIntegration | null => {
+  if (!meta) return null
+  return {
+    active: meta.active === true,
+    ads: meta.ads ? { active: meta.ads.active === true } : null,
+  }
+}
+
 // meta pixel integration
 export interface MetaPixelIntegration {
   id: string
@@ -1380,6 +1466,11 @@ export interface StoreIntegrations {
   // @Default([]) List<MetaPixel> pixels,
   // @Default(true) bool active,
   // @Default({}) Map<String, dynamic> metadata,
+  /**
+   * Global Meta integration — credentials shared by every Meta feature.
+   * Ads live here today; pixels may move over from `metaPixel` later.
+   */
+  meta?: MetaIntegration
   metaPixel?: MetaPixelIntegration
   tiktokPixel?: TiktokPixelIntegration
   googleAnalytics?: GoogleAnalyticsIntegration
