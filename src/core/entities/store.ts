@@ -592,6 +592,12 @@ export interface StoreMember {
   createdAt: any
   active: boolean
   metadata: Record<string, any>
+  /**
+   * Fine-grained RBAC scopes (e.g. `orders`, `products.read`, `store.integrations`).
+   * Empty/undefined = legacy unrestricted access for the member's role.
+   * Parent scopes imply `.read` children (`orders` ⇒ `orders.read`).
+   */
+  scopes?: string[]
 }
 
 export enum StoreInviteStatus {
@@ -614,6 +620,8 @@ export interface StoreInvite {
   createdAt: any
   updatedAt: any
   store?: { id: string; name: string; iconUrl?: string }
+  /** RBAC scopes copied onto the member when the invite is accepted. */
+  scopes?: string[]
 }
 
 export interface CreateStoreInviteInput {
@@ -621,6 +629,8 @@ export interface CreateStoreInviteInput {
   role: StoreMemberRole
   expiresAt?: string
   metadata?: Record<string, any>
+  /** RBAC scopes to grant on acceptance (see {@link StoreMember.scopes}). */
+  scopes?: string[]
 }
 
 /** How order sync handles line items with no inventory bucket for their SKU. */
@@ -1019,6 +1029,19 @@ export interface GoogleSheetsIntegration {
   metadata: Record<string, any>
   simple?: boolean
   columns?: GoogleSheetsColumn<any>[]
+  /**
+   * When true, draft (abandoned-cart) orders are written to a dedicated
+   * sheet tab (`draftSheetName`) instead of the main tab (`name`).
+   * When the order leaves the draft status (e.g. becomes pending), its row is
+   * removed from the draft tab and a fresh row is inserted into the main tab.
+   * Disabled by default.
+   */
+  draftSheetEnabled?: boolean
+  /**
+   * Tab title used for draft orders when `draftSheetEnabled` is true.
+   * Falls back to the platform default ("الطلبات المتروكة") when empty.
+   */
+  draftSheetName?: string | null
 }
 export interface GoogleTagsIntegration {
   id: string
@@ -1279,12 +1302,15 @@ export interface PublicSecurityIntegration {
 }
 
 /**
- * Webhook event types for order lifecycle
+ * Webhook event types for order and product lifecycle
  */
 export enum WebhookEvent {
   ORDER_CREATED = 'orderCreated',
   ORDER_UPDATED = 'orderUpdated',
   ORDER_DELETED = 'orderDeleted',
+  PRODUCT_CREATED = 'productCreated',
+  PRODUCT_UPDATED = 'productUpdated',
+  PRODUCT_DELETED = 'productDeleted',
 }
 
 /**
@@ -1643,6 +1669,8 @@ export interface AddStoreMemberInput {
   role: StoreMemberRole
   name?: string
   metadata?: Record<string, any>
+  /** RBAC scopes to grant (see {@link StoreMember.scopes}). Empty/undefined = unrestricted for the role. */
+  scopes?: string[]
 }
 
 /**
@@ -1652,4 +1680,6 @@ export interface UpdateStoreMemberInput {
   role?: StoreMemberRole
   name?: string
   metadata?: Record<string, any>
+  /** Replacement RBAC scopes (see {@link StoreMember.scopes}). Omit to keep current scopes. */
+  scopes?: string[]
 }

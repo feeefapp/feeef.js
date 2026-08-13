@@ -436,6 +436,10 @@ export interface ProductUpdateInput {
   type?: ProductType
   decoration?: ProductDecoration
   integrationsData?: IntegrationsData
+  /** Moderation (admin): ISO date to verify, null to unverify. */
+  verifiedAt?: string | null
+  /** Moderation (admin): ISO date to block, null to unblock. */
+  blockedAt?: string | null
 }
 
 /**
