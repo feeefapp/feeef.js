@@ -32,7 +32,11 @@ export interface AppCreateInput {
   /** Optional app logo URL. */
   logoUrl?: string
   redirectUris: string[]
-  scopes: string[]
+  /**
+   * Registered scope catalog. Optional — omit or pass `[]` for an
+   * identity-only app (`auth`). Never treated as full access.
+   */
+  scopes?: string[]
   userId?: string
 }
 

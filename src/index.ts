@@ -2,6 +2,7 @@ export * from './feeef/feeef.js'
 
 // Multi-provider AI model catalog (app config / options `models`)
 export * from './core/models_catalog.js'
+export * from './core/oauth_scopes.js'
 
 // ============================================================================
 // Delivery (canonical parcel model)

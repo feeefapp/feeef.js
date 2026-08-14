@@ -1336,7 +1336,7 @@ export interface WebhookConfig {
 }
 
 /**
- * Webhooks integration configuration for real-time order notifications
+ * Webhooks integration configuration for real-time order and product notifications
  */
 export interface WebhooksIntegration {
   /** List of configured webhooks */
