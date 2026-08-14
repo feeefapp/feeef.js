@@ -3,6 +3,8 @@ export enum OrderStatus {
   pending = 'pending',
   review = 'review',
   accepted = 'accepted',
+  /** Confirmed, but still needs merchant action before processing/completed. */
+  followup = 'followup',
   processing = 'processing',
   completed = 'completed',
   cancelled = 'cancelled',

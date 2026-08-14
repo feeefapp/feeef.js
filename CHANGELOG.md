@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Delivery / `ParcelCreate`**: breaking rename — `codAmount` → `total`, `productsSummary` → `summary`, `parcelType` → `type`; added `pickupId`, `freeShipping`; `shippingType` typed as platform `ShippingType`. HTTP bridge still accepts legacy keys (`codAmount`, `productsSummary`, `parcelType`, `centerId`) server-side via `normalizeLegacyParcelCreatePatch`.
 
+## [0.12.12] - 2026-08-14
+
+### Added
+
+- **Orders**: `OrderStatus.followup` (`'followup'`). Use after `accepted` when the order is confirmed but still needs action before `processing` or `completed`. Existing statuses are unchanged.
+
 ## [0.8.7] - 2025-03-21
 
 ### Added
