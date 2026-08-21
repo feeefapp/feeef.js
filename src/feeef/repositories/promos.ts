@@ -14,6 +14,8 @@ export interface PromoEntity {
   starts_at: string | null
   ends_at: string | null
   referral_id: string | null
+  /** Influencer commission in percent (0–100) of the post-discount amount paid. `null` = platform default. */
+  commission_percent: number | null
   created_at: string
   updated_at: string
 }
@@ -52,6 +54,7 @@ export interface PromoCreateInput {
   starts_at?: string | null
   ends_at?: string | null
   referral_id?: string | null
+  commission_percent?: number | null
 }
 
 /**
