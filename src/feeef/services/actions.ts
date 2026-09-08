@@ -152,4 +152,342 @@ export class ActionsService {
     )
     return response.data
   }
+
+  /**
+   * Brandstudio asset generation (`POST /actions/generateBrandAsset`).
+   *
+   * `assetKind=identity` → opaque brand-kit board. Other kinds → transparent PNG.
+   * Returns both `brandStudioId` and deprecated `identityStudioId` (same value).
+   */
+  async generateBrandAsset(input: {
+    logoName: string
+    description: string
+    color1?: number
+    color2?: number
+    colors?: number[]
+    aspectRatio?: string
+    imageModel?: string
+    assetKind?: string
+    inputImageUrl?: string
+    brandStudioId?: string
+    createStudio?: boolean
+    attachments?: unknown[]
+    referenceImageUrls?: string[]
+    referenceImageLabels?: Record<string, string>
+  }): Promise<{
+    success: boolean
+    id?: string | null
+    brandStudioId?: string | null
+    identityStudioId?: string | null
+    message: string
+    error?: string | null
+    metadata?: Record<string, unknown> | null
+  }> {
+    const {
+      logoName,
+      description,
+      color1,
+      color2,
+      colors,
+      aspectRatio,
+      imageModel,
+      assetKind,
+      inputImageUrl,
+      brandStudioId,
+      createStudio,
+      attachments,
+      referenceImageUrls,
+      referenceImageLabels,
+    } = input
+
+    const body: Record<string, unknown> = {
+      logoName: logoName.trim(),
+      description: description.trim(),
+    }
+    if (aspectRatio) body.aspectRatio = aspectRatio
+    if (imageModel?.trim()) body.imageModel = imageModel.trim()
+    if (assetKind?.trim()) body.assetKind = assetKind.trim()
+    if (inputImageUrl?.trim()) body.inputImageUrl = inputImageUrl.trim()
+    if (brandStudioId?.trim()) body.brandStudioId = brandStudioId.trim()
+    if (createStudio) body.createStudio = true
+    if (attachments && attachments.length > 0) body.attachments = attachments
+    if (referenceImageUrls && referenceImageUrls.length > 0) {
+      body.referenceImageUrls = referenceImageUrls
+    }
+    if (referenceImageLabels && Object.keys(referenceImageLabels).length > 0) {
+      body.referenceImageLabels = referenceImageLabels
+    }
+    if (colors && colors.length > 0) {
+      body.colors = colors
+    } else if (color1 != null && color2 != null) {
+      body.color1 = color1
+      body.color2 = color2
+    }
+
+    const response = await this.client.post('/actions/generateBrandAsset', body)
+    const data = response.data || {}
+    const metadata =
+      data.metadata && typeof data.metadata === 'object'
+        ? (data.metadata as Record<string, unknown>)
+        : null
+    const returnedStudioId =
+      (data.brandStudioId as string | undefined) ??
+      (metadata?.brandStudioId as string | undefined) ??
+      (data.identityStudioId as string | undefined) ??
+      (metadata?.identityStudioId as string | undefined) ??
+      null
+
+    return {
+      success: Boolean(data.success),
+      id: (data.id as string | undefined) ?? null,
+      brandStudioId: returnedStudioId,
+      identityStudioId: returnedStudioId,
+      message: (data.message as string | undefined) ?? 'Unknown response',
+      error: (data.error as string | undefined) ?? null,
+      metadata,
+    }
+  }
+
+  /**
+   * Legacy Identity Studio action (`POST /actions/generateLogo`).
+   * Prefer [generateBrandAsset]. Maps `identityStudioId` → request field of the same name.
+   */
+  async generateLogo(input: {
+    logoName: string
+    description: string
+    color1?: number
+    color2?: number
+    colors?: number[]
+    aspectRatio?: string
+    imageModel?: string
+    assetKind?: string
+    inputImageUrl?: string
+    identityStudioId?: string
+    brandStudioId?: string
+    createStudio?: boolean
+    attachments?: unknown[]
+    referenceImageUrls?: string[]
+    referenceImageLabels?: Record<string, string>
+  }): Promise<{
+    success: boolean
+    id?: string | null
+    brandStudioId?: string | null
+    identityStudioId?: string | null
+    message: string
+    error?: string | null
+    metadata?: Record<string, unknown> | null
+  }> {
+    const {
+      logoName,
+      description,
+      color1,
+      color2,
+      colors,
+      aspectRatio,
+      imageModel,
+      assetKind,
+      inputImageUrl,
+      identityStudioId,
+      brandStudioId,
+      createStudio,
+      attachments,
+      referenceImageUrls,
+      referenceImageLabels,
+    } = input
+
+    const studioId = brandStudioId ?? identityStudioId
+    const body: Record<string, unknown> = {
+      logoName: logoName.trim(),
+      description: description.trim(),
+    }
+    if (aspectRatio) body.aspectRatio = aspectRatio
+    if (imageModel?.trim()) body.imageModel = imageModel.trim()
+    if (assetKind?.trim()) body.assetKind = assetKind.trim()
+    if (inputImageUrl?.trim()) body.inputImageUrl = inputImageUrl.trim()
+    if (studioId?.trim()) {
+      body.identityStudioId = studioId.trim()
+      body.brandStudioId = studioId.trim()
+    }
+    if (createStudio) body.createStudio = true
+    if (attachments && attachments.length > 0) body.attachments = attachments
+    if (referenceImageUrls && referenceImageUrls.length > 0) {
+      body.referenceImageUrls = referenceImageUrls
+    }
+    if (referenceImageLabels && Object.keys(referenceImageLabels).length > 0) {
+      body.referenceImageLabels = referenceImageLabels
+    }
+    if (colors && colors.length > 0) {
+      body.colors = colors
+    } else if (color1 != null && color2 != null) {
+      body.color1 = color1
+      body.color2 = color2
+    }
+
+    const response = await this.client.post('/actions/generateLogo', body)
+    const data = response.data || {}
+    const metadata =
+      data.metadata && typeof data.metadata === 'object'
+        ? (data.metadata as Record<string, unknown>)
+        : null
+    const returnedStudioId =
+      (data.brandStudioId as string | undefined) ??
+      (metadata?.brandStudioId as string | undefined) ??
+      (data.identityStudioId as string | undefined) ??
+      (metadata?.identityStudioId as string | undefined) ??
+      null
+
+    return {
+      success: Boolean(data.success),
+      id: (data.id as string | undefined) ?? null,
+      brandStudioId: returnedStudioId,
+      identityStudioId: returnedStudioId,
+      message: (data.message as string | undefined) ?? 'Unknown response',
+      error: (data.error as string | undefined) ?? null,
+      metadata,
+    }
+  }
+
+  /**
+   * Poststudio asset generation (`POST /actions/generatePostAsset`).
+   * Pass `postStudioId` or `createStudio: true`.
+   */
+  async generatePostAsset(input: {
+    name: string
+    brief: string
+    assetKind?: string
+    regionStyle?: string
+    aspectRatio?: string
+    imageModel?: string
+    postStudioId?: string
+    createStudio?: boolean
+    inputImageUrl?: string
+    referenceImageUrls?: string[]
+  }): Promise<{
+    success: boolean
+    id?: string | null
+    postStudioId?: string | null
+    message: string
+    error?: string | null
+    metadata?: Record<string, unknown> | null
+  }> {
+    const {
+      name,
+      brief,
+      assetKind,
+      regionStyle,
+      aspectRatio,
+      imageModel,
+      postStudioId,
+      createStudio,
+      inputImageUrl,
+      referenceImageUrls,
+    } = input
+
+    const body: Record<string, unknown> = {
+      name: name.trim(),
+      brief: brief.trim(),
+    }
+    if (assetKind?.trim()) body.assetKind = assetKind.trim()
+    if (regionStyle?.trim()) body.regionStyle = regionStyle.trim()
+    if (aspectRatio) body.aspectRatio = aspectRatio
+    if (imageModel?.trim()) body.imageModel = imageModel.trim()
+    if (postStudioId?.trim()) body.postStudioId = postStudioId.trim()
+    if (createStudio) body.createStudio = true
+    if (inputImageUrl?.trim()) body.inputImageUrl = inputImageUrl.trim()
+    if (referenceImageUrls && referenceImageUrls.length > 0) {
+      body.referenceImageUrls = referenceImageUrls
+    }
+
+    const response = await this.client.post('/actions/generatePostAsset', body)
+    const data = response.data || {}
+    const metadata =
+      data.metadata && typeof data.metadata === 'object'
+        ? (data.metadata as Record<string, unknown>)
+        : null
+    const returnedStudioId =
+      (data.postStudioId as string | undefined) ??
+      (metadata?.postStudioId as string | undefined) ??
+      null
+
+    return {
+      success: Boolean(data.success),
+      id: (data.id as string | undefined) ?? null,
+      postStudioId: returnedStudioId,
+      message: (data.message as string | undefined) ?? 'Unknown response',
+      error: (data.error as string | undefined) ?? null,
+      metadata,
+    }
+  }
+
+  /**
+   * Uistudio asset generation (`POST /actions/generateUiAsset`).
+   * Pass `uiStudioId` or `createStudio: true`.
+   */
+  async generateUiAsset(input: {
+    name: string
+    brief: string
+    assetKind?: string
+    style?: string
+    aspectRatio?: string
+    imageModel?: string
+    uiStudioId?: string
+    createStudio?: boolean
+    inputImageUrl?: string
+    referenceImageUrls?: string[]
+  }): Promise<{
+    success: boolean
+    id?: string | null
+    uiStudioId?: string | null
+    message: string
+    error?: string | null
+    metadata?: Record<string, unknown> | null
+  }> {
+    const {
+      name,
+      brief,
+      assetKind,
+      style,
+      aspectRatio,
+      imageModel,
+      uiStudioId,
+      createStudio,
+      inputImageUrl,
+      referenceImageUrls,
+    } = input
+
+    const body: Record<string, unknown> = {
+      name: name.trim(),
+      brief: brief.trim(),
+    }
+    if (assetKind?.trim()) body.assetKind = assetKind.trim()
+    if (style?.trim()) body.style = style.trim()
+    if (aspectRatio) body.aspectRatio = aspectRatio
+    if (imageModel?.trim()) body.imageModel = imageModel.trim()
+    if (uiStudioId?.trim()) body.uiStudioId = uiStudioId.trim()
+    if (createStudio) body.createStudio = true
+    if (inputImageUrl?.trim()) body.inputImageUrl = inputImageUrl.trim()
+    if (referenceImageUrls && referenceImageUrls.length > 0) {
+      body.referenceImageUrls = referenceImageUrls
+    }
+
+    const response = await this.client.post('/actions/generateUiAsset', body)
+    const data = response.data || {}
+    const metadata =
+      data.metadata && typeof data.metadata === 'object'
+        ? (data.metadata as Record<string, unknown>)
+        : null
+    const returnedStudioId =
+      (data.uiStudioId as string | undefined) ??
+      (metadata?.uiStudioId as string | undefined) ??
+      null
+
+    return {
+      success: Boolean(data.success),
+      id: (data.id as string | undefined) ?? null,
+      uiStudioId: returnedStudioId,
+      message: (data.message as string | undefined) ?? 'Unknown response',
+      error: (data.error as string | undefined) ?? null,
+      metadata,
+    }
+  }
 }

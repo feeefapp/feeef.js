@@ -24,6 +24,9 @@ import { ProductLandingPageTemplatesRepository } from './repositories/product_la
 import { ProductLandingPagesRepository } from './repositories/product_landing_pages.js'
 import { ImagePromptTemplatesRepository } from './repositories/image_prompt_templates.js'
 import { ImageGenerationsRepository } from './repositories/image_generations.js'
+import { BrandStudiosRepository } from './repositories/brand_studios.js'
+import { PostStudiosRepository } from './repositories/post_studios.js'
+import { UiStudiosRepository } from './repositories/ui_studios.js'
 import { TemplateComponentsRepository } from './repositories/template_components.js'
 import { StoreTemplatesRepository } from './repositories/store_templates.js'
 // Services
@@ -104,6 +107,21 @@ export class FeeeF {
    * The repository for managing async image generations.
    */
   imageGenerations: ImageGenerationsRepository
+
+  /**
+   * Brandstudio projects (`/brandStudios`) — visual identity boards + assets.
+   */
+  brandStudios: BrandStudiosRepository
+
+  /**
+   * Poststudio projects (`/postStudios`) — regional social / ad creatives.
+   */
+  postStudios: PostStudiosRepository
+
+  /**
+   * Uistudio projects (`/uiStudios`) — UI mockups + canvas.
+   */
+  uiStudios: UiStudiosRepository
 
   /**
    * The repository for the per-store **library of reusable custom
@@ -256,6 +274,9 @@ export class FeeeF {
     this.productLandingPageTemplates = new ProductLandingPageTemplatesRepository(this.client)
     this.imagePromptTemplates = new ImagePromptTemplatesRepository(this.client)
     this.imageGenerations = new ImageGenerationsRepository(this.client)
+    this.brandStudios = new BrandStudiosRepository(this.client)
+    this.postStudios = new PostStudiosRepository(this.client)
+    this.uiStudios = new UiStudiosRepository(this.client)
     this.templateComponents = new TemplateComponentsRepository(this.client)
     this.storeTemplates = new StoreTemplatesRepository(this.client)
     this.users = new UserRepository(this.client)
