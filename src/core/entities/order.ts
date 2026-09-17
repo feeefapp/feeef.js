@@ -72,6 +72,23 @@ export interface OrderEntity {
   customStatus?: string | null
   tags: string[] | null
   /**
+   * Opencod Orders v1 — primary fulfillment fields (identical API names).
+   * Legacy enum `status` / `deliveryStatus` / `customStatus` remain during
+   * dual-write and are also mirrored under `deprecated` on list/show.
+   */
+  statusId?: string | null
+  room?: string | null
+  kind?: string | null
+  closeAs?: string | null
+  cash?: string | null
+  stock?: string | null
+  /** Dual-write envelope until 2027-01-15 hard cut. */
+  deprecated?: {
+    status?: string
+    deliveryStatus?: string | null
+    customStatus?: string | null
+  } | null
+  /**
    * Attribution tokens: `product:…`, `product_landing_page:…`.
    * JSON / API field name is always **`references`** (never `orderReferences`).
    */
@@ -251,6 +268,11 @@ export interface OrderUpdateInput {
   references?: string[]
   /** Optional schedule date (ISO). Null clears. */
   scheduledAt?: string | null
+  /** Opencod v1 (prefer apply/confirm/reject doors over enum PATCH). */
+  statusId?: string
+  room?: string
+  kind?: string
+  closeAs?: string
 }
 export interface OrderPricing {
   subtotal: number

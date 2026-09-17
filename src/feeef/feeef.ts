@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 // Repositories
 import { OrderRepository } from './repositories/orders.js'
+import { OrdersV1Repository } from './repositories/orders_v1.js'
 import { ProductRepository } from './repositories/products.js'
 import { StoreRepository } from './repositories/stores.js'
 import { UserRepository } from './repositories/users.js'
@@ -159,6 +160,11 @@ export class FeeeF {
   orders: OrderRepository
 
   /**
+   * Opencod Orders v1 — statuses catalog, counts, apply, confirm/reject doors.
+   */
+  ordersV1: OrdersV1Repository
+
+  /**
    * The repository for managing deposits.
    */
   deposits: DepositRepository
@@ -283,6 +289,7 @@ export class FeeeF {
     this.apps = new AppRepository(this.client)
     this.oauth = new OAuthRepository(this.client)
     this.orders = new OrderRepository(this.client)
+    this.ordersV1 = new OrdersV1Repository(this.client)
     this.deposits = new DepositRepository(this.client)
     this.transfers = new TransferRepository(this.client)
     this.promos = new PromoRepository(this.client)
