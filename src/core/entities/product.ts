@@ -20,7 +20,11 @@ export interface ProductEntity {
 
   shippingMethodId?: string | null
 
-  shippingPriceId?: string | null
+  /**
+   * Cloud shipping fee override: `ca_…` or `unassigned`.
+   * Quoted by the backend — not a legacy `shipping_prices` id.
+   */
+  shippingFeeId?: string | null
 
   categoryId?: string | null
 
@@ -379,7 +383,7 @@ export interface ProductCreateInput {
   photoUrl?: string
   media?: string[]
   shippingMethodId?: string
-  shippingPriceId?: string
+  shippingFeeId?: string
   categoryId?: string
   category?: EmbaddedCategory
   title?: string
@@ -413,7 +417,7 @@ export interface ProductUpdateInput {
   photoUrl?: string
   media?: string[]
   shippingMethodId?: string
-  shippingPriceId?: string
+  shippingFeeId?: string
   categoryId?: string
   category?: EmbaddedCategory
   title?: string

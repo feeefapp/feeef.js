@@ -1,3 +1,8 @@
+/**
+ * Dual-write fulfillment column until 2027-01-15.
+ * Primary writes go through Orders v1 `statusId` / `room` / `kind`.
+ * Do not expose these values in merchant status pickers.
+ */
 export enum OrderStatus {
   draft = 'draft',
   pending = 'pending',

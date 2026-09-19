@@ -436,7 +436,7 @@ const createStore = (overrides: Partial<StoreEntity> = {}): StoreEntity => ({
 })
 
 test.group('CartService - Shipping Price Priority Chain', () => {
-  test('Priority 1: Product shippingPriceId (new system)', (ctx) => {
+  test('Priority 1: Product shippingFeeId (new system)', (ctx) => {
     const { assert } = ctx as any
     const cart = new CartService()
 
@@ -446,7 +446,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product = createProduct({ shippingPriceId: 'sp1' })
+    const product = createProduct({ shippingFeeId: 'sp1' })
     const store = createStore({
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
@@ -460,7 +460,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     assert.equal(price, 800)
   })
 
-  test('Priority 2: Store shippingPriceId (new system)', (ctx) => {
+  test('Priority 2: Store shippingFeeId (new system)', (ctx) => {
     const { assert } = ctx as any
     const cart = new CartService()
 
@@ -470,9 +470,9 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product = createProduct() // No shippingPriceId
+    const product = createProduct() // No shippingFeeId
     const store = createStore({
-      shippingPriceId: 'sp1',
+      shippingFeeId: 'sp1',
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
 
@@ -527,7 +527,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     const { assert } = ctx as any
     const cart = new CartService()
 
-    const product = createProduct() // No shippingPriceId or shippingMethodId
+    const product = createProduct() // No shippingFeeId or shippingMethodId
     const store = createStore()
 
     cart.add({ product, quantity: 1 })
@@ -539,7 +539,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     assert.equal(price, 200)
   })
 
-  test('Product shippingPriceId takes priority over store shippingPriceId', (ctx) => {
+  test('Product shippingFeeId takes priority over store shippingFeeId', (ctx) => {
     const { assert } = ctx as any
     const cart = new CartService()
 
@@ -549,9 +549,9 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product = createProduct({ shippingPriceId: 'sp-product' })
+    const product = createProduct({ shippingFeeId: 'sp-product' })
     const store = createStore({
-      shippingPriceId: 'sp-store',
+      shippingFeeId: 'sp-store',
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
 
@@ -596,7 +596,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       source: null,
     }
 
-    const product = createProduct({ shippingPriceId: 'sp1', shippingMethodId: 'sm1' })
+    const product = createProduct({ shippingFeeId: 'sp1', shippingMethodId: 'sm1' })
     const store = createStore({
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
@@ -621,7 +621,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product = createProduct({ shippingPriceId: 'sp1' })
+    const product = createProduct({ shippingFeeId: 'sp1' })
     const store = createStore({
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
@@ -665,7 +665,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product = createProduct({ shippingPriceId: 'sp1' })
+    const product = createProduct({ shippingFeeId: 'sp1' })
     const store = createStore({
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
@@ -690,7 +690,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product = createProduct({ shippingPriceId: 'sp1' })
+    const product = createProduct({ shippingFeeId: 'sp1' })
     const store = createStore({
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
@@ -714,8 +714,8 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product1 = createProduct({ id: 'p1', shippingPriceId: 'sp1' })
-    const product2 = createProduct({ id: 'p2', shippingPriceId: 'sp1' })
+    const product1 = createProduct({ id: 'p1', shippingFeeId: 'sp1' })
+    const product2 = createProduct({ id: 'p2', shippingFeeId: 'sp1' })
     const store = createStore({
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
@@ -730,7 +730,7 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     assert.equal(price, 800)
   })
 
-  test('Multiple products with different shippingPriceIds falls back to store', (ctx) => {
+  test('Multiple products with different shippingFeeIds falls back to store', (ctx) => {
     const { assert } = ctx as any
     const cart = new CartService()
 
@@ -740,10 +740,10 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product1 = createProduct({ id: 'p1', shippingPriceId: 'sp1' })
-    const product2 = createProduct({ id: 'p2', shippingPriceId: 'sp2' }) // Different
+    const product1 = createProduct({ id: 'p1', shippingFeeId: 'sp1' })
+    const product2 = createProduct({ id: 'p2', shippingFeeId: 'sp2' }) // Different
     const store = createStore({
-      shippingPriceId: 'sp-store',
+      shippingFeeId: 'sp-store',
       configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
     })
 
@@ -757,7 +757,59 @@ test.group('CartService - Shipping Price Priority Chain', () => {
     assert.equal(price, 600) // Should use store shipping price
   })
 
-  test('Default country code is dz when not set in store configs', (ctx) => {
+  test('Cloud ca_ product shippingFeeId is skipped; store matrix still applies', (ctx) => {
+    const { assert } = ctx as any
+    const cart = new CartService()
+
+    const storePrice = createShippingPrice('sp-store', {
+      DZ: {
+        '01': { home: 700, desk: 350, pickup: 0 },
+      },
+    })
+
+    const product = createProduct({ shippingFeeId: 'ca_account123' })
+    const store = createStore({
+      shippingFeeId: 'sp-store',
+      defaultShippingRates: null,
+      configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
+    })
+
+    cart.add({ product, quantity: 1 })
+    cart.setStore(store, false)
+    cart.setShippingPrice(storePrice, false)
+    cart.updateShippingAddress({ state: '01', country: 'dz', type: ShippingType.home }, false)
+
+    // Cloud product id is ignored; store legacy matrix matches → 700.
+    assert.equal(cart.getShippingPriceForType(ShippingType.home), 700)
+  })
+
+  test('Cloud unassigned shippingFeeId skips legacy matrix entirely', (ctx) => {
+    const { assert } = ctx as any
+    const cart = new CartService()
+
+    const legacyPrice = createShippingPrice('sp1', {
+      DZ: {
+        '01': { home: 800, desk: 400, pickup: 0 },
+      },
+    })
+
+    const product = createProduct({ shippingFeeId: 'unassigned' })
+    const store = createStore({
+      shippingFeeId: 'unassigned',
+      defaultShippingRates: null,
+      configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
+    })
+
+    cart.add({ product, quantity: 1 })
+    cart.setStore(store, false)
+    cart.setShippingPrice(legacyPrice, false)
+    cart.updateShippingAddress({ state: '01', country: 'dz', type: ShippingType.home }, false)
+
+    // Both refs are Cloud sentinels — cart must not use the loaded matrix by id match.
+    assert.isNull(cart.getShippingPriceForType(ShippingType.home))
+  })
+
+  test('Store selectedCountry DZ drives matrix when address country is bare dz', (ctx) => {
     const { assert } = ctx as any
     const cart = new CartService()
 
@@ -767,16 +819,19 @@ test.group('CartService - Shipping Price Priority Chain', () => {
       },
     })
 
-    const product = createProduct({ shippingPriceId: 'sp1' })
-    const store = createStore() // No configs.selectedCountry
+    const product = createProduct({ shippingFeeId: 'sp1' })
+    const store = createStore({
+      configs: { selectedCountry: 'DZ', currencies: [], selectedCurrency: '0' },
+    })
 
     cart.add({ product, quantity: 1 })
     cart.setStore(store, false)
     cart.setShippingPrice(shippingPrice, false)
+    // Address `dz` alone is treated as legacy; store.selectedCountry unlocks the matrix.
     cart.updateShippingAddress({ state: '01', country: 'dz', type: ShippingType.home }, false)
 
     const price = cart.getShippingPriceForType(ShippingType.home)
-    assert.equal(price, 800) // Should work with default 'dz'
+    assert.equal(price, 800)
   })
 })
 

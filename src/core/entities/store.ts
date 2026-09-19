@@ -42,7 +42,11 @@ export interface StoreEntity {
   // shippingMethods: ShippingMethodEntity[];
   defaultShippingRates: (number | null)[][] | null
 
-  shippingPriceId?: string | null
+  /**
+   * Default Cloud shipping fee: `ca_…` (carrier account) or `unassigned`
+   * (project fees). Quoted by the backend — not a legacy `shipping_prices` id.
+   */
+  shippingFeeId?: string | null
 
   // subscription
   subscription?: any
@@ -1610,7 +1614,7 @@ export interface StoreCreateInput {
   action?: StoreAction
   metadata?: Record<string, any>
   defaultShippingRates?: (number | null)[][] | null
-  shippingPriceId?: string
+  shippingFeeId?: string
   configs?: StoreConfigs
   metaPixelIds?: string[]
   tiktokPixelIds?: string[]
@@ -1639,7 +1643,7 @@ export interface StoreUpdateInput {
   action?: StoreAction
   metadata?: Record<string, any>
   defaultShippingRates?: (number | null)[][] | null
-  shippingPriceId?: string
+  shippingFeeId?: string
   configs?: StoreConfigs
   metaPixelIds?: string[]
   tiktokPixelIds?: string[]

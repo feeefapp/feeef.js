@@ -79,7 +79,7 @@ export class OrdersV1Repository {
   async apply(
     storeId: string,
     orderId: string,
-    body: { statusId?: string; kind?: string; slug?: string }
+    body: { statusId?: string; kind?: string; slug?: string; allowCrossRoom?: boolean }
   ): Promise<OrderV1ApplyResult> {
     const res = await this.client.post(`/stores/${storeId}/orders/${orderId}/apply`, body)
     return (res.data?.data ?? res.data) as OrderV1ApplyResult

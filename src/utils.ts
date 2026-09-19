@@ -144,3 +144,20 @@ export function validatePhoneNumber(phone: string): string | null {
   // If all checks pass, return null (no errors)
   return null
 }
+
+/**
+ * Sentinel for project-level Cloud `courier_fees` with no carrier account.
+ * Stored in store/product `shippingFeeId` — quoted server-side, not via `shipping_prices`.
+ */
+export const UNASSIGNED_SHIPPING_FEE_ID = 'unassigned' as const
+
+/**
+ * True when [id] is a Cloud Parcel shipping fee ref (`ca_…` or `unassigned`).
+ * Those ids must not be loaded from the legacy `shipping_prices` matrix API.
+ */
+export function isCloudShippingFeeId(id: string | null | undefined): boolean {
+  return (
+    typeof id === 'string' &&
+    (id === UNASSIGNED_SHIPPING_FEE_ID || (id.startsWith('ca_') && id.length >= 6))
+  )
+}

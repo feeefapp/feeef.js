@@ -60,7 +60,7 @@ export class CartService extends NotifiableService {
   private items: CartItem[] = [] // Array to support multiple items with same product but different variants
   private shippingMethod: ShippingMethodEntity | null = null
   private shippingPrice: ShippingPriceEntity | null = null // New shipping price system
-  private store: StoreEntity | null = null // Store entity for accessing shippingPriceId
+  private store: StoreEntity | null = null // Store entity for accessing shippingFeeId
   private shippingAddress: CartShippingAddress = {
     name: null,
     phone: null,
@@ -613,7 +613,7 @@ export class CartService extends NotifiableService {
 
   /**
    * Resolves shipping price using the priority chain.
-   * Priority: 1. Product shippingPriceId, 2. Store shippingPriceId, 3. Product shippingMethodId, 4. Store defaultShippingRates
+   * Priority: 1. Product shippingFeeId, 2. Store shippingFeeId, 3. Product shippingMethodId, 4. Store defaultShippingRates
    *
    * Note: Shipping prices must be loaded and set via setShippingPrice() for the new system to work.
    * If shipping prices are not loaded, the method falls back to the legacy system.
@@ -623,6 +623,14 @@ export class CartService extends NotifiableService {
    * @param shippingType - The shipping type
    * @returns The shipping price or null if not available
    */
+
+  /** Cloud Parcel shipping fee (`ca_…` | `unassigned`) — quoted server-side, not via shipping_prices. */
+  private isCloudShippingFeeId(id: string | null | undefined): boolean {
+    // Inline match of `isCloudShippingFeeId` from utils — keep cart free of a
+    // hard import cycle with the package barrel in some bundlers.
+    return typeof id === 'string' && (id === 'unassigned' || (id.startsWith('ca_') && id.length >= 6))
+  }
+
   private resolveShippingPrice(
     countryCode: string | undefined,
     stateCode: string,
@@ -651,19 +659,19 @@ export class CartService extends NotifiableService {
     // 1. Try product-specific ShippingPrice (new system) - HIGHEST PRIORITY
     // Check if all products have the same shippingPriceId
     if (countryCode && this.shippingPrice) {
-      const productShippingPriceIds = allProducts
-        .map((item) => item.product.shippingPriceId)
-        .filter((id): id is string => id !== null)
+      const productShippingFeeIds = allProducts
+        .map((item) => item.product.shippingFeeId)
+        .filter((id): id is string => id !== null && !this.isCloudShippingFeeId(id))
 
-      console.log('[resolveShippingPrice] Product shippingPriceIds:', productShippingPriceIds)
+      console.log('[resolveShippingPrice] Product shippingFeeIds:', productShippingFeeIds)
 
-      if (productShippingPriceIds.length > 0) {
+      if (productShippingFeeIds.length > 0) {
         // Check if all products have the same shippingPriceId
-        const uniqueIds = new Set(productShippingPriceIds)
-        if (uniqueIds.size === 1 && this.shippingPrice.id === productShippingPriceIds[0]) {
+        const uniqueIds = new Set(productShippingFeeIds)
+        if (uniqueIds.size === 1 && this.shippingPrice.id === productShippingFeeIds[0]) {
           console.log(
-            '[resolveShippingPrice] Using product shippingPriceId:',
-            productShippingPriceIds[0]
+            '[resolveShippingPrice] Using product shippingFeeId:',
+            productShippingFeeIds[0]
           )
           const price = getShippingPriceHelper(
             this.shippingPrice.prices,
@@ -680,14 +688,15 @@ export class CartService extends NotifiableService {
       }
     }
 
-    // 2. Try store shippingPriceId (new system)
+    // 2. Try store shippingFeeId (new system)
     if (
       countryCode &&
-      this.store?.shippingPriceId &&
+      this.store?.shippingFeeId &&
+      !this.isCloudShippingFeeId(this.store.shippingFeeId) &&
       this.shippingPrice &&
-      this.shippingPrice.id === this.store.shippingPriceId
+      this.shippingPrice.id === this.store.shippingFeeId
     ) {
-      console.log('[resolveShippingPrice] Using store shippingPriceId:', this.store.shippingPriceId)
+      console.log('[resolveShippingPrice] Using store shippingFeeId:', this.store.shippingFeeId)
       const price = getShippingPriceHelper(
         this.shippingPrice.prices,
         countryCode,
@@ -760,7 +769,7 @@ export class CartService extends NotifiableService {
 
   /**
    * Retrieves the available shipping types using the priority chain.
-   * Priority: 1. Product shippingPriceId, 2. Store shippingPriceId, 3. Product shippingMethodId, 4. Store defaultShippingRates
+   * Priority: 1. Product shippingFeeId, 2. Store shippingFeeId, 3. Product shippingMethodId, 4. Store defaultShippingRates
    *
    * Note: Shipping prices must be loaded and set via setShippingPrice() for the new system to work.
    * If shipping prices are not loaded, the method falls back to the legacy system.
@@ -791,13 +800,13 @@ export class CartService extends NotifiableService {
 
     // 1. Try product-specific ShippingPrice (new system) - only if countryCode is available
     if (countryCode && this.shippingPrice) {
-      const productShippingPriceIds = allProducts
-        .map((item) => item.product.shippingPriceId)
-        .filter((id): id is string => id !== null)
+      const productShippingFeeIds = allProducts
+        .map((item) => item.product.shippingFeeId)
+        .filter((id): id is string => id !== null && !this.isCloudShippingFeeId(id))
 
-      if (productShippingPriceIds.length > 0) {
-        const uniqueIds = new Set(productShippingPriceIds)
-        if (uniqueIds.size === 1 && this.shippingPrice.id === productShippingPriceIds[0]) {
+      if (productShippingFeeIds.length > 0) {
+        const uniqueIds = new Set(productShippingFeeIds)
+        if (uniqueIds.size === 1 && this.shippingPrice.id === productShippingFeeIds[0]) {
           const available = getAvailableShippingTypesHelper(
             this.shippingPrice.prices,
             countryCode,
@@ -822,12 +831,13 @@ export class CartService extends NotifiableService {
       }
     }
 
-    // 2. Try store shippingPriceId (new system)
+    // 2. Try store shippingFeeId (new system)
     if (
       countryCode &&
-      this.store?.shippingPriceId &&
+      this.store?.shippingFeeId &&
+      !this.isCloudShippingFeeId(this.store.shippingFeeId) &&
       this.shippingPrice &&
-      this.shippingPrice.id === this.store.shippingPriceId
+      this.shippingPrice.id === this.store.shippingFeeId
     ) {
       const available = getAvailableShippingTypesHelper(
         this.shippingPrice.prices,
@@ -946,7 +956,7 @@ export class CartService extends NotifiableService {
 
   /**
    * Gets the shipping price for a specific shipping type using the priority chain.
-   * Priority: 1. Product shippingPriceId, 2. Store shippingPriceId, 3. Product shippingMethodId, 4. Store defaultShippingRates
+   * Priority: 1. Product shippingFeeId, 2. Store shippingFeeId, 3. Product shippingMethodId, 4. Store defaultShippingRates
    * @param type - The shipping type to check (pickup, home, store)
    * @returns The shipping price for the specified type, or null if not available
    */
