@@ -7,6 +7,8 @@ export interface ProductLandingPageTemplate {
   name: string | null
   description: string | null
   imageUrl: string | null
+  /** Store that published this listing. Null is a platform template. */
+  storeId?: string | null
   schema: Record<string, any>
   defaults: Record<string, any>
   createdAt: string

@@ -9,6 +9,8 @@ export interface ProductLandingPage {
   name: string | null
   description: string | null
   templateId: string | null
+  /** Public template this page last published, when set. */
+  publishedTemplateId?: string | null
   schema: Record<string, any> | null
   defaults: Record<string, any> | null
   productId: string | null

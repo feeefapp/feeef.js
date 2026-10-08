@@ -102,11 +102,18 @@ export interface ProductEntity {
 // function that generate public data from the integrations data
 export function generatePublicIntegrationsData(data: IntegrationsData | null | null): any {
   if (!data) return data
-  const { metaPixelData, tiktokPixelData, googleAnalyticsData, googleTagsData, paymentMethodData } =
-    data
+  const {
+    metaPixelData,
+    tiktokPixelData,
+    snapchatPixelData,
+    googleAnalyticsData,
+    googleTagsData,
+    paymentMethodData,
+  } = data
   return {
     metaPixelData: generatePublicIntegrationsDataMetaPixel(metaPixelData),
     tiktokPixelData: generatePublicIntegrationsDataTiktokPixel(tiktokPixelData),
+    snapchatPixelData: generatePublicIntegrationsDataSnapchatPixel(snapchatPixelData),
     googleAnalyticsData: generatePublicIntegrationsDataGoogleAnalytics(googleAnalyticsData),
     googleTagsData: generatePublicIntegrationsDataGoogleTag(googleTagsData),
     paymentMethodData: generatePublicIntegrationsDataPaymentMethod(paymentMethodData),
@@ -128,6 +135,19 @@ export function generatePublicIntegrationsDataMetaPixel(
 export function generatePublicIntegrationsDataTiktokPixel(
   data: TiktokPixelData | null | undefined
 ): PublicTiktokPixelData | null | undefined {
+  if (!data) return data
+  const { ids, objective, draftObjective } = data
+  return {
+    ids: ids,
+    objective,
+    draftObjective,
+  }
+}
+
+/** Public product Snap Pixel override. Status rules stay merchant-only. */
+export function generatePublicIntegrationsDataSnapchatPixel(
+  data: SnapchatPixelData | null | undefined
+): PublicSnapchatPixelData | null | undefined {
   if (!data) return data
   const { ids, objective, draftObjective } = data
   return {
@@ -161,6 +181,7 @@ export function generatePublicIntegrationsDataGoogleSheets(
 export interface IntegrationsData {
   metaPixelData?: MetaPixelData | null
   tiktokPixelData?: TiktokPixelData | null
+  snapchatPixelData?: SnapchatPixelData | null
   googleAnalyticsData?: GoogleAnalyticsData | null
   googleTagsData?: GoogleTagData | null
   googleSheetsData?: GoogleSheetsData | null
@@ -234,6 +255,37 @@ export interface TiktokPixelData {
    */
   statusRules?: PixelStatusRule[] | null
 }
+
+/**
+ * Snap standard events used by Feeef.
+ * Values are the Conversions API / Snap Pixel names (`PURCHASE`, `START_CHECKOUT`, …).
+ * `none` skips the send.
+ */
+export enum SnapchatPixelEvent {
+  none = 'none',
+  pageView = 'PAGE_VIEW',
+  viewContent = 'VIEW_CONTENT',
+  addCart = 'ADD_CART',
+  startCheckout = 'START_CHECKOUT',
+  signUp = 'SIGN_UP',
+  addToWishlist = 'ADD_TO_WISHLIST',
+  search = 'SEARCH',
+  purchase = 'PURCHASE',
+}
+
+export interface SnapchatPixelData {
+  /** When false, ignore product override and use store defaults. */
+  enabled?: boolean | null
+  ids: string[] | null
+  objective: SnapchatPixelEvent | null
+  draftObjective: SnapchatPixelEvent | null
+  /**
+   * Optional product-level status transition rules (server CAPI).
+   * When non-empty on a single-product order, overrides store `statusRules`.
+   * Never exposed on public product JSON.
+   */
+  statusRules?: PixelStatusRule[] | null
+}
 export interface GoogleAnalyticsData {}
 export interface GoogleTagData {}
 export interface GoogleSheetsData {
@@ -261,6 +313,11 @@ export interface PublicTiktokPixelData {
   ids: string[] | null
   objective: TiktokPixelEvent | null
   draftObjective: TiktokPixelEvent | null
+}
+export interface PublicSnapchatPixelData {
+  ids: string[] | null
+  objective: SnapchatPixelEvent | null
+  draftObjective: SnapchatPixelEvent | null
 }
 // public google analytics data
 export interface PublicGoogleAnalyticsData {}

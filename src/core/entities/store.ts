@@ -2,7 +2,7 @@ import { EmbaddedAddress } from '../embadded/address.js'
 import { EmbaddedCategory } from '../embadded/category.js'
 import { EmbaddedContact } from '../embadded/contact.js'
 import { OrderEntity, OrderStatus, DeliveryStatus, PaymentStatus } from './order.js'
-import { MetaPixelEvent, TiktokPixelEvent } from './product.js'
+import { MetaPixelEvent, SnapchatPixelEvent, TiktokPixelEvent } from './product.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
 import { UserEntity } from './user.js'
@@ -61,6 +61,9 @@ export interface StoreEntity {
   // tiktokPixelIds
   tiktokPixelIds?: string[] | null
 
+  // snapchatPixelIds
+  snapchatPixelIds?: string[] | null
+
   // googleAnalyticsId
   googleAnalyticsId?: string | null
 
@@ -91,6 +94,7 @@ export const generatePublicStoreIntegrations = (
     meta,
     metaPixel,
     tiktokPixel,
+    snapchatPixel,
     googleAnalytics,
     googleTags,
     clarity,
@@ -107,6 +111,7 @@ export const generatePublicStoreIntegrations = (
     meta: generatePublicStoreIntegrationMeta(meta),
     metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
     tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
+    snapchatPixel: generatePublicStoreIntegrationSnapchatPixel(snapchatPixel) || null,
     googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
     googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
     clarity: generatePublicStoreIntegrationClarity(clarity) || null,
@@ -219,6 +224,24 @@ export const generatePublicStoreIntegrationTiktokPixel = (
     objective: tiktokPixel.objective,
     draftObjective: tiktokPixel.draftObjective,
     mode: tiktokPixel.mode,
+  }
+}
+
+/**
+ * Public Snap Pixel config. CAPI access tokens are never included.
+ */
+export const generatePublicStoreIntegrationSnapchatPixel = (
+  snapchatPixel: SnapchatPixelIntegration | null | undefined
+): PublicSnapchatPixelIntegration | null | undefined => {
+  if (!snapchatPixel) return null
+  return {
+    pixels: (snapchatPixel.pixels || []).map((pixel) => ({
+      id: pixel.id,
+    })),
+    active: snapchatPixel.active,
+    objective: snapchatPixel.objective,
+    draftObjective: snapchatPixel.draftObjective,
+    mode: snapchatPixel.mode,
   }
 }
 export const generatePublicStoreIntegrationGoogleAnalytics = (
@@ -477,6 +500,13 @@ export interface PublicTiktokPixelIntegration {
   draftObjective?: TiktokPixelEvent | null
   mode?: PixelReportMode | null
 }
+export interface PublicSnapchatPixelIntegration {
+  pixels: { id: string }[]
+  active: boolean
+  objective?: SnapchatPixelEvent | null
+  draftObjective?: SnapchatPixelEvent | null
+  mode?: PixelReportMode | null
+}
 export interface PublicGoogleAnalyticsIntegration {
   id: string
   active: boolean
@@ -562,6 +592,8 @@ export interface PublicStoreIntegrations {
   meta: PublicMetaIntegration | null
   metaPixel: PublicMetaPixelIntegration | null
   tiktokPixel: PublicTiktokPixelIntegration | null
+  /** Snap Pixel ids + objectives. CAPI tokens are stripped. */
+  snapchatPixel?: PublicSnapchatPixelIntegration | null
   googleAnalytics: PublicGoogleAnalyticsIntegration | null
   googleSheet: PublicGoogleSheetsIntegration | null
   googleTags: PublicGoogleTagsIntegration | null
@@ -865,9 +897,12 @@ export interface PixelStatusRule {
   equals: string
   metaEvent?: MetaPixelEvent | null
   tiktokEvent?: TiktokPixelEvent | null
+  snapchatEvent?: SnapchatPixelEvent | null
   /** When set, overrides `metaEvent` (Meta CAPI custom event name). */
   metaCustomEvent?: string | null
   tiktokCustomEvent?: string | null
+  /** Overrides `snapchatEvent`. Snap standard name, e.g. `CUSTOM_EVENT_1`. */
+  snapchatCustomEvent?: string | null
 }
 export interface MetaPixel {
   name?: string
@@ -890,6 +925,14 @@ export interface FacebookMarketingOAuth {
 // tiktok pixel
 export interface TiktokPixel {
   name?: string
+  id: string
+  accessToken?: string
+}
+
+/** One Snap Pixel. `accessToken` is the Conversions API token (server-only). */
+export interface SnapchatPixel {
+  name?: string
+  /** Pixel UUID from Snap Events Manager. */
   id: string
   accessToken?: string
 }
@@ -1001,6 +1044,20 @@ export interface TiktokPixelIntegration {
   active: boolean
   metadata: Record<string, any>
   /** Where to send events: server, client, or both. Omit for auto (prefer server if accessToken set). */
+  mode?: PixelReportMode | null
+}
+
+/** Snap Pixel + Conversions API (`store.integrations.snapchatPixel`). */
+export interface SnapchatPixelIntegration {
+  id: string
+  pixels: SnapchatPixel[]
+  objective?: SnapchatPixelEvent | null
+  draftObjective?: SnapchatPixelEvent | null
+  /** Server-only lifecycle rules; never exposed on public storefront JSON. */
+  statusRules?: PixelStatusRule[]
+  active: boolean
+  metadata: Record<string, any>
+  /** Where to send events: server (CAPI), client (snaptr), or both. Omit for auto. */
   mode?: PixelReportMode | null
 }
 
@@ -1503,6 +1560,7 @@ export interface StoreIntegrations {
   meta?: MetaIntegration
   metaPixel?: MetaPixelIntegration
   tiktokPixel?: TiktokPixelIntegration
+  snapchatPixel?: SnapchatPixelIntegration
   googleAnalytics?: GoogleAnalyticsIntegration
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration
@@ -1618,6 +1676,7 @@ export interface StoreCreateInput {
   configs?: StoreConfigs
   metaPixelIds?: string[]
   tiktokPixelIds?: string[]
+  snapchatPixelIds?: string[]
   googleAnalyticsId?: string
   googleTagsId?: string
   projectId?: string
@@ -1647,6 +1706,7 @@ export interface StoreUpdateInput {
   configs?: StoreConfigs
   metaPixelIds?: string[]
   tiktokPixelIds?: string[]
+  snapchatPixelIds?: string[]
   googleAnalyticsId?: string
   googleTagsId?: string
   integrations?: StoreIntegrations
