@@ -376,48 +376,14 @@ function toPublicMinTimeInPage(
   }
 }
 
-function toPublicCountries(
-  raw: SecurityCountriesOption | null | undefined
-): PublicSecurityCountriesOption | undefined {
-  if (
-    !raw ||
-    typeof raw.active !== 'boolean' ||
-    raw.treatment === undefined ||
-    raw.treatment === null
-  ) {
-    return undefined
-  }
-  return {
-    active: raw.active,
-    treatment: raw.treatment,
-    allowed: raw.allowed ?? null,
-    blocked: Array.isArray(raw.blocked) ? [...raw.blocked] : [],
-  }
-}
-
-function toPublicSources(
-  raw: SecuritySourcesOption | null | undefined
-): PublicSecuritySourcesOption | undefined {
-  if (
-    !raw ||
-    typeof raw.active !== 'boolean' ||
-    raw.treatment === undefined ||
-    raw.treatment === null
-  ) {
-    return undefined
-  }
-  return {
-    active: raw.active,
-    treatment: raw.treatment,
-    allowed: raw.allowed ?? null,
-    blocked: Array.isArray(raw.blocked) ? [...raw.blocked] : [],
-  }
-}
-
 /**
  * Generates public security integration data from private integration data.
- * Exposes storefront-safe rules: frontend, doubleSend, minTimeInPage, countries, sources.
- * Fingerprint, ip, phone, and ads stay server-only.
+ * Exposes only the rules the storefront enforces client-side: frontend,
+ * doubleSend, minTimeInPage.
+ * Countries and sources (allowed/blocked lists and their treatments) are
+ * enforced by the API on `POST /orders/send` and are never published, so a
+ * visitor cannot read the policy to evade it. Fingerprint, ip, phone, and ads
+ * stay server-only too.
  */
 export const generatePublicStoreIntegrationSecurity = (
   security: SecurityIntegration | null | undefined
@@ -428,15 +394,11 @@ export const generatePublicStoreIntegrationSecurity = (
   const frontend = toPublicSecurityOption(opts?.frontend)
   const doubleSend = toPublicSecurityOption(opts?.doubleSend)
   const minTimeInPage = toPublicMinTimeInPage(opts?.minTimeInPage)
-  const countries = toPublicCountries(opts?.countries)
-  const sources = toPublicSources(opts?.sources)
 
   const options: PublicSecurityOptions = {
     ...(frontend ? { frontend } : {}),
     ...(doubleSend ? { doubleSend } : {}),
     ...(minTimeInPage ? { minTimeInPage } : {}),
-    ...(countries ? { countries } : {}),
-    ...(sources ? { sources } : {}),
   }
 
   return {
@@ -1318,10 +1280,6 @@ export interface SecuritySourcesOption {
 
 /** Storefront-safe min-time rule (same shape as private; no secrets). */
 export type PublicSecurityMinTimeOption = SecurityMinTimeOption
-/** Storefront-safe country allow/block lists (policy only). */
-export type PublicSecurityCountriesOption = SecurityCountriesOption
-/** Storefront-safe traffic-source allow/block lists (policy only). */
-export type PublicSecuritySourcesOption = SecuritySourcesOption
 
 // All security options (private). Keys match API / Vine: each block is optional.nullable.
 export interface SecurityOptions {
@@ -1351,14 +1309,12 @@ export interface PublicSecurityOption {
   treatment: SecurityTreatment
 }
 
-// Public security options for storefronts (client-enforceable / policy visibility).
-// Fingerprint, ip, phone, and ads remain server-only.
+// Public security options for storefronts (client-enforceable rules only).
+// Countries, sources, fingerprint, ip, phone, and ads remain server-only.
 export interface PublicSecurityOptions {
   frontend?: PublicSecurityOption
   doubleSend?: PublicSecurityOption
   minTimeInPage?: PublicSecurityMinTimeOption
-  countries?: PublicSecurityCountriesOption
-  sources?: PublicSecuritySourcesOption
 }
 
 // Public security integration (storefront)

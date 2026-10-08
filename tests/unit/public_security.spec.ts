@@ -13,26 +13,26 @@ test.group('generatePublicStoreIntegrationSecurity', () => {
     assert.isNull(generatePublicStoreIntegrationSecurity(undefined))
   })
 
-  test('exposes frontend / doubleSend / minTime / countries / sources only', ({ assert }) => {
+  test('exposes frontend / doubleSend / minTime only', ({ assert }) => {
     const pub = generatePublicStoreIntegrationSecurity({
       active: true,
       options: {
         frontend: { active: true, ttl: 3600, treatment: SecurityTreatment.block },
         doubleSend: { active: true, ttl: 300, treatment: SecurityTreatment.fake },
         minTimeInPage: { active: true, duration: 10, treatment: SecurityTreatment.warning },
+        // Server-only — must not appear on public payload
         countries: {
           active: true,
           treatment: SecurityTreatment.block,
           allowed: ['DZ'],
-          blocked: [],
+          blocked: ['FR'],
         },
         sources: {
           active: true,
-          treatment: SecurityTreatment.block,
+          treatment: SecurityTreatment.fake,
           allowed: ['ads'],
-          blocked: [],
+          blocked: ['organic'],
         },
-        // Server-only — must not appear on public payload
         ip: { active: true, ttl: 86400, treatment: SecurityTreatment.block },
         phone: { active: true, ttl: 86400, treatment: SecurityTreatment.block },
         fingerprint: { active: true, ttl: 3600, treatment: SecurityTreatment.block },
@@ -44,13 +44,69 @@ test.group('generatePublicStoreIntegrationSecurity', () => {
     assert.exists(pub?.options.frontend)
     assert.exists(pub?.options.doubleSend)
     assert.exists(pub?.options.minTimeInPage)
-    assert.exists(pub?.options.countries)
-    assert.exists(pub?.options.sources)
+    assert.notProperty(pub?.options as object, 'countries')
+    assert.notProperty(pub?.options as object, 'sources')
     assert.notProperty(pub?.options as object, 'ip')
     assert.notProperty(pub?.options as object, 'phone')
     assert.notProperty(pub?.options as object, 'fingerprint')
     assert.notProperty(pub?.options as object, 'ads')
     assert.equal(pub?.options.doubleSend?.ttl, 300)
+    assert.deepEqual(Object.keys(pub?.options ?? {}).sort(), [
+      'doubleSend',
+      'frontend',
+      'minTimeInPage',
+    ])
+  })
+
+  test('never leaks country / source lists or treatments anywhere in the payload', ({ assert }) => {
+    const pub = generatePublicStoreIntegrationSecurity({
+      active: true,
+      options: {
+        frontend: { active: true, ttl: 60, treatment: SecurityTreatment.block },
+        countries: {
+          active: true,
+          treatment: SecurityTreatment.warning,
+          allowed: ['ZZ-ALLOWED-COUNTRY'],
+          blocked: ['ZZ-BLOCKED-COUNTRY'],
+        },
+        sources: {
+          active: true,
+          treatment: SecurityTreatment.fake,
+          allowed: ['zz-allowed-source'],
+          blocked: ['zz-blocked-source'],
+        },
+      },
+    })
+    const json = JSON.stringify(pub)
+    for (const leaked of [
+      'ZZ-ALLOWED-COUNTRY',
+      'ZZ-BLOCKED-COUNTRY',
+      'zz-allowed-source',
+      'zz-blocked-source',
+      'countries',
+      'sources',
+      'allowed',
+      'blocked',
+      'warning',
+      'fake',
+    ]) {
+      assert.notInclude(json, leaked)
+    }
+    assert.deepEqual(pub, {
+      active: true,
+      options: { frontend: { active: true, ttl: 60, treatment: SecurityTreatment.block } },
+    })
+  })
+
+  test('countries / sources only config publishes empty options', ({ assert }) => {
+    const pub = generatePublicStoreIntegrationSecurity({
+      active: true,
+      options: {
+        countries: { active: true, treatment: SecurityTreatment.block, allowed: null, blocked: [] },
+        sources: { active: false, treatment: SecurityTreatment.block, allowed: null, blocked: [] },
+      },
+    })
+    assert.deepEqual(pub, { active: true, options: {} })
   })
 
   test('omits incomplete option blocks', ({ assert }) => {
