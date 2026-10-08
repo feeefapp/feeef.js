@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { type AxiosInstance } from 'axios'
 // Repositories
 import { OrderRepository } from './repositories/orders.js'
 import { OrdersV1Repository } from './repositories/orders_v1.js'

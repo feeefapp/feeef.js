@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 import {
   type BatchDeleteRequest,
   type BatchReleaseRequest,
@@ -8,16 +8,16 @@ import {
   batchUpdateManyBody,
 } from '../../core/batch.js'
 import {
-  InventoryObject,
-  Project,
-  InventoryMovement,
-  InventoryAlias,
-  InventoryWarehouse,
-  InventoryReservation,
-  InventoryReceiveInput,
-  InventoryApplyDeltasInput,
+  type InventoryObject,
+  type Project,
+  type InventoryMovement,
+  type InventoryAlias,
+  type InventoryWarehouse,
+  type InventoryReservation,
+  type InventoryReceiveInput,
+  type InventoryApplyDeltasInput,
 } from '../../core/entities/inventory.js'
-import { ModelRepository, ListResponse } from './repository.js'
+import { ModelRepository, type ListResponse } from './repository.js'
 
 /** Typed batch update for inventory objects (`objects.updateMany`). */
 export class InventoryBatchUpdateObjectsRequest implements BatchUpdateManyRequest {

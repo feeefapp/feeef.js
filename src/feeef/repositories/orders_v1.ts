@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 
 /**
  * Opencod Orders v1 catalog + lifecycle surface.

@@ -1,14 +1,14 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ListResponse } from './repository.js'
 import {
-  StoreEntity,
-  StoreSummary,
-  StoreMember,
-  StoreSubscriptionType,
-  AddStoreMemberInput,
-  UpdateStoreMemberInput,
-  StoreCreateInput,
-  StoreUpdateInput,
+  type StoreEntity,
+  type StoreSummary,
+  type StoreMember,
+  type StoreSubscriptionType,
+  type AddStoreMemberInput,
+  type UpdateStoreMemberInput,
+  type StoreCreateInput,
+  type StoreUpdateInput,
 } from '../../core/entities/store.js'
 import type { LiteOrdersReport } from '../../core/entities/order.js'
 import { StoreInvitesRepository } from './store_invites_repository.js'
@@ -186,7 +186,7 @@ export class StoreRepository extends ModelRepository<
     await this.client.post(`/${this.resource}/${id}/subscription/upgrade`, {
       plan,
       months,
-      // eslint-disable-next-line eqeqeq
+
       ...(options?.code != null && options.code !== '' && { code: options.code }),
     })
   }

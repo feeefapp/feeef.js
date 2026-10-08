@@ -1,17 +1,17 @@
-import { AxiosInstance } from 'axios'
-import { ListResponse, ModelRepository } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { type ListResponse, ModelRepository } from './repository.js'
 import {
-  StoreTemplateEntity,
-  StoreTemplateCreateInput,
-  StoreTemplateUpdateInput,
-  StoreTemplateLocaleEntity,
-  StoreTemplateLocaleInput,
-  StoreTemplateLocalesBundle,
-  StoreTemplateReleaseEntity,
-  StoreTemplatePurchaseResult,
-  StoreTemplateReleaseCreateInput,
+  type StoreTemplateEntity,
+  type StoreTemplateCreateInput,
+  type StoreTemplateUpdateInput,
+  type StoreTemplateLocaleEntity,
+  type StoreTemplateLocaleInput,
+  type StoreTemplateLocalesBundle,
+  type StoreTemplateReleaseEntity,
+  type StoreTemplatePurchaseResult,
+  type StoreTemplateReleaseCreateInput,
 } from '../../core/entities/store_template.js'
-import { TemplateComponentPolicy } from '../../core/entities/template_component.js'
+import { type TemplateComponentPolicy } from '../../core/entities/template_component.js'
 
 export interface StoreTemplateListOptions {
   page?: number

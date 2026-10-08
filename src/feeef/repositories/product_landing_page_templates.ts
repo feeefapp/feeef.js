@@ -1,9 +1,9 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 import { ModelRepository } from './repository.js'
 import {
-  ProductLandingPageTemplate,
-  ProductLandingPageTemplateCreate,
-  ProductLandingPageTemplateUpdate,
+  type ProductLandingPageTemplate,
+  type ProductLandingPageTemplateCreate,
+  type ProductLandingPageTemplateUpdate,
 } from '../../core/entities/product_landing_page_template.js'
 
 /**

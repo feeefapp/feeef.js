@@ -1,5 +1,5 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { ModelRepository, type ListResponse } from './repository.js'
 
 /**
  * Developer-registered app (OAuth client) returned by the apps API.

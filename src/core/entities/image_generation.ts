@@ -1,24 +1,12 @@
-import { AttachmentPayload, serializeAttachmentPayloads } from './attachment.js'
+import { type AttachmentPayload, serializeAttachmentPayloads } from './attachment.js'
 
 export type ImageGenerationStatus = 'pending' | 'processing' | 'completed' | 'published' | 'failed'
 
 export type ImageGenerationResolution =
-  | 'MEDIA_RESOLUTION_LOW'
-  | 'MEDIA_RESOLUTION_MEDIUM'
-  | 'MEDIA_RESOLUTION_HIGH'
+  'MEDIA_RESOLUTION_LOW' | 'MEDIA_RESOLUTION_MEDIUM' | 'MEDIA_RESOLUTION_HIGH'
 
 export type ImageGenerationAspectRatio =
-  | '1:1'
-  | '16:9'
-  | '9:16'
-  | '4:3'
-  | '3:4'
-  | '4:5'
-  | '9:32'
-  | '1:8'
-  | '8:1'
-  | '1:4'
-  | '4:1'
+  '1:1' | '16:9' | '9:16' | '4:3' | '3:4' | '4:5' | '9:32' | '1:8' | '8:1' | '1:4' | '4:1'
 
 export interface ImageGenerationHistoryItem {
   id: string
@@ -194,7 +182,7 @@ export function normalizePaginatedResponse<T>(
 
 function toBlob(value: File | Blob | Uint8Array | ArrayBuffer): Blob {
   if (value instanceof Blob) return value
-  if (value instanceof Uint8Array) return new Blob([value], { type: 'image/png' })
+  if (value instanceof Uint8Array) return new Blob([Uint8Array.from(value)], { type: 'image/png' })
   return new Blob([value], { type: 'image/png' })
 }
 

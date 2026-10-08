@@ -1,5 +1,5 @@
 import { ShippingType } from '../../core/entities/order.js'
-import { ProductEntity, ProductOffer } from '../../core/entities/product.js'
+import { type ProductEntity, type ProductOffer } from '../../core/entities/product.js'
 import {
   clampQuantityToOfferLimits,
   finiteOfferNumber,
@@ -8,17 +8,17 @@ import {
   resolveInitialProductOffer,
 } from '../../core/entities/product_offer_policy.js'
 import {
-  ShippingMethodEntity,
+  type ShippingMethodEntity,
   ShippingMethodPolicy,
   ShippingMethodStatus,
 } from '../../core/entities/shipping_method.js'
 import {
-  ShippingPriceEntity,
-  ShippingPriceType,
+  type ShippingPriceEntity,
+  type ShippingPriceType,
   getShippingPrice as getShippingPriceHelper,
   getAvailableShippingTypes as getAvailableShippingTypesHelper,
 } from '../../core/entities/shipping_price.js'
-import { StoreEntity } from '../../core/entities/store.js'
+import { type StoreEntity } from '../../core/entities/store.js'
 import { NotifiableService } from './service.js'
 
 /**
@@ -628,7 +628,9 @@ export class CartService extends NotifiableService {
   private isCloudShippingFeeId(id: string | null | undefined): boolean {
     // Inline match of `isCloudShippingFeeId` from utils — keep cart free of a
     // hard import cycle with the package barrel in some bundlers.
-    return typeof id === 'string' && (id === 'unassigned' || (id.startsWith('ca_') && id.length >= 6))
+    return (
+      typeof id === 'string' && (id === 'unassigned' || (id.startsWith('ca_') && id.length >= 6))
+    )
   }
 
   private resolveShippingPrice(

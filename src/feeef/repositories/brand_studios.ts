@@ -1,16 +1,16 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 import {
-  BrandStudio,
-  BrandStudioCreateInput,
-  BrandStudioGenerationsOptions,
-  BrandStudioListOptions,
-  BrandStudioSetPrimaryInput,
-  BrandStudioUpdateInput,
+  type BrandStudio,
+  type BrandStudioCreateInput,
+  type BrandStudioGenerationsOptions,
+  type BrandStudioListOptions,
+  type BrandStudioSetPrimaryInput,
+  type BrandStudioUpdateInput,
   normalizeBrandStudio,
 } from '../../core/entities/brand_studio.js'
 import {
-  ImageGeneration,
-  PaginatedResourceResponse,
+  type ImageGeneration,
+  type PaginatedResourceResponse,
   normalizeImageGeneration,
   normalizePaginatedResponse,
 } from '../../core/entities/image_generation.js'
@@ -29,9 +29,7 @@ export class BrandStudiosRepository {
     this.client = client
   }
 
-  async list(
-    options?: BrandStudioListOptions
-  ): Promise<PaginatedResourceResponse<BrandStudio>> {
+  async list(options?: BrandStudioListOptions): Promise<PaginatedResourceResponse<BrandStudio>> {
     const { page = 1, limit = 24, params } = options || {}
     const response = await this.client.get(`/${this.resource}`, {
       params: { page, limit, ...params },
@@ -66,17 +64,14 @@ export class BrandStudiosRepository {
    */
   async generations(
     options: BrandStudioGenerationsOptions
-  ): Promise<
-    PaginatedResourceResponse<ImageGeneration> & { primaryGenerationId?: string | null }
-  > {
+  ): Promise<PaginatedResourceResponse<ImageGeneration> & { primaryGenerationId?: string | null }> {
     const { studioId, kind, page = 1, limit = 40 } = options
     const response = await this.client.get(`/${this.resource}/${studioId}/generations`, {
       params: { kind, page, limit },
     })
     const pageResult = normalizePaginatedResponse(response.data, normalizeImageGeneration)
     const meta = pageResult.meta || {}
-    const primary =
-      meta.primaryGenerationId != null ? String(meta.primaryGenerationId) : null
+    const primary = meta.primaryGenerationId != null ? String(meta.primaryGenerationId) : null
     return {
       ...pageResult,
       primaryGenerationId: primary,

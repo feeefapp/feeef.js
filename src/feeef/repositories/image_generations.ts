@@ -1,11 +1,11 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 import {
-  ImageGeneration,
-  ImageGenerationGalleryOptions,
-  ImageGenerationGenerateInput,
-  ImageGenerationListOptions,
-  ImageGenerationPublishInput,
-  PaginatedResourceResponse,
+  type ImageGeneration,
+  type ImageGenerationGalleryOptions,
+  type ImageGenerationGenerateInput,
+  type ImageGenerationListOptions,
+  type ImageGenerationPublishInput,
+  type PaginatedResourceResponse,
   createImageGenerationFormData,
   normalizeImageGeneration,
   normalizePaginatedResponse,

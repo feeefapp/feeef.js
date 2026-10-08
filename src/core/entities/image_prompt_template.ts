@@ -1,5 +1,5 @@
 import {
-  AttachmentPayload,
+  type AttachmentPayload,
   normalizeAttachmentPayloads,
   serializeAttachmentPayloads,
 } from './attachment.js'

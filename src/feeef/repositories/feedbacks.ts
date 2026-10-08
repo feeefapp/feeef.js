@@ -1,10 +1,10 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ListResponse } from './repository.js'
 import {
-  FeedbackEntity,
-  FeedbackCreateInput,
-  FeedbackUpdateInput,
-  FeedbackListOptions,
+  type FeedbackEntity,
+  type FeedbackCreateInput,
+  type FeedbackUpdateInput,
+  type FeedbackListOptions,
 } from '../../core/entities/feedback.js'
 
 /**

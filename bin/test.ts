@@ -9,6 +9,7 @@ Assert.macro('validationErrors', async function (this: Assert, promiseLike, mess
   try {
     await promiseLike
   } catch (error) {
+    if (typeof error !== 'object' || error === null || !('messages' in error)) throw error
     hasFailed = true
     this.deepEqual(error.messages, messages)
   }
@@ -40,11 +41,11 @@ configure({
   suites: [
     {
       name: 'unit',
-      files: ['tests/unit/**/*.spec(.js|.ts)'],
+      files: ['tests/unit/**/*.spec.{js,ts}'],
     },
     {
       name: 'integration',
-      files: ['tests/integration/**/*.spec(.js|.ts)'],
+      files: ['tests/integration/**/*.spec.{js,ts}'],
     },
   ],
   plugins: [assert(), expectTypeOf(), snapshot()],
@@ -58,5 +59,5 @@ configure({
 | The following "run" method is required to execute all the tests.
 |
 */
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
+
 run()

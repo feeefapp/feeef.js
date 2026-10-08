@@ -1,9 +1,9 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ListResponse } from './repository.js'
 import {
-  CategoryEntity,
-  CategoryCreateInput,
-  CategoryUpdateInput,
+  type CategoryEntity,
+  type CategoryCreateInput,
+  type CategoryUpdateInput,
 } from '../../core/entities/category.js'
 
 /**

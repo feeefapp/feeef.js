@@ -1,5 +1,8 @@
 import { test } from '@japa/runner'
-import { OAuthRepository, OAuthIntrospectResponse } from '../../src/feeef/repositories/oauth.js'
+import {
+  OAuthRepository,
+  type OAuthIntrospectResponse,
+} from '../../src/feeef/repositories/oauth.js'
 
 test.group('OAuthRepository.buildAuthorizeUrl', () => {
   test('builds URL with required params', ({ assert }) => {

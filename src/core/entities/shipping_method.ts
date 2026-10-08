@@ -1,4 +1,4 @@
-import { OrderEntity } from './order.js'
+import { type OrderEntity } from './order.js'
 
 export interface ShippingMethodEntity {
   id: string

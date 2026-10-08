@@ -1,10 +1,10 @@
-import { AxiosInstance } from 'axios'
-import { ListResponse, ModelRepository } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { type ListResponse, ModelRepository } from './repository.js'
 import {
-  TemplateComponentEntity,
-  TemplateComponentCreateInput,
-  TemplateComponentUpdateInput,
-  TemplateComponentPolicy,
+  type TemplateComponentEntity,
+  type TemplateComponentCreateInput,
+  type TemplateComponentUpdateInput,
+  type TemplateComponentPolicy,
 } from '../../core/entities/template_component.js'
 
 /**

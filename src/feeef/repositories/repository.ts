@@ -1,4 +1,4 @@
-import { AxiosInstance, isAxiosError } from 'axios'
+import { type AxiosInstance, isAxiosError } from 'axios'
 import {
   type BatchCreateManyRequest,
   type BatchDeleteRequest,

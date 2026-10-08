@@ -1,6 +1,6 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ModelListOptions } from './repository.js'
-import { StateEntity } from '../../core/entities/state.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ModelListOptions } from './repository.js'
+import { type StateEntity } from '../../core/entities/state.js'
 
 /**
  * Repository for managing State entities.

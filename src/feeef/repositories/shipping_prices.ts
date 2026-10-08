@@ -1,10 +1,10 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ListResponse } from './repository.js'
 import {
-  ShippingPriceEntity,
-  ShippingPriceCreateInput,
-  ShippingPriceUpdateInput,
-  ShippingPriceStatus,
+  type ShippingPriceEntity,
+  type ShippingPriceCreateInput,
+  type ShippingPriceUpdateInput,
+  type ShippingPriceStatus,
 } from '../../core/entities/shipping_price.js'
 
 /**

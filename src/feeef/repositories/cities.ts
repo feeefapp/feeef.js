@@ -1,6 +1,6 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ModelListOptions } from './repository.js'
-import { CityEntity } from '../../core/entities/city.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ModelListOptions } from './repository.js'
+import { type CityEntity } from '../../core/entities/city.js'
 
 /**
  * Repository for managing City entities.

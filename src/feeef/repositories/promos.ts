@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 
 /**
  * Promo entity (list item from GET /promos).
@@ -73,9 +73,9 @@ export class PromoRepository {
     filterator?: string
   }): Promise<PromoListResponse> {
     const query: Record<string, unknown> = {}
-    // eslint-disable-next-line eqeqeq
+
     if (params?.page != null) query.page = params.page
-    // eslint-disable-next-line eqeqeq
+
     if (params?.limit != null) query.limit = params.limit
     if (params?.validNow === true) query.validNow = '1'
     if (params?.filterator) query.filterator = params.filterator

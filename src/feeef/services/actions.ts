@@ -1,5 +1,5 @@
-import { AxiosInstance } from 'axios'
-import { TemplateComponentPolicy } from '../../core/entities/template_component.js'
+import { type AxiosInstance } from 'axios'
+import { type TemplateComponentPolicy } from '../../core/entities/template_component.js'
 
 /**
  * Slim, render-ready shape returned by `actions/resolveComponents` for a

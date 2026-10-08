@@ -12,11 +12,7 @@ export { Subscription, Transmit } from '@adonisjs/transmit-client'
 
 /** Transmit status string literals (mirrors @adonisjs/transmit-client `TransmitStatus`). */
 export type FeeefTransmitConnectionStatus =
-  | 'initializing'
-  | 'connecting'
-  | 'connected'
-  | 'disconnected'
-  | 'reconnecting'
+  'initializing' | 'connecting' | 'connected' | 'disconnected' | 'reconnecting'
 
 /**
  * Strips REST prefixes from the axios/API base URL so Transmit hits the same host as the Dart SDK.
@@ -104,7 +100,7 @@ export function createFeeefTransmit(options: CreateFeeefTransmitOptions): Transm
   return new Transmit({
     ...options.transmit,
     baseUrl,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Transmit’s HttpClient is not exported; FeeefTransmitHttpClient matches its shape.
+
     httpClientFactory: (url, uid): any =>
       new FeeefTransmitHttpClient({ baseUrl: url, uid }, () => {
         const t = getToken()

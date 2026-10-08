@@ -1,16 +1,16 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 import {
-  UiStudio,
-  UiStudioCreateInput,
-  UiStudioGenerationsOptions,
-  UiStudioListOptions,
-  UiStudioSetPrimaryInput,
-  UiStudioUpdateInput,
+  type UiStudio,
+  type UiStudioCreateInput,
+  type UiStudioGenerationsOptions,
+  type UiStudioListOptions,
+  type UiStudioSetPrimaryInput,
+  type UiStudioUpdateInput,
   normalizeUiStudio,
 } from '../../core/entities/ui_studio.js'
 import {
-  ImageGeneration,
-  PaginatedResourceResponse,
+  type ImageGeneration,
+  type PaginatedResourceResponse,
   normalizeImageGeneration,
   normalizePaginatedResponse,
 } from '../../core/entities/image_generation.js'
@@ -64,17 +64,14 @@ export class UiStudiosRepository {
    */
   async generations(
     options: UiStudioGenerationsOptions
-  ): Promise<
-    PaginatedResourceResponse<ImageGeneration> & { primaryGenerationId?: string | null }
-  > {
+  ): Promise<PaginatedResourceResponse<ImageGeneration> & { primaryGenerationId?: string | null }> {
     const { studioId, kind, page = 1, limit = 40 } = options
     const response = await this.client.get(`/${this.resource}/${studioId}/generations`, {
       params: { kind, page, limit },
     })
     const pageResult = normalizePaginatedResponse(response.data, normalizeImageGeneration)
     const meta = pageResult.meta || {}
-    const primary =
-      meta.primaryGenerationId != null ? String(meta.primaryGenerationId) : null
+    const primary = meta.primaryGenerationId != null ? String(meta.primaryGenerationId) : null
     return {
       ...pageResult,
       primaryGenerationId: primary,

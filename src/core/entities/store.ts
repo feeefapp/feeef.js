@@ -1,13 +1,18 @@
-import { EmbaddedAddress } from '../embadded/address.js'
-import { EmbaddedCategory } from '../embadded/category.js'
-import { EmbaddedContact } from '../embadded/contact.js'
-import { OrderEntity, OrderStatus, DeliveryStatus, PaymentStatus } from './order.js'
-import { MetaPixelEvent, SnapchatPixelEvent, TiktokPixelEvent } from './product.js'
+import { type EmbaddedAddress } from '../embadded/address.js'
+import { type EmbaddedCategory } from '../embadded/category.js'
+import { type EmbaddedContact } from '../embadded/contact.js'
+import {
+  type OrderEntity,
+  type OrderStatus,
+  type DeliveryStatus,
+  type PaymentStatus,
+} from './order.js'
+import { type MetaPixelEvent, type SnapchatPixelEvent, type TiktokPixelEvent } from './product.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
-import { UserEntity } from './user.js'
-import { CategoryEntity } from './category.js'
-import { DateTime } from 'luxon'
+import { type UserEntity } from './user.js'
+import { type CategoryEntity } from './category.js'
+import { type DateTime } from 'luxon'
 
 export interface StoreEntity {
   id: string

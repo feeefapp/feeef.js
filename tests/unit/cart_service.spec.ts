@@ -1,14 +1,17 @@
 import { test } from '@japa/runner'
-import { ProductEntity, ProductStatus, ProductType } from '../../src/core/entities/product.js'
+import { type ProductEntity, ProductStatus, ProductType } from '../../src/core/entities/product.js'
 import {
-  ShippingMethodEntity,
+  type ShippingMethodEntity,
   ShippingMethodStatus,
   ShippingMethodPolicy,
 } from '../../src/core/entities/shipping_method.js'
-import { ShippingPriceEntity, ShippingPriceStatus } from '../../src/core/entities/shipping_price.js'
-import { StoreEntity } from '../../src/core/entities/store.js'
+import {
+  type ShippingPriceEntity,
+  ShippingPriceStatus,
+} from '../../src/core/entities/shipping_price.js'
+import { type StoreEntity } from '../../src/core/entities/store.js'
 import { ShippingType } from '../../src/core/entities/order.js'
-import { CartItem, CartService } from '../../src/feeef/services/cart.js'
+import { type CartItem, CartService } from '../../src/feeef/services/cart.js'
 
 test.group('CartService', () => {
   test('add new item to cart', (ctx) => {

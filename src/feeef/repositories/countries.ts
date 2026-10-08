@@ -1,6 +1,6 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 import { ModelRepository } from './repository.js'
-import { CountryEntity } from '../../core/entities/country.js'
+import { type CountryEntity } from '../../core/entities/country.js'
 
 /**
  * Repository for managing Country entities.

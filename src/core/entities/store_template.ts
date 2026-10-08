@@ -4,7 +4,7 @@
  * Multi-page `data` (TemplateData-shaped) plus `schema` (TemplateSchema-shaped).
  * Same policy/version/catalog patterns as template components, without component `code`.
  */
-import { TemplateComponentPolicy } from './template_component.js'
+import { type TemplateComponentPolicy } from './template_component.js'
 
 /** Reuse the same wire values as `template_components` (`store_templates_policy` matches). */
 export { TemplateComponentPolicy as StoreTemplatePolicy } from './template_component.js'

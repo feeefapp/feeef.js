@@ -2,7 +2,7 @@
  * Product Landing Page entity
  */
 
-import { ProductLandingPageTemplate } from './product_landing_page_template.js'
+import { type ProductLandingPageTemplate } from './product_landing_page_template.js'
 
 export interface ProductLandingPage {
   id: string

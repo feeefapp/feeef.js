@@ -1,11 +1,11 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ListResponse } from './repository.js'
 import {
-  ShippingMethodEntity,
-  ShippingMethodCreateInput,
-  ShippingMethodUpdateInput,
-  ShippingMethodStatus,
-  ShippingMethodPolicy,
+  type ShippingMethodEntity,
+  type ShippingMethodCreateInput,
+  type ShippingMethodUpdateInput,
+  type ShippingMethodStatus,
+  type ShippingMethodPolicy,
 } from '../../core/entities/shipping_method.js'
 
 /**

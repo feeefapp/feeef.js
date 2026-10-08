@@ -1,11 +1,11 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ListResponse } from './repository.js'
 import {
-  ProductEntity,
-  ProductCreateInput,
-  ProductUpdateInput,
-  ProductReport,
-  ProductStatus,
+  type ProductEntity,
+  type ProductCreateInput,
+  type ProductUpdateInput,
+  type ProductReport,
+  type ProductStatus,
 } from '../../core/entities/product.js'
 import type { LiteOrdersReport } from '../../core/entities/order.js'
 

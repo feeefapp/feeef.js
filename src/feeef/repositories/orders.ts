@@ -1,16 +1,16 @@
-import { AxiosInstance } from 'axios'
-import { ModelRepository, ListResponse } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { ModelRepository, type ListResponse } from './repository.js'
 import {
-  OrderEntity,
-  OrderTrackEntity,
-  OrderStatus,
-  DeliveryStatus,
-  PaymentStatus,
-  ShippingType,
-  OrderCreateInput,
-  OrderUpdateInput,
-  OrderPricing,
-  CalculateOrderPricingOptions,
+  type OrderEntity,
+  type OrderTrackEntity,
+  type OrderStatus,
+  type DeliveryStatus,
+  type PaymentStatus,
+  type ShippingType,
+  type OrderCreateInput,
+  type OrderUpdateInput,
+  type OrderPricing,
+  type CalculateOrderPricingOptions,
 } from '../../core/entities/order.js'
 
 /**
@@ -162,7 +162,7 @@ export class OrderRepository extends ModelRepository<
       if (options.page) params.page = options.page
       if (options.offset) params.offset = options.offset
       if (options.limit) params.limit = options.limit
-      // eslint-disable-next-line eqeqeq
+
       const useMultiStore = options.storeIds != null && options.storeIds.length > 0
       if (useMultiStore) {
         params.store_ids = options.storeIds

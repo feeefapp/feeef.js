@@ -1,9 +1,9 @@
-import { AxiosInstance } from 'axios'
-import { ListResponse, ModelRepository } from './repository.js'
+import { type AxiosInstance } from 'axios'
+import { type ListResponse, ModelRepository } from './repository.js'
 import {
-  ImagePromptTemplate,
-  ImagePromptTemplateCreate,
-  ImagePromptTemplateUpdate,
+  type ImagePromptTemplate,
+  type ImagePromptTemplateCreate,
+  type ImagePromptTemplateUpdate,
   normalizeImagePromptTemplate,
   serializeImagePromptTemplateCreate,
   serializeImagePromptTemplateUpdate,

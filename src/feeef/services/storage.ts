@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosProgressEvent, CancelToken } from 'axios'
+import { type AxiosInstance, type AxiosProgressEvent, type CancelToken } from 'axios'
 
 /**
  * Options for uploading a file
@@ -101,7 +101,9 @@ export class StorageService {
    * @returns Promise resolving to the upload result
    */
   async uploadBytes(options: UploadBytesOptions): Promise<UploadResult> {
-    const blob = new Blob([options.bytes])
+    const blob = new Blob([
+      options.bytes instanceof Uint8Array ? Uint8Array.from(options.bytes) : options.bytes,
+    ])
     const file = new File([blob], options.filename)
 
     return this.upload({

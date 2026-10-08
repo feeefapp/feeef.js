@@ -42,8 +42,8 @@
  */
 
 import {
-  ModelsCatalogConfig,
-  ModelCatalogRow,
+  type ModelsCatalogConfig,
+  type ModelCatalogRow,
   COCONUTSTUDIO_FLAT_IMAGE_USD,
   FALLBACK_DEFAULT_IMAGE_MODEL,
 } from '../core/models_catalog.js'
@@ -521,10 +521,7 @@ export class AiCalculator {
    * USD per image from a pricing blob (provider or row). Per-tier map first,
    * then flat `image_output`.
    */
-  private pickUsdFromImagePricing(
-    pricing: unknown,
-    imageSize?: string
-  ): number | null {
+  private pickUsdFromImagePricing(pricing: unknown, imageSize?: string): number | null {
     if (!pricing || typeof pricing !== 'object') return null
     const p = pricing as {
       image_output?: unknown
@@ -533,8 +530,7 @@ export class AiCalculator {
       imageOutputPerSizeUsd?: unknown
     }
     const perTier = (p.image_output_per_size_usd ?? p.imageOutputPerSizeUsd) as
-      | Record<string, unknown>
-      | undefined
+      Record<string, unknown> | undefined
     if (perTier && typeof perTier === 'object') {
       const ordered = imageSize ? [imageSize, '1K', '2K', '4K'] : ['1K', '2K', '4K']
       for (const key of ordered) {

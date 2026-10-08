@@ -1,5 +1,9 @@
-import { AxiosInstance } from 'axios'
-import { StoreInvite, CreateStoreInviteInput, StoreMember } from '../../core/entities/store.js'
+import { type AxiosInstance } from 'axios'
+import {
+  type StoreInvite,
+  type CreateStoreInviteInput,
+  type StoreMember,
+} from '../../core/entities/store.js'
 
 /**
  * Repository for store invites. Exposed as `ff.stores.invites`.

@@ -1,6 +1,6 @@
-import { AxiosInstance } from 'axios'
+import { type AxiosInstance } from 'axios'
 import { ModelRepository } from './repository.js'
-import { CurrencyEntity } from '../../core/entities/currency.js'
+import { type CurrencyEntity } from '../../core/entities/currency.js'
 
 /**
  * Repository for managing Currency entities.

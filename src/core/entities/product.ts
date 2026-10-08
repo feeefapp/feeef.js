@@ -1,7 +1,7 @@
-import { EmbaddedCategory } from '../embadded/category.js'
-import { ShippingMethodEntity } from './shipping_method.js'
-import { GoogleSheetsColumn, PixelStatusRule, StoreEntity } from './store.js'
-import { CategoryEntity } from './category.js'
+import { type EmbaddedCategory } from '../embadded/category.js'
+import { type ShippingMethodEntity } from './shipping_method.js'
+import { type GoogleSheetsColumn, type PixelStatusRule, type StoreEntity } from './store.js'
+import { type CategoryEntity } from './category.js'
 
 export interface ProductEntity {
   id: string
