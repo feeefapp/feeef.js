@@ -340,108 +340,47 @@ export const generatePublicStoreIntegrationWebhooks = (
     webhookUrls: activeWebhooks.map((webhook) => webhook.url),
   }
 }
-function toPublicSecurityOption(
-  raw: SecurityOption | null | undefined
-): PublicSecurityOption | undefined {
-  if (
-    !raw ||
-    typeof raw.active !== 'boolean' ||
-    raw.treatment === undefined ||
-    raw.treatment === null
-  ) {
-    return undefined
-  }
-  return {
-    active: raw.active,
-    ttl: typeof raw.ttl === 'number' && !Number.isNaN(raw.ttl) ? raw.ttl : 0,
-    treatment: raw.treatment,
-  }
-}
+const DUPLICATE_WINDOW_DEFAULT_S = 3600
+const COOLDOWN_DEFAULT_MS = 3_000
+/** The client lock is UX only; never publish the server cooldown itself. */
+const COOLDOWN_MAX_MS = 60_000
 
-function toPublicMinTimeInPage(
-  raw: SecurityMinTimeOption | null | undefined
-): PublicSecurityMinTimeOption | undefined {
-  if (
-    !raw ||
-    typeof raw.active !== 'boolean' ||
-    raw.treatment === undefined ||
-    raw.treatment === null
-  ) {
-    return undefined
-  }
-  return {
-    active: raw.active,
-    duration: typeof raw.duration === 'number' && !Number.isNaN(raw.duration) ? raw.duration : 0,
-    treatment: raw.treatment,
-  }
-}
-
-function toPublicCountries(
-  raw: SecurityCountriesOption | null | undefined
-): PublicSecurityCountriesOption | undefined {
-  if (
-    !raw ||
-    typeof raw.active !== 'boolean' ||
-    raw.treatment === undefined ||
-    raw.treatment === null
-  ) {
-    return undefined
-  }
-  return {
-    active: raw.active,
-    treatment: raw.treatment,
-    allowed: raw.allowed ?? null,
-    blocked: Array.isArray(raw.blocked) ? [...raw.blocked] : [],
-  }
-}
-
-function toPublicSources(
-  raw: SecuritySourcesOption | null | undefined
-): PublicSecuritySourcesOption | undefined {
-  if (
-    !raw ||
-    typeof raw.active !== 'boolean' ||
-    raw.treatment === undefined ||
-    raw.treatment === null
-  ) {
-    return undefined
-  }
-  return {
-    active: raw.active,
-    treatment: raw.treatment,
-    allowed: raw.allowed ?? null,
-    blocked: Array.isArray(raw.blocked) ? [...raw.blocked] : [],
-  }
-}
+const positiveSeconds = (v: unknown): number =>
+  typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0
 
 /**
- * Generates public security integration data from private integration data.
- * Exposes storefront-safe rules: frontend, doubleSend, minTimeInPage, countries, sources.
- * Fingerprint, ip, phone, and ads stay server-only.
+ * Generates the public (storefront) security knobs from the private config.
+ *
+ * Only numbers the browser needs to run its own cheap checks; no rule names,
+ * no outcomes, no lists. Everything else (countries, sources, fingerprint,
+ * ip, phone, ads, and what happens when a check trips) stays on the API,
+ * which enforces it on `POST /orders/send`. Null when security is off.
  */
 export const generatePublicStoreIntegrationSecurity = (
   security: SecurityIntegration | null | undefined
-): PublicSecurityIntegration | null | undefined => {
-  if (!security) return null
+): PublicSecurityIntegration | null => {
+  if (!security || security.active !== true) return null
 
   const opts = security.options
-  const frontend = toPublicSecurityOption(opts?.frontend)
-  const doubleSend = toPublicSecurityOption(opts?.doubleSend)
-  const minTimeInPage = toPublicMinTimeInPage(opts?.minTimeInPage)
-  const countries = toPublicCountries(opts?.countries)
-  const sources = toPublicSources(opts?.sources)
-
-  const options: PublicSecurityOptions = {
-    ...(frontend ? { frontend } : {}),
-    ...(doubleSend ? { doubleSend } : {}),
-    ...(minTimeInPage ? { minTimeInPage } : {}),
-    ...(countries ? { countries } : {}),
-    ...(sources ? { sources } : {}),
-  }
+  const minTime = opts?.minTimeInPage
+  const frontend = opts?.frontend
+  const doubleSend = opts?.doubleSend
 
   return {
-    active: security.active,
-    options,
+    minTimeMs: minTime?.active === true ? Math.round(positiveSeconds(minTime.duration) * 1000) : 0,
+    duplicateWindowMs:
+      frontend?.active === true
+        ? Math.round((positiveSeconds(frontend.ttl) || DUPLICATE_WINDOW_DEFAULT_S) * 1000)
+        : 0,
+    submitCooldownMs:
+      doubleSend?.active === true
+        ? Math.min(
+            positiveSeconds(doubleSend.ttl)
+              ? Math.round(positiveSeconds(doubleSend.ttl) * 1000)
+              : COOLDOWN_DEFAULT_MS,
+            COOLDOWN_MAX_MS
+          )
+        : 0,
   }
 }
 
@@ -1316,13 +1255,6 @@ export interface SecuritySourcesOption {
   blocked: string[]
 }
 
-/** Storefront-safe min-time rule (same shape as private; no secrets). */
-export type PublicSecurityMinTimeOption = SecurityMinTimeOption
-/** Storefront-safe country allow/block lists (policy only). */
-export type PublicSecurityCountriesOption = SecurityCountriesOption
-/** Storefront-safe traffic-source allow/block lists (policy only). */
-export type PublicSecuritySourcesOption = SecuritySourcesOption
-
 // All security options (private). Keys match API / Vine: each block is optional.nullable.
 export interface SecurityOptions {
   fingerprint?: SecurityOption | null
@@ -1344,27 +1276,17 @@ export interface SecurityIntegration {
   metadata?: Record<string, any>
 }
 
-// Public security option - only active, ttl, treatment (ttl normalized for clients)
-export interface PublicSecurityOption {
-  active: boolean
-  ttl: number
-  treatment: SecurityTreatment
-}
-
-// Public security options for storefronts (client-enforceable / policy visibility).
-// Fingerprint, ip, phone, and ads remain server-only.
-export interface PublicSecurityOptions {
-  frontend?: PublicSecurityOption
-  doubleSend?: PublicSecurityOption
-  minTimeInPage?: PublicSecurityMinTimeOption
-  countries?: PublicSecurityCountriesOption
-  sources?: PublicSecuritySourcesOption
-}
-
-// Public security integration (storefront)
+/**
+ * Public security knobs (storefront). Numbers only, in milliseconds; 0 means
+ * the check is off (for `minTimeMs`: the storefront default applies).
+ */
 export interface PublicSecurityIntegration {
-  active: boolean
-  options: PublicSecurityOptions
+  /** Minimum time the order form is open before a pending submit. */
+  minTimeMs: number
+  /** How long a repeat of the same order from one browser is held back. */
+  duplicateWindowMs: number
+  /** How long the browser keeps its in-flight submit lock after a success. */
+  submitCooldownMs: number
 }
 
 /**

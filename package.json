@@ -1,7 +1,7 @@
 {
   "name": "feeef",
   "description": "feeef sdk for javascript",
-  "version": "0.12.13",
+  "version": "0.13.0",
   "main": "build/index.js",
   "type": "module",
   "files": [
@@ -24,7 +24,8 @@
     "publish:npm": "bash ./scripts/publish.sh",
     "version": "npm run build",
     "prepublishOnly": "npm run build",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:public-docs",
+    "lint:public-docs": "node scripts/check-public-docs.mjs --self-test && node scripts/check-public-docs.mjs",
     "format": "prettier --write ."
   },
   "devDependencies": {
