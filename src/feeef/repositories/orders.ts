@@ -11,6 +11,8 @@ import {
   type OrderUpdateInput,
   type OrderPricing,
   type CalculateOrderPricingOptions,
+  type ShippingQuote,
+  type ShippingQuoteOptions,
 } from '../../core/entities/order.js'
 
 /**
@@ -245,6 +247,7 @@ export class OrderRepository extends ModelRepository<
         discount: item.discount,
       })),
       shippingState: options.shippingState,
+      shippingCity: options.shippingCity || undefined,
       shippingCountry: options.shippingCountry,
       shippingType: options.shippingType,
       shippingAddress: options.shippingAddress,
@@ -254,6 +257,34 @@ export class OrderRepository extends ModelRepository<
       subtotal: res.data.pricing.subtotal,
       shippingPrice: res.data.pricing.shippingPrice,
       calculatedTotal: res.data.pricing.calculatedTotal,
+    }
+  }
+
+  /**
+   * Quotes the shipping fee the backend will charge for `items` delivered to
+   * `shippingState` / `shippingCity` (Cloud Parcel fees: product fee ref, then
+   * store fee ref, then the cheapest connected account). Public; no auth.
+   *
+   * Uses `POST /orders/calculate`. A missing or non-finite price is `null`.
+   */
+  async quoteShipping(options: ShippingQuoteOptions): Promise<ShippingQuote> {
+    if (!options.storeId || !options.shippingState || !options.items?.length) {
+      return { shippingPrice: null }
+    }
+    const pricing = await this.calculate({
+      storeId: options.storeId,
+      items: options.items,
+      shippingState: options.shippingState,
+      shippingCity: options.shippingCity,
+      shippingCountry: options.shippingCountry,
+      shippingType: options.shippingType,
+    })
+    const price = pricing.shippingPrice
+    return {
+      shippingPrice:
+        price !== null && price !== undefined && Number.isFinite(Number(price)) && Number(price) >= 0
+          ? Number(price)
+          : null,
     }
   }
 

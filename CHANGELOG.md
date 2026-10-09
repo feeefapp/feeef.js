@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `ff.orders.quoteShipping({ storeId, items, shippingState, shippingCity?, shippingType? })`
+  returns `{ shippingPrice: number | null }`, the fee `POST /orders/calculate`
+  will charge (Cloud Parcel fees included). `calculate` now forwards
+  `shippingCity` (commune) too. New types `ShippingQuoteOptions`, `ShippingQuote`.
 - Public Meta, TikTok and Snap pixel entries (`generatePublicStoreIntegrations`)
   now carry `capi: boolean`: whether the pixel has a Conversions API key /
   access token (the value itself is never exposed). The storefront uses it to
