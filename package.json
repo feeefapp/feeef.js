@@ -24,7 +24,8 @@
     "publish:npm": "bash ./scripts/publish.sh",
     "version": "npm run build",
     "prepublishOnly": "npm run build",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:public-docs",
+    "lint:public-docs": "node scripts/check-public-docs.mjs --self-test && node scripts/check-public-docs.mjs",
     "format": "prettier --write ."
   },
   "devDependencies": {
