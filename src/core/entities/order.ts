@@ -292,7 +292,35 @@ export interface CalculateOrderPricingOptions {
   storeId: string
   items: OrderItemInput[]
   shippingState?: string
+  /** Commune / city name; lets Cloud fees match a commune row before the wilaya row. */
+  shippingCity?: string
   shippingCountry?: string
   shippingType?: ShippingType
   shippingAddress?: string
+}
+
+/**
+ * Options for {@link OrderRepository.quoteShipping}: the shipping part of
+ * `POST /orders/calculate` (the fee the backend will charge for these items).
+ */
+export interface ShippingQuoteOptions {
+  storeId: string
+  /** Items that share one shipping fee ref (product/store `shippingFeeId`). */
+  items: OrderItemInput[]
+  /** Wilaya / state code, e.g. "16". */
+  shippingState: string
+  /** Commune name; optional (falls back to the wilaya fee). */
+  shippingCity?: string
+  /** ISO country, defaults to the store country on the backend. */
+  shippingCountry?: string
+  shippingType?: ShippingType
+}
+
+/** Result of {@link OrderRepository.quoteShipping}. */
+export interface ShippingQuote {
+  /**
+   * The fee, or null when the backend has no price for this destination
+   * (no Cloud coverage, parcels disabled). 0 means free shipping.
+   */
+  shippingPrice: number | null
 }
