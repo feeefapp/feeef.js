@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Security (breaking)**: `generatePublicStoreIntegrationSecurity` now returns only numeric knobs, `{ minTimeMs, duplicateWindowMs, submitCooldownMs }` (milliseconds, 0 = off), or `null` when security is off. Rule names and outcomes are no longer published. `PublicSecurityOption`, `PublicSecurityOptions` and `PublicSecurityMinTimeOption` are removed.
+
+### Removed
+
+- **Orders**: the order classification helpers `isFakeOrderId`, `isFakeOrder`, `isWarningOrder` and `shouldSuppressPixelEvents`. Storefronts decide on order events from their own submit result.
+
 - **Delivery / `ParcelCreate`**: breaking rename — `codAmount` → `total`, `productsSummary` → `summary`, `parcelType` → `type`; added `pickupId`, `freeShipping`; `shippingType` typed as platform `ShippingType`. HTTP bridge still accepts legacy keys (`codAmount`, `productsSummary`, `parcelType`, `centerId`) server-side via `normalizeLegacyParcelCreatePatch`.
 
 ## [0.12.12] - 2026-08-14
