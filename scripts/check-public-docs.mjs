@@ -35,6 +35,12 @@ export const RULES = [
     id: "direct-post-wording",
     re: /\bboth (paths )?are allowed\b|\bthe future path\b|\bdirect (browser )?POST\b[^.|]*\b(is|are) allowed\b|\benforces anti-fraud\b[^.|]*\bevery path\b/i,
   },
+  // Review 7 D1: pixels, cart clear and redirect behave the same on every
+  // success; they are never gated on shouldSuppressOrderPixelEvents.
+  {
+    id: "pixel-suppression",
+    re: /\bshouldSuppressOrderPixelEvents\b[^.|]*\b(is|===?|!==?|returns?)\s*(false|true)\b|\b(fire|send|track|clear|redirect)\w*\b[^.|]*\b(when|if|unless)\b[^.|]*\bshouldSuppressOrderPixelEvents\b|\bif\s*\(\s*!?\s*shouldSuppressOrderPixelEvents\b/i,
+  },
   {
     id: "threshold",
     re: /formLoadTime\s*<\s*\d|<\s*3000\b|\bmin(imum)?\.?\s+\d+(\.\d+)?\s*(s|sec|secs|seconds?)\b|\b\d+(\.\d+)?\s*(s|sec|seconds?)\s+(dwell|of\s+(mount|page\s+load)|on\s+(the\s+)?(page|form))\b|\bwithin\s+\d+(\.\d+)?\s*(s|sec|seconds?)\s+of\s+(mount|load)|\b(one|two|three|four|five|ten)[\s-]seconds?\s+(wait|dwell|rule|minimum|check)/i,
@@ -81,9 +87,13 @@ function selfTest() {
     "A direct browser POST to the feeef API is allowed; the API enforces anti-fraud and dedupe.",
     "Both are allowed: the proxy or a direct POST (the future path)",
     "The feeef API enforces anti-fraud and dedupe on every path, including a direct browser POST.",
+    "Use submitFeeefOrder (or the native form); fire pixels only when shouldSuppressOrderPixelEvents(order) is false.",
+    "if (!shouldSuppressOrderPixelEvents(order)) fireConversion(order)",
+    "Clear the cart and redirect unless shouldSuppressOrderPixelEvents says otherwise.",
   ];
   const good = [
-    "Use submitFeeefOrder (or the native form); fire pixels only when shouldSuppressOrderPixelEvents(order) is false.",
+    "Use submitFeeefOrder (or the native form); fire pixels, clear the cart and redirect on every success response.",
+    "Do not use `shouldSuppressOrderPixelEvents` for pixels, cart or redirect.",
     "A direct browser POST to the feeef API is coming but not recommended until backend enforcement ships.",
     "Auto-redirect after 5s to /",
   ];
