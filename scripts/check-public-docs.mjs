@@ -29,6 +29,12 @@ export const RULES = [
   { id: "outcome-name", re: /\btreatments?\b/i },
   { id: "rule-name", re: /\bminTimeInPage\b|\bdoubleSend\b|\boptions\.(frontend|ads|doubleSend|minTimeInPage)\b/ },
   { id: "decoy-wording", re: /\bfake[\s-]+(success|order[\s-]?ids?|ids?)\b|\bsynthetic\s+(order\s+)?ids?\b/i },
+  // Review #5: submitFeeefOrder is the supported path; a direct browser POST
+  // to the feeef API is not recommended until backend enforcement ships.
+  {
+    id: "direct-post-wording",
+    re: /\bboth (paths )?are allowed\b|\bthe future path\b|\bdirect (browser )?POST\b[^.|]*\b(is|are) allowed\b|\benforces anti-fraud\b[^.|]*\bevery path\b/i,
+  },
   {
     id: "threshold",
     re: /formLoadTime\s*<\s*\d|<\s*3000\b|\bmin(imum)?\.?\s+\d+(\.\d+)?\s*(s|sec|secs|seconds?)\b|\b\d+(\.\d+)?\s*(s|sec|seconds?)\s+(dwell|of\s+(mount|page\s+load)|on\s+(the\s+)?(page|form))\b|\bwithin\s+\d+(\.\d+)?\s*(s|sec|seconds?)\s+of\s+(mount|load)|\b(one|two|three|four|five|ten)[\s-]seconds?\s+(wait|dwell|rule|minimum|check)/i,
@@ -72,10 +78,13 @@ function selfTest() {
     "a submit within 3 seconds of mount",
     "Never fire for synthetic ids",
     "keeps the honeypot, the three-second wait",
+    "A direct browser POST to the feeef API is allowed; the API enforces anti-fraud and dedupe.",
+    "Both are allowed: the proxy or a direct POST (the future path)",
+    "The feeef API enforces anti-fraud and dedupe on every path, including a direct browser POST.",
   ];
   const good = [
     "Use submitFeeefOrder (or the native form); fire pixels only when shouldSuppressOrderPixelEvents(order) is false.",
-    "A direct browser POST to the feeef API is allowed; the API enforces anti-fraud and dedupe.",
+    "A direct browser POST to the feeef API is coming but not recommended until backend enforcement ships.",
     "Auto-redirect after 5s to /",
   ];
   let ok = true;
