@@ -7,19 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-09
+
+### BREAKING CHANGES
+
+- **Public store security config** (`generatePublicStoreIntegrationSecurity`, the `security` block in the public store payload) is now numeric knobs only:
+
+  ```ts
+  { minTimeMs: number; duplicateWindowMs: number; submitCooldownMs: number } | null
+  ```
+
+  Values are milliseconds (0 = off); `null` when security is off. Rule names and outcomes are no longer published.
+- **Removed exports**:
+  - order helpers `isFakeOrderId`, `isFakeOrder`, `isWarningOrder` and `shouldSuppressPixelEvents`;
+  - the old public option types `PublicSecurityOption`, `PublicSecurityOptions` and `PublicSecurityMinTimeOption`.
+
+#### Migration
+
+- Read `minTimeMs`, `duplicateWindowMs` and `submitCooldownMs` from the public security config instead of the old per-rule options, and handle `null`.
+- Drop calls to the removed order helpers. Submit orders through the storefront (`submitFeeefOrder`) and decide on browser order events from your own submit result; nothing in an order's `id` or body classifies it.
+
 ### Added
 
 - **Delivery**: exported canonical `ParcelCreate` / `ParcelUpdate` / related types (`src/delivery/parcel.ts`) and `DeliveryCarrierClient` (`src/delivery/delivery_carrier_client.ts`), aligned with the Feeef API parcel domain.
 
 ### Changed
 
-- **Security (breaking)**: `generatePublicStoreIntegrationSecurity` now returns only numeric knobs, `{ minTimeMs, duplicateWindowMs, submitCooldownMs }` (milliseconds, 0 = off), or `null` when security is off. Rule names and outcomes are no longer published. `PublicSecurityOption`, `PublicSecurityOptions` and `PublicSecurityMinTimeOption` are removed.
-
-### Removed
-
-- **Orders**: the order classification helpers `isFakeOrderId`, `isFakeOrder`, `isWarningOrder` and `shouldSuppressPixelEvents`. Storefronts decide on order events from their own submit result.
-
-- **Delivery / `ParcelCreate`**: breaking rename — `codAmount` → `total`, `productsSummary` → `summary`, `parcelType` → `type`; added `pickupId`, `freeShipping`; `shippingType` typed as platform `ShippingType`. HTTP bridge still accepts legacy keys (`codAmount`, `productsSummary`, `parcelType`, `centerId`) server-side via `normalizeLegacyParcelCreatePatch`.
+- **Delivery / `ParcelCreate`** (breaking): rename — `codAmount` → `total`, `productsSummary` → `summary`, `parcelType` → `type`; added `pickupId`, `freeShipping`; `shippingType` typed as platform `ShippingType`. HTTP bridge still accepts legacy keys (`codAmount`, `productsSummary`, `parcelType`, `centerId`) server-side via `normalizeLegacyParcelCreatePatch`.
 
 ## [0.12.12] - 2026-08-14
 
