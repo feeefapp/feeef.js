@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Public Meta, TikTok and Snap pixel entries (`generatePublicStoreIntegrations`)
+  now carry `capi: boolean`: whether the pixel has a Conversions API key /
+  access token (the value itself is never exposed). The storefront uses it to
+  send Purchase/Lead from the browser only for platforms the server cannot
+  cover (mode `client`, or a pixel without a key). New type
+  `PublicPixelEntry`. Additive; the backend must depend on this version to
+  emit the flag (and its own Snap override in `Store.publicIntegrations` must
+  add it too).
+
 ## [0.13.0] - 2026-10-09
 
 ### BREAKING CHANGES

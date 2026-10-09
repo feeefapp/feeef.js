@@ -198,6 +198,12 @@ export const generatePublicStoreIntegrationCustomFields = (
   }
 }
 /**
+ * True when a CAPI key / access token is set (same test as the backend's
+ * hasPixelKey / hasPixelAccessToken). Never exposes the value.
+ */
+const hasSecret = (v: string | null | undefined): boolean => !!(v && String(v).trim().length > 0)
+
+/**
  * Generates public Meta Pixel integration data from private integration data.
  * Only exposes non-sensitive information (pixel IDs, active status, objectives).
  * Sensitive data like oauth2 tokens, pixel API keys, and metadata are NOT exposed.
@@ -206,10 +212,13 @@ export const generatePublicStoreIntegrationMetaPixel = (
   metaPixel: MetaPixelIntegration | null | undefined
 ): PublicMetaPixelIntegration | null | undefined => {
   if (!metaPixel) return null
-  // NOTE: oauth2, pixel.key, and metadata are intentionally excluded for security
+  // NOTE: oauth2, pixel.key, and metadata are intentionally excluded for security.
+  // `capi` only says whether a key is set (never the key), so the storefront
+  // knows whether the server can send this pixel's order conversions.
   return {
     pixels: (metaPixel.pixels || []).map((pixel) => ({
       id: pixel.id,
+      capi: hasSecret(pixel.key),
     })),
     active: metaPixel.active,
     objective: metaPixel.objective,
@@ -224,6 +233,7 @@ export const generatePublicStoreIntegrationTiktokPixel = (
   return {
     pixels: (tiktokPixel.pixels || []).map((pixel) => ({
       id: pixel.id,
+      capi: hasSecret(pixel.accessToken),
     })),
     active: tiktokPixel.active,
     objective: tiktokPixel.objective,
@@ -242,6 +252,7 @@ export const generatePublicStoreIntegrationSnapchatPixel = (
   return {
     pixels: (snapchatPixel.pixels || []).map((pixel) => ({
       id: pixel.id,
+      capi: hasSecret(pixel.accessToken),
     })),
     active: snapchatPixel.active,
     objective: snapchatPixel.objective,
@@ -430,22 +441,32 @@ export interface PublicWebhooksIntegration {
   webhookUrls: string[]
 }
 
+/**
+ * A public pixel entry. `capi` is true when the pixel has a Conversions API
+ * key/token, i.e. the server can send its order conversions (unless the mode
+ * is `client`). The storefront sends the conversion from the browser for
+ * pixels where it is false or missing.
+ */
+export interface PublicPixelEntry {
+  id: string
+  capi?: boolean
+}
 export interface PublicMetaPixelIntegration {
-  pixels: { id: string }[]
+  pixels: PublicPixelEntry[]
   active: boolean
   objective?: MetaPixelEvent | null
   draftObjective?: MetaPixelEvent | null
   mode?: PixelReportMode | null
 }
 export interface PublicTiktokPixelIntegration {
-  pixels: { id: string }[]
+  pixels: PublicPixelEntry[]
   active: boolean
   objective?: TiktokPixelEvent | null
   draftObjective?: TiktokPixelEvent | null
   mode?: PixelReportMode | null
 }
 export interface PublicSnapchatPixelIntegration {
-  pixels: { id: string }[]
+  pixels: PublicPixelEntry[]
   active: boolean
   objective?: SnapchatPixelEvent | null
   draftObjective?: SnapchatPixelEvent | null
