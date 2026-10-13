@@ -354,15 +354,15 @@ export function generatePublicIntegrationsDataPaymentMethod(
 }
 
 export interface ProductAddon {
-  photoUrl?: string
+  photoUrl?: string | null
   title: string
-  subtitle?: string
+  subtitle?: string | null
   /** Inventory bucket SKU (scoped under product root when inventory is enabled). */
   sku?: string | null
-  stock?: number
-  price?: number
-  min?: number
-  max?: number
+  stock?: number | null
+  price?: number | null
+  min?: number | null
+  max?: number | null
 }
 
 export enum ProductStatus {
@@ -420,14 +420,14 @@ export enum ProductType {
 export interface ProductOffer {
   code: string
   title: string
-  subtitle?: string
+  subtitle?: string | null
   /** Unit price override; API may emit `null` when unset. */
   price?: number | null
   /** Minimum qty for this offer; API may emit `null` when unset. */
   minQuantity?: number | null
   /** Maximum qty for this offer; API may emit `null` when unset. */
   maxQuantity?: number | null
-  freeShipping?: boolean
+  freeShipping?: boolean | null
 }
 
 /**

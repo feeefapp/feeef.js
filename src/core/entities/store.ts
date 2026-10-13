@@ -1236,7 +1236,7 @@ export interface FeeefDeliveryIntegration {
   /** Prefer Feeef-branded PDF labels (default true). */
   useFeeefLabel?: boolean | null
   webhookSecret?: string | null
-  metadata?: Record<string, any>
+  metadata?: Record<string, any> | null
 }
 
 // Security Treatment enum

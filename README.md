@@ -341,3 +341,11 @@ catalog. SDK paid calls make no automatic retries. Streams can return SSE or a
 remain decimal strings (`chargeDzd`, `chargedMicros`). New Cloud AI billing has
 no Feeef wallet reserve and permits negative balances after verified usage.
 Never put permanent Cloud/provider credentials in a browser or app SDK.
+
+## AI action workflows
+
+Legacy AI actions now run through Feeef Cloud and require a persisted workflow key.
+Use `await ff.withAiWorkflow(savedKey, scoped => scoped.actions.generateSimpleCode(options))`.
+Keep the original key and input on connection failures or pending outcomes. The server
+recovers each paid step and settles verified usage once; the SDK does not retry paid calls.
+Native AI operations remain available through `ff.ai` with caller-owned keys.

@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.1] - 2026-10-13
+
+- Added `ff.withAiWorkflow(key, action)` for legacy AI actions. Persist the key before calling; replays recover the same Cloud jobs and charges without mutating shared request headers.
+- Aligned nullable product options and delivery metadata with API payloads; tracking conversion now accepts only the fields it reads.
+
 ## [Unreleased]
 
 ### Added

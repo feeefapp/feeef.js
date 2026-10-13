@@ -173,7 +173,12 @@ interface OrderMetadata {
 
 // utils
 // order entity to order track entity
-export const convertOrderEntityToOrderTrackEntity = (order: OrderEntity): OrderTrackEntity => {
+export const convertOrderEntityToOrderTrackEntity = (
+  order: Pick<
+    OrderEntity,
+    'id' | 'customerName' | 'items' | 'total' | 'createdAt' | 'storeId' | 'status' | 'metadata'
+  >
+): OrderTrackEntity => {
   return {
     id: order.id,
     customerName: order.customerName,

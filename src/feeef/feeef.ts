@@ -321,6 +321,17 @@ export class FeeeF {
    * @param {string} key - The header key.
    * @param {string} value - The header value.
    */
+  /** Invoke legacy AI actions with a caller-persisted key, without mutating shared headers. */
+  async withAiWorkflow<T>(key: string, action: (scoped: FeeeF) => Promise<T>): Promise<T> {
+    if (!/^[\x21-\x7e]{1,200}$/.test(key))
+      throw new Error('Persist an AI workflow key before sending')
+    const client = axios.create({
+      ...this.client.defaults,
+      headers: { ...this.client.defaults.headers.common, 'Idempotency-Key': key },
+    })
+    return action(new FeeeF({ apiKey: this.apiKey, baseURL: this.client.defaults.baseURL, client }))
+  }
+
   setHeader(key: string, value: string) {
     this.client.defaults.headers.common[key] = value
   }
