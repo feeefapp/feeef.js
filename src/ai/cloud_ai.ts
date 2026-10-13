@@ -90,8 +90,8 @@ export function validateCloudImageSettings(model: CloudAiModel, settings: CloudI
         field === 'size' && typeof value === 'string' ? /^([1-9]\d*)x([1-9]\d*)$/.exec(value) : null
       const d = caps.customDimensions
       if (match && d) {
-        const w = Number(match[1]),
-          h = Number(match[2])
+        const w = Number(match[1])
+        const h = Number(match[2])
         if (
           !(w % d.multipleOf) &&
           !(h % d.multipleOf) &&
@@ -140,11 +140,10 @@ export class CloudAiApi {
     return response.data
   }
   async requests(idempotencyKey?: string): Promise<CloudAiRequest[]> {
-    return (
-      await this.client.get('/ai/requests', {
-        params: idempotencyKey ? { key: idempotencyKey } : {},
-      })
-    ).data.data
+    const response = await this.client.get('/ai/requests', {
+      params: idempotencyKey ? { key: idempotencyKey } : {},
+    })
+    return response.data.data
   }
   async submitFile(input: {
     endpoint: string
@@ -161,11 +160,10 @@ export class CloudAiApi {
     form.set('body', JSON.stringify(input.body))
     form.set('files', input.file, input.filename)
     if (input.storeId) form.set('storeId', input.storeId)
-    return (
-      await this.client.post('/ai/requests', form, {
-        headers: { 'Idempotency-Key': input.idempotencyKey },
-      })
-    ).data
+    const response = await this.client.post('/ai/requests', form, {
+      headers: { 'Idempotency-Key': input.idempotencyKey },
+    })
+    return response.data
   }
   async stream(input: {
     endpoint: string
@@ -210,14 +208,14 @@ export class CloudAiApi {
     })
   }
   async content(id: string): Promise<ArrayBuffer> {
-    return (
-      await this.client.get(`/ai/requests/${encodeURIComponent(id)}/content`, {
-        responseType: 'arraybuffer',
-      })
-    ).data
+    const response = await this.client.get(`/ai/requests/${encodeURIComponent(id)}/content`, {
+      responseType: 'arraybuffer',
+    })
+    return response.data
   }
   async request(id: string): Promise<CloudAiRequest> {
-    return (await this.client.get(`/ai/requests/${encodeURIComponent(id)}`)).data
+    const response = await this.client.get(`/ai/requests/${encodeURIComponent(id)}`)
+    return response.data
   }
   async generateImage(input: {
     model: CloudAiModel
@@ -226,12 +224,21 @@ export class CloudAiApi {
     idempotencyKey: string
     id?: string
     storeId?: string
+    recoverOriginal?: boolean
     image?: Blob
     mask?: Blob
     attachments?: { type: string; value: string; label?: string; prompt?: string }[]
   }): Promise<Record<string, unknown>> {
     this.validateKey(input.idempotencyKey)
-    validateCloudImageSettings(input.model, input.settings)
+    validateCloudImageSettings(
+      input.recoverOriginal
+        ? {
+            ...input.model,
+            pricing: { ...input.model.pricing, valid_until: '9999-01-01T00:00:00Z' },
+          }
+        : input.model,
+      input.settings
+    )
     const refs = input.attachments?.filter((a) => a.type === 'image').length ?? 0
     const caps = input.model.feeef_image!
     if (
@@ -240,6 +247,8 @@ export class CloudAiApi {
       (input.mask && !caps.references?.masks)
     )
       throw Error('References exceed model capabilities')
+    if (input.mask && (input.mask.type !== 'image/png' || (!input.image && !refs)))
+      throw Error('A PNG mask requires a reference image')
     const form = new FormData()
     form.set('model', input.model.id)
     form.set('prompt', input.prompt)
@@ -263,10 +272,9 @@ export class CloudAiApi {
             : 'reference.webp'
       )
     }
-    return (
-      await this.client.post('/ai/images', form, {
-        headers: { 'Idempotency-Key': input.idempotencyKey },
-      })
-    ).data
+    const response = await this.client.post('/ai/images', form, {
+      headers: { 'Idempotency-Key': input.idempotencyKey },
+    })
+    return response.data
   }
 }

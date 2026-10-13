@@ -38,7 +38,7 @@ export const MEMBER_SCOPES = [
 export type MemberScope = (typeof MEMBER_SCOPES)[number]
 
 /** Scopes for developer tooling / delegation (not store-specific RBAC). */
-export const OAUTH_PLATFORM_SCOPES = ['auth', 'apps'] as const
+export const OAUTH_PLATFORM_SCOPES = ['auth', 'apps', 'ai.read', 'ai.generate'] as const
 
 /**
  * Identity-only grant when an app is registered without scopes.

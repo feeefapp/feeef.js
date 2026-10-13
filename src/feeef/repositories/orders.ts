@@ -282,7 +282,10 @@ export class OrderRepository extends ModelRepository<
     const price = pricing.shippingPrice
     return {
       shippingPrice:
-        price !== null && price !== undefined && Number.isFinite(Number(price)) && Number(price) >= 0
+        price !== null &&
+        price !== undefined &&
+        Number.isFinite(Number(price)) &&
+        Number(price) >= 0
           ? Number(price)
           : null,
     }

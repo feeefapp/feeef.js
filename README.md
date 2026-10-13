@@ -311,3 +311,33 @@ const authorizeUrl = OAuthRepository.buildAuthorizeUrl({
 - Keep `client_secret` server-side only.
 - Always validate `state` on callback.
 - Prefer PKCE (`code_challenge`, `code_verifier`) for public clients.
+
+## Feeef Cloud AI (SDK 0.14.0)
+
+`feeef.ai` uses the authenticated Feeef account and server-owned Cloud workspace.
+Use `models()` to discover provider/model route IDs and capabilities, `submit()`
+for native durable requests, `submitFile()` for audio/video uploads, `stream()`
+for SSE, and `prepareLiveSession()` for an ephemeral transcription ticket.
+`generateImage()` validates only settings advertised by the selected model.
+
+```ts
+const models = await feeef.ai.models()
+const model = models.find(m => m.feeef_image && Date.parse(m.pricing.valid_until) > Date.now())!
+// Persist the immutable input and key before sending a paid request.
+const job = await feeef.ai.submit({
+  endpoint: 'images/generations',
+  body: { model: model.id, prompt: 'A clean product photograph' },
+  idempotencyKey: 'your-persisted-request-key',
+})
+const receipt = await feeef.ai.request(job.id)
+```
+
+Do not infer settings from model names, swap provider routes on retry, or create
+replacement keys after a timeout. Recover via `requests(originalKey)` or replay
+the original input/key. `recoverOriginal` on image requests permits expired local
+metadata only for recovery; new requests are validated by the server's current
+catalog. SDK paid calls make no automatic retries. Streams can return SSE or a
+202 JSON job on recovery; inspect the status/content type. Settlement amounts
+remain decimal strings (`chargeDzd`, `chargedMicros`). New Cloud AI billing has
+no Feeef wallet reserve and permits negative balances after verified usage.
+Never put permanent Cloud/provider credentials in a browser or app SDK.

@@ -61,9 +61,15 @@ test.group('OrderRepository.quoteShipping', () => {
   test('no wilaya, store or items: no request, null price', async ({ assert }) => {
     const { client, calls } = fakeClient(500)
     const repo = new OrderRepository(client)
-    assert.deepEqual(await repo.quoteShipping({ storeId: 's1', items, shippingState: '' }), { shippingPrice: null })
-    assert.deepEqual(await repo.quoteShipping({ storeId: '', items, shippingState: '16' }), { shippingPrice: null })
-    assert.deepEqual(await repo.quoteShipping({ storeId: 's1', items: [], shippingState: '16' }), { shippingPrice: null })
+    assert.deepEqual(await repo.quoteShipping({ storeId: 's1', items, shippingState: '' }), {
+      shippingPrice: null,
+    })
+    assert.deepEqual(await repo.quoteShipping({ storeId: '', items, shippingState: '16' }), {
+      shippingPrice: null,
+    })
+    assert.deepEqual(await repo.quoteShipping({ storeId: 's1', items: [], shippingState: '16' }), {
+      shippingPrice: null,
+    })
     assert.lengthOf(calls, 0)
   })
 
