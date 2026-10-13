@@ -131,3 +131,5 @@ export * from './utils.js'
 
 // Re-export StoreIntegrations for convenience
 export type { StoreIntegrations } from './core/entities/store.js'
+
+export * from './ai/cloud_ai.js'

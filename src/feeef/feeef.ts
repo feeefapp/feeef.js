@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance } from 'axios'
+import { CloudAiApi } from '../ai/cloud_ai.js'
 // Repositories
 import { OrderRepository } from './repositories/orders.js'
 import { OrdersV1Repository } from './repositories/orders_v1.js'
@@ -108,6 +109,8 @@ export class FeeeF {
    * The repository for managing async image generations.
    */
   imageGenerations: ImageGenerationsRepository
+
+  ai: CloudAiApi
 
   /**
    * Brandstudio projects (`/brandStudios`) — visual identity boards + assets.
@@ -280,6 +283,7 @@ export class FeeeF {
     this.productLandingPageTemplates = new ProductLandingPageTemplatesRepository(this.client)
     this.imagePromptTemplates = new ImagePromptTemplatesRepository(this.client)
     this.imageGenerations = new ImageGenerationsRepository(this.client)
+    this.ai = new CloudAiApi(this.client)
     this.brandStudios = new BrandStudiosRepository(this.client)
     this.postStudios = new PostStudiosRepository(this.client)
     this.uiStudios = new UiStudiosRepository(this.client)
