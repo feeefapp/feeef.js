@@ -214,11 +214,11 @@ export interface MetaPixelData {
   /** When false, ignore product override and use store defaults. */
   enabled?: boolean | null
   // active meta pixel ids
-  ids: string[] | null
+  ids?: string[] | null
   // main objective
-  objective: MetaPixelEvent | null
+  objective?: string | null
   // draft objective
-  draftObjective: MetaPixelEvent | null
+  draftObjective?: string | null
   /**
    * Optional product-level status transition rules (server CAPI).
    * When non-empty on a single-product order, overrides store `statusRules`.
@@ -243,11 +243,11 @@ export interface TiktokPixelData {
   /** When false, ignore product override and use store defaults. */
   enabled?: boolean | null
   // active tiktok pixel ids
-  ids: string[] | null
+  ids?: string[] | null
   // main objective
-  objective: TiktokPixelEvent | null
+  objective?: string | null
   // draft objective
-  draftObjective: TiktokPixelEvent | null
+  draftObjective?: string | null
   /**
    * Optional product-level status transition rules (server Events API).
    * When non-empty on a single-product order, overrides store `statusRules`.
@@ -276,9 +276,9 @@ export enum SnapchatPixelEvent {
 export interface SnapchatPixelData {
   /** When false, ignore product override and use store defaults. */
   enabled?: boolean | null
-  ids: string[] | null
-  objective: SnapchatPixelEvent | null
-  draftObjective: SnapchatPixelEvent | null
+  ids?: string[] | null
+  objective?: string | null
+  draftObjective?: string | null
   /**
    * Optional product-level status transition rules (server CAPI).
    * When non-empty on a single-product order, overrides store `statusRules`.
@@ -291,33 +291,33 @@ export interface GoogleTagData {}
 export interface GoogleSheetsData {
   enabled: boolean
   // use cant use both sheetId and sheetName
-  sheetId: string | null
+  sheetId?: string | null
   // if sheetId is null, use sheetName
   // if sheetName not exists in the spreadsheet, create it
-  sheetName: string | null
-  spreadsheetId: string | null
+  sheetName?: string | null
+  spreadsheetId?: string | null
   // the next row to insert data
-  nextRow: number | null
+  nextRow?: number | null
   // columns to insert data
-  columns: GoogleSheetsColumn<any>[] | null
+  columns?: Partial<GoogleSheetsColumn<any>>[] | null
 }
 
 // public meta pixel data
 export interface PublicMetaPixelData {
-  ids: string[] | null
-  objective: MetaPixelEvent | null
-  draftObjective: MetaPixelEvent | null
+  ids?: string[] | null
+  objective?: string | null
+  draftObjective?: string | null
 }
 // public tiktok pixel data
 export interface PublicTiktokPixelData {
-  ids: string[] | null
-  objective: TiktokPixelEvent | null
-  draftObjective: TiktokPixelEvent | null
+  ids?: string[] | null
+  objective?: string | null
+  draftObjective?: string | null
 }
 export interface PublicSnapchatPixelData {
-  ids: string[] | null
-  objective: SnapchatPixelEvent | null
-  draftObjective: SnapchatPixelEvent | null
+  ids?: string[] | null
+  objective?: string | null
+  draftObjective?: string | null
 }
 // public google analytics data
 export interface PublicGoogleAnalyticsData {}

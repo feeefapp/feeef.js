@@ -858,11 +858,24 @@ export enum PixelStatusDimension {
  */
 export interface PixelStatusRule {
   id: string
-  dimension: PixelStatusDimension
+  dimension: PixelStatusDimension | `${PixelStatusDimension}`
   equals: string
-  metaEvent?: MetaPixelEvent | null
-  tiktokEvent?: TiktokPixelEvent | null
-  snapchatEvent?: SnapchatPixelEvent | null
+  metaEvent?: MetaPixelEvent | `${MetaPixelEvent}` | keyof typeof MetaPixelEvent | null
+  tiktokEvent?: TiktokPixelEvent | `${TiktokPixelEvent}` | keyof typeof TiktokPixelEvent | null
+  snapchatEvent?:
+    | SnapchatPixelEvent
+    | `${SnapchatPixelEvent}`
+    | keyof typeof SnapchatPixelEvent
+    | 'ADD_BILLING'
+    | 'SUBSCRIBE'
+    | 'CUSTOM_EVENT_1'
+    | 'CUSTOM_EVENT_2'
+    | 'CUSTOM_EVENT_3'
+    | 'CUSTOM_EVENT_4'
+    | 'CUSTOM_EVENT_5'
+    | 'addBilling'
+    | 'subscribe'
+    | null
   /** When set, overrides `metaEvent` (Meta CAPI custom event name). */
   metaCustomEvent?: string | null
   tiktokCustomEvent?: string | null

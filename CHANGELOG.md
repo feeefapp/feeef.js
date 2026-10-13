@@ -1,3 +1,7 @@
+# 0.14.2
+
+- Match nullable product integration settings and accepted pixel event wire values to the API validation contract.
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -13,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - `ff.orders.quoteShipping({ storeId, items, shippingState, shippingCity?, shippingType? })`
   returns `{ shippingPrice: number | null }`, the fee `POST /orders/calculate`
   will charge (Cloud Parcel fees included). `calculate` now forwards
@@ -37,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
   Values are milliseconds (0 = off); `null` when security is off. Rule names and outcomes are no longer published.
+
 - **Removed exports**:
   - order helpers `isFakeOrderId`, `isFakeOrder`, `isWarningOrder` and `shouldSuppressPixelEvents`;
   - the old public option types `PublicSecurityOption`, `PublicSecurityOptions` and `PublicSecurityMinTimeOption`.
