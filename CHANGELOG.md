@@ -1,3 +1,7 @@
+# 0.14.3
+
+- Export `customFields` order custom fields contract v2 helpers (`normalizeCustomFields`, `visibleCustomFields`, `validateOrderCustomFields`, `collectPricingAdjustments`, `coerceSubmittedCustomFields`).
+
 # 0.14.2
 
 - Match nullable product integration settings and accepted pixel event wire values to the API validation contract.

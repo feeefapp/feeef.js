@@ -143,7 +143,11 @@ export function isSafeRegex(pattern: string): boolean {
 }
 
 /** Runs a merchant regex against capped input; unsafe patterns are skipped. */
-export function safeRegexTest(pattern: string, value: string, maxInput: number = LIMITS.text): boolean {
+export function safeRegexTest(
+  pattern: string,
+  value: string,
+  maxInput: number = LIMITS.text
+): boolean {
   if (!isSafeRegex(pattern)) return true
   return new RegExp(pattern).test(value.slice(0, maxInput))
 }
@@ -328,11 +332,15 @@ function checkScalar(
       return null
     }
     case 'date':
-      return typeof v === 'string' && (DATE_RE.test(v) || ISO_RE.test(v)) && !Number.isNaN(Date.parse(v))
+      return typeof v === 'string' &&
+        (DATE_RE.test(v) || ISO_RE.test(v)) &&
+        !Number.isNaN(Date.parse(v))
         ? null
         : 'must be a valid date'
     case 'time':
-      return typeof v === 'string' && (TIME_RE.test(v) || ISO_RE.test(v)) ? null : 'must be a valid time'
+      return typeof v === 'string' && (TIME_RE.test(v) || ISO_RE.test(v))
+        ? null
+        : 'must be a valid time'
     case 'datetime':
       return typeof v === 'string' && ISO_RE.test(v) && !Number.isNaN(Date.parse(v))
         ? null
@@ -346,7 +354,8 @@ function checkOne(f: CustomField, v: unknown, opts: ValueCheckOptions): string |
   if (!RANGE_TYPES.has(f.type)) return checkScalar(f, v, opts)
   const base: CustomFieldType =
     f.type === 'timerange' ? 'time' : f.type === 'daterange' ? 'date' : 'datetime'
-  let start: unknown, end: unknown
+  let start: unknown
+  let end: unknown
   if (Array.isArray(v) && v.length === 2) [start, end] = v
   else if (v && typeof v === 'object' && !Array.isArray(v)) {
     start = (v as any).start
@@ -396,7 +405,8 @@ export function validateCustomFieldValues(
       }
       const items = v.filter(isFilled)
       const max = Math.min(f.maxCount ?? LIMITS.defaultMaxCount, LIMITS.count)
-      if (items.length > max) issues.push({ fieldId: f.id, message: `allows at most ${max} values` })
+      if (items.length > max)
+        issues.push({ fieldId: f.id, message: `allows at most ${max} values` })
       else if (f.minCount != null && items.length < f.minCount)
         issues.push({ fieldId: f.id, message: `needs at least ${f.minCount} values` })
       else {
@@ -432,9 +442,7 @@ export function visibleCustomFields(
 ): CustomField[] {
   const list = fields ?? []
   const visible = visibleCustomFieldIds(list, values, productIds)
-  return [...list]
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    .filter((f) => visible.has(f.id))
+  return [...list].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).filter((f) => visible.has(f.id))
 }
 
 /** Accepted `<input accept>` value for an image/file field. */
