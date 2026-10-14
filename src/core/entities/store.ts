@@ -1,3 +1,4 @@
+import type { CustomFieldType, CustomFieldVisibility, FileKind } from '../custom_fields.js'
 import { type EmbaddedAddress } from '../embadded/address.js'
 import { type EmbaddedCategory } from '../embadded/category.js'
 import { type EmbaddedContact } from '../embadded/contact.js'
@@ -179,21 +180,31 @@ export const generatePublicStoreIntegrationCustomFields = (
 ): PublicCustomFieldsIntegration | null | undefined => {
   if (!customFields || !customFields.active) return null
   return {
-    fields: (customFields.fields || []).map((field: any) => ({
-      id: field.id,
-      label: field.label,
-      type: field.type,
-      required: field.required,
-      multiple: field.multiple,
-      minCount: field.minCount,
-      maxCount: field.maxCount,
-      placeholder: field.placeholder,
-      helpText: field.helpText,
-      regexPattern: field.regexPattern,
-      defaultValue: field.defaultValue,
-      order: field.order,
-      active: field.active,
-    })),
+    fields: (customFields.fields || [])
+      .filter((field: any) => field && field.active !== false)
+      .map((field: any) => ({
+        id: field.id,
+        label: field.label,
+        type: field.type,
+        required: field.required,
+        multiple: field.multiple,
+        minCount: field.minCount,
+        maxCount: field.maxCount,
+        placeholder: field.placeholder,
+        helpText: field.helpText,
+        minLength: field.minLength,
+        maxLength: field.maxLength,
+        regexPattern: field.regexPattern,
+        min: field.min,
+        max: field.max,
+        integer: field.integer,
+        options: field.options,
+        accept: field.accept,
+        visibility: field.visibility,
+        defaultValue: field.defaultValue,
+        order: field.order,
+        active: field.active,
+      })),
     active: customFields.active,
   }
 }
@@ -497,17 +508,29 @@ export interface PublicAiIntegration {
   imageModel: string
 }
 
+/**
+ * Public custom field definition — contract v2 (`docs/custom-fields.md`).
+ * Use the `customFields` helpers (`visibleCustomFields`, `validateCustomFieldValues`).
+ */
 export interface PublicCustomField {
   id: string
   label: string
-  type: string
+  type: CustomFieldType | string
   required?: boolean
   multiple?: boolean
-  minCount?: number
-  maxCount?: number
-  placeholder?: string
-  helpText?: string
-  regexPattern?: string
+  minCount?: number | null
+  maxCount?: number | null
+  placeholder?: string | null
+  helpText?: string | null
+  minLength?: number | null
+  maxLength?: number | null
+  regexPattern?: string | null
+  min?: number | null
+  max?: number | null
+  integer?: boolean
+  options?: { value: string; label: string }[] | null
+  accept?: FileKind[] | null
+  visibility?: CustomFieldVisibility | null
   defaultValue?: any
   order?: number
   active?: boolean

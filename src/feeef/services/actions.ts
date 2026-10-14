@@ -74,7 +74,8 @@ export class ActionsService {
     file: File | Blob
     storeId: string
     fieldId: string
-    productId: string
+    /** Product whose override fields apply (omit / 'none' for store fields). */
+    productId?: string
   }): Promise<{
     url: string
     filename: string
@@ -85,7 +86,7 @@ export class ActionsService {
     formData.append('file', file)
     formData.append('storeId', storeId)
     formData.append('fieldId', fieldId)
-    formData.append('productId', productId)
+    if (productId && productId !== 'none') formData.append('productId', productId)
 
     // Debug: log the baseURL and full URL that will be used
     if (

@@ -188,6 +188,11 @@ export interface IntegrationsData {
   paymentMethodData?: PaymentMethodData | null
   /** Merchant-only Ecotrack warehouse stock mapping — never public. */
   ecotrackData?: EcotrackData | null
+  /** Product override of order custom fields (contract v2). */
+  customFieldsData?: {
+    useProductFields?: boolean
+    fields?: import('../custom_fields.js').CustomField[]
+  } | null
 }
 
 /**
