@@ -16,14 +16,14 @@ import {
 } from '../../core/entities/image_generation.js'
 
 /**
- * Repository for Brandstudio projects (`/brandStudios`).
+ * Repository for Brandstudio projects (`/ai/brand-studios`).
  *
  * Generations are created via `ActionsService.generateBrandAsset`.
  */
 export class BrandStudiosRepository {
   client: AxiosInstance
   /** CamelCase resource path matching the Feeef API. */
-  resource = 'brandStudios'
+  resource = 'ai/brand-studios'
 
   constructor(client: AxiosInstance) {
     this.client = client

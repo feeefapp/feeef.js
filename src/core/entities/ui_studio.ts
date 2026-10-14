@@ -1,5 +1,5 @@
 /**
- * Uistudio project entity (`/uiStudios`).
+ * Uistudio project entity (`/ai/ui-studios`).
  */
 
 export type UiStudioStatus = 'draft' | 'ready'

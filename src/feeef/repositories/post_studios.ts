@@ -16,14 +16,14 @@ import {
 } from '../../core/entities/image_generation.js'
 
 /**
- * Repository for Poststudio projects (`/postStudios`).
+ * Repository for Poststudio projects (`/ai/post-studios`).
  *
  * Generations are created via `ActionsService.generatePostAsset`.
  */
 export class PostStudiosRepository {
   client: AxiosInstance
   /** CamelCase resource path matching the Feeef API. */
-  resource = 'postStudios'
+  resource = 'ai/post-studios'
 
   constructor(client: AxiosInstance) {
     this.client = client

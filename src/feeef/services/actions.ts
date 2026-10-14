@@ -154,7 +154,7 @@ export class ActionsService {
   }
 
   /**
-   * Brandstudio asset generation (`POST /actions/generateBrandAsset`).
+   * Brandstudio asset generation (`POST /ai/brand-assets`).
    *
    * `assetKind=identity` → opaque brand-kit board. Other kinds → transparent PNG.
    * Returns both `brandStudioId` and deprecated `identityStudioId` (same value).
@@ -224,7 +224,7 @@ export class ActionsService {
       body.color2 = color2
     }
 
-    const response = await this.client.post('/actions/generateBrandAsset', body)
+    const response = await this.client.post('/ai/brand-assets', body)
     const data = response.data || {}
     const metadata =
       data.metadata && typeof data.metadata === 'object'
@@ -249,106 +249,7 @@ export class ActionsService {
   }
 
   /**
-   * Legacy Identity Studio action (`POST /actions/generateLogo`).
-   * Prefer [generateBrandAsset]. Maps `identityStudioId` → request field of the same name.
-   */
-  async generateLogo(input: {
-    logoName: string
-    description: string
-    color1?: number
-    color2?: number
-    colors?: number[]
-    aspectRatio?: string
-    imageModel?: string
-    assetKind?: string
-    inputImageUrl?: string
-    identityStudioId?: string
-    brandStudioId?: string
-    createStudio?: boolean
-    attachments?: unknown[]
-    referenceImageUrls?: string[]
-    referenceImageLabels?: Record<string, string>
-  }): Promise<{
-    success: boolean
-    id?: string | null
-    brandStudioId?: string | null
-    identityStudioId?: string | null
-    message: string
-    error?: string | null
-    metadata?: Record<string, unknown> | null
-  }> {
-    const {
-      logoName,
-      description,
-      color1,
-      color2,
-      colors,
-      aspectRatio,
-      imageModel,
-      assetKind,
-      inputImageUrl,
-      identityStudioId,
-      brandStudioId,
-      createStudio,
-      attachments,
-      referenceImageUrls,
-      referenceImageLabels,
-    } = input
-
-    const studioId = brandStudioId ?? identityStudioId
-    const body: Record<string, unknown> = {
-      logoName: logoName.trim(),
-      description: description.trim(),
-    }
-    if (aspectRatio) body.aspectRatio = aspectRatio
-    if (imageModel?.trim()) body.imageModel = imageModel.trim()
-    if (assetKind?.trim()) body.assetKind = assetKind.trim()
-    if (inputImageUrl?.trim()) body.inputImageUrl = inputImageUrl.trim()
-    if (studioId?.trim()) {
-      body.identityStudioId = studioId.trim()
-      body.brandStudioId = studioId.trim()
-    }
-    if (createStudio) body.createStudio = true
-    if (attachments && attachments.length > 0) body.attachments = attachments
-    if (referenceImageUrls && referenceImageUrls.length > 0) {
-      body.referenceImageUrls = referenceImageUrls
-    }
-    if (referenceImageLabels && Object.keys(referenceImageLabels).length > 0) {
-      body.referenceImageLabels = referenceImageLabels
-    }
-    if (colors && colors.length > 0) {
-      body.colors = colors
-    } else if (color1 != null && color2 != null) {
-      body.color1 = color1
-      body.color2 = color2
-    }
-
-    const response = await this.client.post('/actions/generateLogo', body)
-    const data = response.data || {}
-    const metadata =
-      data.metadata && typeof data.metadata === 'object'
-        ? (data.metadata as Record<string, unknown>)
-        : null
-    const returnedStudioId =
-      (data.brandStudioId as string | undefined) ??
-      (metadata?.brandStudioId as string | undefined) ??
-      (data.identityStudioId as string | undefined) ??
-      (metadata?.identityStudioId as string | undefined) ??
-      null
-
-    return {
-      success: Boolean(data.success),
-      id: (data.id as string | undefined) ?? null,
-      brandStudioId: returnedStudioId,
-      identityStudioId: returnedStudioId,
-      message: (data.message as string | undefined) ?? 'Unknown response',
-      error: (data.error as string | undefined) ?? null,
-      metadata,
-    }
-  }
-
-  /**
-   * Poststudio asset generation (`POST /actions/generatePostAsset`).
+   * Poststudio asset generation (`POST /ai/post-assets`).
    * Pass `postStudioId` or `createStudio: true`.
    */
   async generatePostAsset(input: {
@@ -398,7 +299,7 @@ export class ActionsService {
       body.referenceImageUrls = referenceImageUrls
     }
 
-    const response = await this.client.post('/actions/generatePostAsset', body)
+    const response = await this.client.post('/ai/post-assets', body)
     const data = response.data || {}
     const metadata =
       data.metadata && typeof data.metadata === 'object'
@@ -420,7 +321,7 @@ export class ActionsService {
   }
 
   /**
-   * Uistudio asset generation (`POST /actions/generateUiAsset`).
+   * Uistudio asset generation (`POST /ai/ui-assets`).
    * Pass `uiStudioId` or `createStudio: true`.
    */
   async generateUiAsset(input: {
@@ -470,7 +371,7 @@ export class ActionsService {
       body.referenceImageUrls = referenceImageUrls
     }
 
-    const response = await this.client.post('/actions/generateUiAsset', body)
+    const response = await this.client.post('/ai/ui-assets', body)
     const data = response.data || {}
     const metadata =
       data.metadata && typeof data.metadata === 'object'

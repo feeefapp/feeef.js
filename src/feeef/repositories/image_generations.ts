@@ -16,7 +16,7 @@ import {
  */
 export class ImageGenerationsRepository {
   client: AxiosInstance
-  resource = 'image_generations'
+  resource = 'ai/image-generations'
 
   constructor(client: AxiosInstance) {
     this.client = client
@@ -63,7 +63,7 @@ export class ImageGenerationsRepository {
 
   async generateImageGeneration(input: ImageGenerationGenerateInput): Promise<ImageGeneration> {
     const response = await this.client.post(
-      `/${this.resource}/generate`,
+      `/${this.resource}`,
       createImageGenerationFormData(input),
       {
         headers: {
@@ -80,7 +80,7 @@ export class ImageGenerationsRepository {
     input: Omit<ImageGenerationGenerateInput, 'id'> = {}
   ): Promise<ImageGeneration> {
     const response = await this.client.post(
-      `/${this.resource}/${id}/generate`,
+      `/${this.resource}/${id}/regenerate`,
       createImageGenerationFormData({ ...input, id }),
       {
         headers: {

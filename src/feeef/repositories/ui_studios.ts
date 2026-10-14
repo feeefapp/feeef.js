@@ -16,14 +16,14 @@ import {
 } from '../../core/entities/image_generation.js'
 
 /**
- * Repository for Uistudio projects (`/uiStudios`).
+ * Repository for Uistudio projects (`/ai/ui-studios`).
  *
  * Generations are created via `ActionsService.generateUiAsset`.
  */
 export class UiStudiosRepository {
   client: AxiosInstance
   /** CamelCase resource path matching the Feeef API. */
-  resource = 'uiStudios'
+  resource = 'ai/ui-studios'
 
   constructor(client: AxiosInstance) {
     this.client = client

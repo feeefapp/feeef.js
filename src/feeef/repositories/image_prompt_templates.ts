@@ -53,7 +53,7 @@ export class ImagePromptTemplatesRepository extends ModelRepository<
   ImagePromptTemplateUpdate
 > {
   constructor(client: AxiosInstance) {
-    super('image_prompt_templates', client)
+    super('ai/image-prompt-templates', client)
   }
 
   async find(options: { id: string; by?: string; params?: Record<string, unknown> }) {

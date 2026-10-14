@@ -113,17 +113,17 @@ export class FeeeF {
   ai: CloudAiApi
 
   /**
-   * Brandstudio projects (`/brandStudios`) — visual identity boards + assets.
+   * Brandstudio projects (`/ai/brand-studios`) — visual identity boards + assets.
    */
   brandStudios: BrandStudiosRepository
 
   /**
-   * Poststudio projects (`/postStudios`) — regional social / ad creatives.
+   * Poststudio projects (`/ai/post-studios`) — regional social / ad creatives.
    */
   postStudios: PostStudiosRepository
 
   /**
-   * Uistudio projects (`/uiStudios`) — UI mockups + canvas.
+   * Uistudio projects (`/ai/ui-studios`) — UI mockups + canvas.
    */
   uiStudios: UiStudiosRepository
 
@@ -321,7 +321,7 @@ export class FeeeF {
    * @param {string} key - The header key.
    * @param {string} value - The header value.
    */
-  /** Invoke legacy AI actions with a caller-persisted key, without mutating shared headers. */
+  /** Call paid `/ai/*` workflow routes with a caller-persisted Idempotency-Key, without mutating shared headers. */
   async withAiWorkflow<T>(key: string, action: (scoped: FeeeF) => Promise<T>): Promise<T> {
     if (!/^[\x21-\x7e]{1,200}$/.test(key))
       throw new Error('Persist an AI workflow key before sending')

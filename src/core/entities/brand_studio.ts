@@ -1,5 +1,5 @@
 /**
- * Brandstudio project entity (`/brandStudios`).
+ * Brandstudio project entity (`/ai/brand-studios`).
  */
 
 export type BrandStudioStatus = 'draft' | 'ready'

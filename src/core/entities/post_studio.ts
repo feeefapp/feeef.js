@@ -1,5 +1,5 @@
 /**
- * Poststudio project entity (`/postStudios`).
+ * Poststudio project entity (`/ai/post-studios`).
  */
 
 export type PostStudioStatus = 'draft' | 'ready'
