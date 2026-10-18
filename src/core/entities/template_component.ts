@@ -76,6 +76,7 @@ export interface TemplateComponentEntity {
    * Used as a cache-key suffix and (later) as the pinning target.
    */
   version: number
+  publishedVersion?: number | null
 
   // ── Timestamps ────────────────────────────────────────────────────────
   // `any` to stay compatible across runtimes — backend Lucid models
@@ -152,6 +153,8 @@ export interface TemplateComponentCreateInput {
  * or `slotsLayout` changes; clients do not send `version`.
  */
 export interface TemplateComponentUpdateInput {
+  publish?: boolean
+  expectedVersion?: number
   title?: string
   subtitle?: string | null
   body?: string | null

@@ -56,6 +56,12 @@ export interface ProductEntity {
   likes: number
 
   dislikes: number
+  /** Verified-buyer stars only (docs/product-reviews.md). 0 when there are no verified reviews. */
+  ratingAvg?: number
+  ratingCount?: number
+  ratingHistogram?: { '1': number; '2': number; '3': number; '4': number; '5': number }
+  /** AI "what customers say"; null until the merchant generates one. */
+  reviewSummary?: import('./review.js').ReviewSummaryEntity | null
 
   variant?: ProductVariant | null
 
@@ -188,6 +194,8 @@ export interface IntegrationsData {
   paymentMethodData?: PaymentMethodData | null
   /** Merchant-only Ecotrack warehouse stock mapping — never public. */
   ecotrackData?: EcotrackData | null
+  /** Product override of review settings (docs/product-reviews.md §5). */
+  reviewsData?: import('./review.js').ProductReviewsData | null
   /** Product override of order custom fields (contract v2). */
   customFieldsData?: {
     useProductFields?: boolean

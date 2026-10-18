@@ -109,6 +109,7 @@ export const generatePublicStoreIntegrations = (
     ai,
     security,
     customFields,
+    reviews,
     payment,
     connectors,
     inventory,
@@ -127,6 +128,7 @@ export const generatePublicStoreIntegrations = (
     webhooks: generatePublicStoreIntegrationWebhooks(webhooks) || null,
     security: generatePublicStoreIntegrationSecurity(security) || null,
     customFields: generatePublicStoreIntegrationCustomFields(customFields) || null,
+    reviews: generatePublicStoreIntegrationReviews(reviews),
     payment: generatePublicStoreIntegrationPayment(payment) || null,
     connectors: generatePublicStoreIntegrationConnectors(connectors) || null,
     inventory:
@@ -174,6 +176,19 @@ export const generatePublicStoreIntegrationConnectors = (
     })),
   }
 }
+
+export interface PublicReviewsIntegration {
+  active: boolean
+  storefrontForm: boolean
+}
+
+/** Store-level public review switches. Null when the store never configured reviews (default on). */
+export const generatePublicStoreIntegrationReviews = (
+  reviews: any | null | undefined
+): PublicReviewsIntegration => ({
+  active: reviews?.active !== false,
+  storefrontForm: reviews?.active !== false && reviews?.storefrontForm === true,
+})
 
 export const generatePublicStoreIntegrationCustomFields = (
   customFields: any | null | undefined
@@ -592,6 +607,8 @@ export interface PublicStoreIntegrations {
   webhooks: PublicWebhooksIntegration | null
   security: PublicSecurityIntegration | null
   customFields: PublicCustomFieldsIntegration | null
+  /** Product reviews: `active` and `storefrontForm` only (backend-owned, free). */
+  reviews: PublicReviewsIntegration | null
   payment: PublicPaymentIntegration | null
   connectors: PublicConnectorsIntegration | null
   /**

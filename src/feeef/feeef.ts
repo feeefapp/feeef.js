@@ -31,6 +31,8 @@ import { PostStudiosRepository } from './repositories/post_studios.js'
 import { UiStudiosRepository } from './repositories/ui_studios.js'
 import { TemplateComponentsRepository } from './repositories/template_components.js'
 import { StoreTemplatesRepository } from './repositories/store_templates.js'
+import { StorePagesRepository } from './repositories/store_pages.js'
+import { ReviewsRepository } from './repositories/reviews.js'
 // Services
 import { CartService } from './services/cart.js'
 import { ActionsService } from './services/actions.js'
@@ -141,6 +143,10 @@ export class FeeeF {
    * Full-site template library rows (`store_templates`) + marketplace.
    */
   storeTemplates: StoreTemplatesRepository
+  storePages: StorePagesRepository
+
+  /** Customer product reviews, the review page and merchant moderation. */
+  reviews: ReviewsRepository
 
   /**
    * The repository for managing users.
@@ -289,6 +295,8 @@ export class FeeeF {
     this.uiStudios = new UiStudiosRepository(this.client)
     this.templateComponents = new TemplateComponentsRepository(this.client)
     this.storeTemplates = new StoreTemplatesRepository(this.client)
+    this.storePages = new StorePagesRepository(this.client)
+    this.reviews = new ReviewsRepository(this.client)
     this.users = new UserRepository(this.client)
     this.apps = new AppRepository(this.client)
     this.oauth = new OAuthRepository(this.client)
