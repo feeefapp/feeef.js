@@ -677,20 +677,19 @@ export interface CreateStoreInviteInput {
 /** How order sync handles line items with no inventory bucket for their SKU. */
 export type MissingInventoryBucketPolicy = 'ignore' | 'reject'
 
-/** When an order field equals `equals`, apply the parent lifecycle list (reserve / release / consume). */
-export interface InventoryLifecycleRule {
-  id: string
-  dimension: PixelStatusDimension
-  equals: string
-}
+/** First rooms phase that holds stock for an order (default `open`). */
+export type InventoryReservePhase = 'open' | 'pack' | 'ship'
+
+/** Rooms phase that turns the hold into a sale (default `done`). */
+export type InventoryConsumePhase = 'ship' | 'done'
 
 export interface InventoryIntegration {
-  reserve_on: OrderStatus[]
-  unreserve_on: OrderStatus[]
-  consume_on: OrderStatus[]
-  reserve_rules?: InventoryLifecycleRule[]
-  unreserve_rules?: InventoryLifecycleRule[]
-  consume_rules?: InventoryLifecycleRule[]
+  /**
+   * Rooms lifecycle. Draft and failed orders (cancelled, returned, …) never
+   * hold stock; a failed order after consumption is restocked.
+   */
+  reserve_from?: InventoryReservePhase
+  consume_at?: InventoryConsumePhase
   /**
    * `ignore` — skip untracked SKUs and continue the order save.
    * `reject` — block the order with a stock validation error.
@@ -727,10 +726,11 @@ export interface FinancePdfSettings {
   footerNote: string
 }
 
-/** Order → finance behavior: when revenue/COGS are recognized for an order. */
+/**
+ * Order → finance settings. Revenue + COGS are recognized when an order is
+ * closed as done in the rooms model (not configurable).
+ */
 export interface FinanceIntegration {
-  /** Order statuses at which revenue + COGS are recognized (receivable opens). */
-  recognize_on: OrderStatus[]
   /** Cash-basis metrics cutoff — payments/expenses before this are ignored. */
   activated_at?: string | null
   pdf?: FinancePdfSettings
@@ -886,9 +886,16 @@ export enum PixelReportMode {
 
 /** Which order field to compare for [PixelStatusRule] (server-side CAPI on transition). */
 export enum PixelStatusDimension {
-  orderStatus = 'orderStatus',
-  deliveryStatus = 'deliveryStatus',
+  /** Rooms-model phase: draft | open | pack | ship | done | fail. */
+  phase = 'phase',
+  /** Status catalog kind (or custom status slug). */
+  kind = 'kind',
   paymentStatus = 'paymentStatus',
+  /** @deprecated Legacy — old saved rules only; the API rejects it on save. Use `phase`. */
+  orderStatus = 'orderStatus',
+  /** @deprecated Legacy — use `phase` / `kind`. */
+  deliveryStatus = 'deliveryStatus',
+  /** @deprecated Legacy — use `kind`. */
   customStatus = 'customStatus',
 }
 
