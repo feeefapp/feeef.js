@@ -743,8 +743,10 @@ export interface StoreConfigs {
   defaultLanguage?: string
   countries?: StoreCountryConfig[]
   selectedCountry?: string
+  /** @deprecated Legacy — the API ignores it; use the orders-v1 status catalog. */
   customStatusMappings?: CustomStatusMapping[]
   /** Feature flag to enable custom statuses across the app */
+  /** @deprecated Legacy — the API ignores it. */
   customStatusEnabled?: boolean
   confirmationQueue?: ConfirmationQueueConfig
   inventory_integration?: InventoryIntegration
