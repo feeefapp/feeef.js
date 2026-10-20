@@ -436,16 +436,6 @@ export class GoogleSheetIntegrationApi {
       row: values,
     })
   }
-
-  /**
-   * Creates a new spreadsheet
-   */
-  async createSpreadsheet(name: string): Promise<void> {
-    await this.client.post(
-      `/stores/${this.storeId}/integrations/google-sheets/create-spreadsheet`,
-      { name }
-    )
-  }
 }
 
 // ============================================================================

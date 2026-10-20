@@ -158,13 +158,10 @@ export class ActionsService {
    * Brandstudio asset generation (`POST /ai/brand-assets`).
    *
    * `assetKind=identity` → opaque brand-kit board. Other kinds → transparent PNG.
-   * Returns both `brandStudioId` and deprecated `identityStudioId` (same value).
    */
   async generateBrandAsset(input: {
     logoName: string
     description: string
-    color1?: number
-    color2?: number
     colors?: number[]
     aspectRatio?: string
     imageModel?: string
@@ -173,13 +170,10 @@ export class ActionsService {
     brandStudioId?: string
     createStudio?: boolean
     attachments?: unknown[]
-    referenceImageUrls?: string[]
-    referenceImageLabels?: Record<string, string>
   }): Promise<{
     success: boolean
     id?: string | null
     brandStudioId?: string | null
-    identityStudioId?: string | null
     message: string
     error?: string | null
     metadata?: Record<string, unknown> | null
@@ -187,8 +181,6 @@ export class ActionsService {
     const {
       logoName,
       description,
-      color1,
-      color2,
       colors,
       aspectRatio,
       imageModel,
@@ -197,8 +189,6 @@ export class ActionsService {
       brandStudioId,
       createStudio,
       attachments,
-      referenceImageUrls,
-      referenceImageLabels,
     } = input
 
     const body: Record<string, unknown> = {
@@ -212,17 +202,8 @@ export class ActionsService {
     if (brandStudioId?.trim()) body.brandStudioId = brandStudioId.trim()
     if (createStudio) body.createStudio = true
     if (attachments && attachments.length > 0) body.attachments = attachments
-    if (referenceImageUrls && referenceImageUrls.length > 0) {
-      body.referenceImageUrls = referenceImageUrls
-    }
-    if (referenceImageLabels && Object.keys(referenceImageLabels).length > 0) {
-      body.referenceImageLabels = referenceImageLabels
-    }
     if (colors && colors.length > 0) {
       body.colors = colors
-    } else if (color1 != null && color2 != null) {
-      body.color1 = color1
-      body.color2 = color2
     }
 
     const response = await this.client.post('/ai/brand-assets', body)
@@ -234,15 +215,12 @@ export class ActionsService {
     const returnedStudioId =
       (data.brandStudioId as string | undefined) ??
       (metadata?.brandStudioId as string | undefined) ??
-      (data.identityStudioId as string | undefined) ??
-      (metadata?.identityStudioId as string | undefined) ??
       null
 
     return {
       success: Boolean(data.success),
       id: (data.id as string | undefined) ?? null,
       brandStudioId: returnedStudioId,
-      identityStudioId: returnedStudioId,
       message: (data.message as string | undefined) ?? 'Unknown response',
       error: (data.error as string | undefined) ?? null,
       metadata,
