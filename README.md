@@ -349,3 +349,14 @@ Use `await ff.withAiWorkflow(savedKey, scoped => scoped.actions.generateSimpleCo
 Keep the original key and input on connection failures or pending outcomes. The server
 recovers each paid step and settles verified usage once; the SDK does not retry paid calls.
 Native AI operations remain available through `ff.ai` with caller-owned keys.
+
+### Source-first template projects (local foundation integration)
+
+`ff.templateProjects` exposes authorized projects/workspaces, CAS file changes,
+backend builds, immutable revision publication, scoped preview and exact activation.
+Callers keep the workspace/project/installation versions and file hashes they read;
+they never fetch fresh tokens to overwrite stale files. The canonical generated
+client is checked by backend `scripts/sync-template-project-adapters.mjs --check`.
+No source/debug access follows from an artifact hash. No source/document dual save
+exists in this API. Deployment and package publication remain separately gated;
+see backend `docs/template-foundation/e.md`.

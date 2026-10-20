@@ -139,3 +139,6 @@ export type { StoreIntegrations } from './core/entities/store.js'
 export * from './ai/cloud_ai.js'
 export * from './core/entities/store_page.js'
 export { StorePagesRepository } from './feeef/repositories/store_pages.js'
+
+export { ProjectClient } from './feeef/services/project-client.js'
+export type { Project as TemplateProject, Workspace as TemplateWorkspace, Build as TemplateProjectBuild, Publication as TemplatePublication, Change as TemplateFileChange } from './feeef/services/project-client.js'

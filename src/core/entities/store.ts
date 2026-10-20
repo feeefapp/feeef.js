@@ -1554,12 +1554,20 @@ export interface StoreIntegrations {
   dispatcher?: DispatcherIntegration
   inventory?: StoreInventoryIntegration
   finance?: StoreFinanceIntegration
+  /** Store-owned pages, billed per store. */
+  pages?: StorePagesIntegration
   /** Inbound platform connectors (Shopify, YouCan, Google Sheets, …). */
   connectors?: ConnectorsIntegration
 }
 
 /** Marketplace inventory module (billing + active toggle). */
 export interface StoreInventoryIntegration {
+  active: boolean
+  metadata?: Record<string, any>
+}
+
+/** Store-owned website pages: monthly integration and active toggle. */
+export interface StorePagesIntegration {
   active: boolean
   metadata?: Record<string, any>
 }

@@ -1,3 +1,4 @@
+import { ProjectClient } from './services/project-client.js'
 import axios, { type AxiosInstance } from 'axios'
 import { CloudAiApi } from '../ai/cloud_ai.js'
 // Repositories
@@ -142,6 +143,7 @@ export class FeeeF {
   /**
    * Full-site template library rows (`store_templates`) + marketplace.
    */
+  templateProjects: ProjectClient
   storeTemplates: StoreTemplatesRepository
   storePages: StorePagesRepository
 
@@ -294,6 +296,10 @@ export class FeeeF {
     this.postStudios = new PostStudiosRepository(this.client)
     this.uiStudios = new UiStudiosRepository(this.client)
     this.templateComponents = new TemplateComponentsRepository(this.client)
+    this.templateProjects = new ProjectClient(async (method, url, data) => {
+      const request = { method, url, data, cache: false }
+      return (await this.client.request(request)).data
+    })
     this.storeTemplates = new StoreTemplatesRepository(this.client)
     this.storePages = new StorePagesRepository(this.client)
     this.reviews = new ReviewsRepository(this.client)
