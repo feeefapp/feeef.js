@@ -23,7 +23,7 @@ export interface StorePageEntity extends StorePageDocument {
   publishedAt: string | null
   deletedAt: string | null
 }
-export interface InstalledTheme {
+export interface InstalledTemplate {
   data: Record<string, unknown>
   schema: Record<string, unknown>
   revision: string
@@ -34,7 +34,7 @@ export interface InstalledTheme {
 }
 export interface WebsiteExport {
   formatVersion: 1
-  kind: 'page' | 'theme'
+  kind: 'page' | 'template'
   data: Record<string, unknown>
   checksum: string
 }

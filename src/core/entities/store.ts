@@ -2,12 +2,7 @@ import type { CustomFieldType, CustomFieldVisibility, FileKind } from '../custom
 import { type EmbaddedAddress } from '../embadded/address.js'
 import { type EmbaddedCategory } from '../embadded/category.js'
 import { type EmbaddedContact } from '../embadded/contact.js'
-import {
-  type OrderEntity,
-  type OrderStatus,
-  type DeliveryStatus,
-  type PaymentStatus,
-} from './order.js'
+import { type OrderEntity } from './order.js'
 import { type MetaPixelEvent, type SnapchatPixelEvent, type TiktokPixelEvent } from './product.js'
 // import { OrderEntity } from "./order.js";
 // import { ShippingMethodEntity } from "./shipping_method.js";
@@ -743,50 +738,9 @@ export interface StoreConfigs {
   defaultLanguage?: string
   countries?: StoreCountryConfig[]
   selectedCountry?: string
-  /** @deprecated Legacy — the API ignores it; use the orders-v1 status catalog. */
-  customStatusMappings?: CustomStatusMapping[]
-  /** Feature flag to enable custom statuses across the app */
-  /** @deprecated Legacy — the API ignores it. */
-  customStatusEnabled?: boolean
   confirmationQueue?: ConfirmationQueueConfig
   inventory_integration?: InventoryIntegration
   finance_integration?: FinanceIntegration
-}
-
-export interface CustomStatusMapping {
-  /** The custom status name (e.g., "not_respond", "phone_closed_1") */
-  name: string
-  /** Auto-generated code based on name if not provided (e.g., "not_respond" -> "not_respond") */
-  code?: string
-  /** Optional color for UI display (hex color as number) */
-  color?: number
-  /** Whether this custom status is enabled and should be shown in UI */
-  enabled?: boolean
-  /** Status to map to (null means no change) */
-  status?: OrderStatus | null
-  /** Delivery status to map to (null means no change) */
-  deliveryStatus?: DeliveryStatus | null
-  /** Payment status to map to (null means no change) */
-  paymentStatus?: PaymentStatus | null
-  /** Codes (or names) of other mappings suggested as the next workflow step */
-  next?: string[]
-  /**
-   * Minutes to postpone the order when this status is set. The order's
-   * `scheduledAt` becomes `now + snoozeMinutes`, so it leaves the confirmation
-   * queue and re-enters it once the delay elapses (e.g. "not_respond_1" -> 180).
-   */
-  snoozeMinutes?: number | null
-  /** Plain-text reason presets offered to the confirmer when this status is set. */
-  reasons?: string[]
-  /** Whether the confirmer may type a reason that is not in `reasons`. */
-  allowOtherReason?: boolean
-  /**
-   * Whether a reason is mandatory. Always treated as `true` when `status` is
-   * `cancelled`, regardless of the stored value.
-   */
-  requiresReason?: boolean
-  /** Whether orders carrying this status may be served by the confirmation queue. */
-  queueEligible?: boolean
 }
 
 /** Store-level confirmation queue settings. */

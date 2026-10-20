@@ -217,7 +217,7 @@ export class StoreRepository extends ModelRepository<
   }
 
   /**
-   * Upserts a draft theme preview (does not change live `metadata.templateData`).
+   * Upserts a draft template preview (does not change live `metadata.templateData`).
    */
   async putTemplatePreview(
     storeId: string,
@@ -232,7 +232,7 @@ export class StoreRepository extends ModelRepository<
   }
 
   /**
-   * Clears the draft theme preview for a store.
+   * Clears the draft template preview for a store.
    */
   async clearTemplatePreview(storeId: string): Promise<{ cleared: boolean }> {
     const res = await this.client.delete(`/${this.resource}/${storeId}/template-preview`)

@@ -226,29 +226,6 @@ export function mergeAiModelsBilling(partial?: AIModelsBilling | null): Resolved
   }
 }
 
-/** Legacy flat keys for older importers (DZD leaves use `exchangeRate`). */
-export interface LegacyAiBillingFlat {
-  MULTIPLIER: number
-  FREE_TEXT_TOKENS_THRESHOLD: number
-  DEFAULT_EXCHANGE_RATE: number
-  DEFAULT_GOOGLE_IMAGE_COST_USD: number
-  DEFAULT_ATTACHMENT_COST_USD: number
-  ATTACHMENT_HIGH_RES_EXTRA_USD: number
-  ATTACHMENT_LOW_RES_DISCOUNT_USD: number
-  VOICEOVER_FIXED_COST_DZD: number
-  VOICEOVER_ENHANCE_ADDON_DZD: number
-  IMAGE_LANDING_PAGE_FIXED_COST_DZD: number
-  DEFAULT_TEXT_PROMPT_TOKENS: number
-  DEFAULT_TEXT_OUTPUT_TOKENS: number
-  VOICE_TTS_EMPTY_SCRIPT_TEXT_TOKENS: number
-  VOICE_TTS_ATTACHMENT_ONLY_TEXT_TOKENS: number
-  VOICE_TTS_PROMPT_BASE: number
-  VOICE_TTS_PROMPT_PER_ATTACHMENT: number
-  VOICE_TTS_OUTPUT_MIN: number
-  VOICE_TTS_OUTPUT_TEXT_FACTOR: number
-  VOICE_TTS_TOKEN_CAP: number
-}
-
 /** Round money to [precision] decimals (mirror backend `roundMoney`). */
 function roundMoney(amount: number, precision = 3): number {
   const factor = 10 ** precision
@@ -259,52 +236,6 @@ function safeNumber(value: unknown, fallback = 0): number {
   const n = Number(value)
   return Number.isFinite(n) ? n : fallback
 }
-
-/** @deprecated Prefer `mergeAiModelsBilling` + `ResolvedAiModelsBilling`. */
-export function getLegacyAiBillingFlat(
-  exchangeRate: number,
-  resolved: ResolvedAiModelsBilling = mergeAiModelsBilling(null)
-): LegacyAiBillingFlat {
-  const t = resolved.voiceGeneration.ttsTokenEstimate
-  return {
-    MULTIPLIER: resolved.retailMarkup.multiplier,
-    FREE_TEXT_TOKENS_THRESHOLD: resolved.textGeneration.freeTierMaxPromptTokens,
-    DEFAULT_EXCHANGE_RATE: FALLBACK_AI_EXCHANGE_RATE,
-    DEFAULT_GOOGLE_IMAGE_COST_USD: resolved.imageGeneration.fallbackProviderCostPerImageUsd,
-    DEFAULT_ATTACHMENT_COST_USD: resolved.referenceAttachmentSurcharge.perFileUsd,
-    ATTACHMENT_HIGH_RES_EXTRA_USD:
-      resolved.referenceAttachmentSurcharge.highResolutionExtraPerFileUsd,
-    ATTACHMENT_LOW_RES_DISCOUNT_USD:
-      resolved.referenceAttachmentSurcharge.lowResolutionDiscountPerFileUsd,
-    VOICEOVER_FIXED_COST_DZD: roundMoney(
-      resolved.voiceGeneration.minimumChargeUsd * exchangeRate,
-      3
-    ),
-    VOICEOVER_ENHANCE_ADDON_DZD: roundMoney(
-      resolved.voiceGeneration.scriptEnhancementAddonUsd * exchangeRate,
-      3
-    ),
-    IMAGE_LANDING_PAGE_FIXED_COST_DZD: roundMoney(
-      resolved.landingPageImage.fixedChargeUsd * exchangeRate,
-      3
-    ),
-    DEFAULT_TEXT_PROMPT_TOKENS: resolved.textGeneration.estimatedPromptTokensDefault,
-    DEFAULT_TEXT_OUTPUT_TOKENS: resolved.textGeneration.estimatedOutputTokensDefault,
-    VOICE_TTS_EMPTY_SCRIPT_TEXT_TOKENS: t.whenScriptEmptyTokens,
-    VOICE_TTS_ATTACHMENT_ONLY_TEXT_TOKENS: t.whenAttachmentsOnlyTokens,
-    VOICE_TTS_PROMPT_BASE: t.promptBaseTokens,
-    VOICE_TTS_PROMPT_PER_ATTACHMENT: t.promptPerAttachmentTokens,
-    VOICE_TTS_OUTPUT_MIN: t.outputMinimumTokens,
-    VOICE_TTS_OUTPUT_TEXT_FACTOR: t.outputToTextTokenRatio,
-    VOICE_TTS_TOKEN_CAP: t.maxTotalTokens,
-  }
-}
-
-/**
- * @deprecated Prefer `mergeAiModelsBilling` + `ResolvedAiModelsBilling`.
- * Snapshot of defaults at `FALLBACK_AI_EXCHANGE_RATE` for DZD-derived fields.
- */
-export const AI_BILLING: LegacyAiBillingFlat = getLegacyAiBillingFlat(FALLBACK_AI_EXCHANGE_RATE)
 
 // --- Model config shapes --------------------------------------------------------
 

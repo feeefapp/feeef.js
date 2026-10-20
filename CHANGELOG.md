@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- `AI_BILLING`, `getLegacyAiBillingFlat`, `LegacyAiBillingFlat` (use `mergeAiModelsBilling` + `ResolvedAiModelsBilling`), the `AiRepository` alias (use `ImageGenerationsRepository`), and `CustomStatusMapping` with `StoreConfigs.customStatusMappings`/`customStatusEnabled` (use the orders-v1 status catalog).
+
 ### Added
 
 - `ff.orders.quoteShipping({ storeId, items, shippingState, shippingCity?, shippingType? })`

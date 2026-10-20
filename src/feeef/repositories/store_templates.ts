@@ -1,5 +1,5 @@
 import { type AxiosInstance } from 'axios'
-import type { InstalledTheme, WebsiteExport } from '../../core/entities/store_page.js'
+import type { InstalledTemplate, WebsiteExport } from '../../core/entities/store_page.js'
 import { type ListResponse, ModelRepository } from './repository.js'
 import {
   type StoreTemplateEntity,
@@ -84,7 +84,7 @@ export class StoreTemplatesRepository extends ModelRepository<
   }
 
   /**
-   * Platform default Lithium theme (`GET /store_templates/default`).
+   * Platform default Lithium template (`GET /store_templates/default`).
    * Configured via `templateMarketplace.defaultTemplateId`.
    */
   async getDefault(): Promise<{
@@ -128,38 +128,40 @@ export class StoreTemplatesRepository extends ModelRepository<
     return response.data
   }
 
-  async installedTheme(storeId: string): Promise<InstalledTheme> {
-    const response = await this.client.get(`/stores/${encodeURIComponent(storeId)}/theme`)
+  async installedTemplate(storeId: string): Promise<InstalledTemplate> {
+    const response = await this.client.get(`/stores/${encodeURIComponent(storeId)}/template`)
     return response.data
   }
-  async saveInstalledTheme(
+  async saveInstalledTemplate(
     storeId: string,
     data: Record<string, unknown>,
     expectedRevision: string
-  ): Promise<InstalledTheme> {
-    const response = await this.client.put(`/stores/${encodeURIComponent(storeId)}/theme`, {
+  ): Promise<InstalledTemplate> {
+    const response = await this.client.put(`/stores/${encodeURIComponent(storeId)}/template`, {
       data,
       expectedRevision,
     })
     return response.data
   }
-  async exportInstalledTheme(storeId: string): Promise<WebsiteExport> {
-    const response = await this.client.get(`/stores/${encodeURIComponent(storeId)}/theme/export`)
+  async exportInstalledTemplate(storeId: string): Promise<WebsiteExport> {
+    const response = await this.client.get(`/stores/${encodeURIComponent(storeId)}/template/export`)
     return response.data
   }
-  async themeBackups(storeId: string): Promise<{
+  async templateBackups(storeId: string): Promise<{
     data: Array<{ id: string; reason: string; created_at: string; expires_at: string }>
   }> {
-    const response = await this.client.get(`/stores/${encodeURIComponent(storeId)}/theme/backups`)
+    const response = await this.client.get(
+      `/stores/${encodeURIComponent(storeId)}/template/backups`
+    )
     return response.data
   }
-  async restoreTheme(
+  async restoreTemplate(
     storeId: string,
     backupId: string,
     expectedRevision: string
-  ): Promise<InstalledTheme> {
+  ): Promise<InstalledTemplate> {
     const response = await this.client.post(
-      `/stores/${encodeURIComponent(storeId)}/theme/backups/${encodeURIComponent(backupId)}/restore`,
+      `/stores/${encodeURIComponent(storeId)}/template/backups/${encodeURIComponent(backupId)}/restore`,
       { expectedRevision }
     )
     return response.data
@@ -168,7 +170,7 @@ export class StoreTemplatesRepository extends ModelRepository<
     fromId: string
     storeId: string
     releaseId?: string
-    expectedThemeRevision?: string
+    expectedTemplateRevision?: string
     confirmReplace?: boolean
   }): Promise<{
     storeTemplate: StoreTemplateEntity
@@ -179,8 +181,8 @@ export class StoreTemplatesRepository extends ModelRepository<
     const res = await this.client.post(`/${this.resource}/${options.fromId}/install`, {
       storeId: options.storeId,
       ...(options.releaseId ? { releaseId: options.releaseId } : {}),
-      ...(options.expectedThemeRevision !== undefined
-        ? { expectedThemeRevision: options.expectedThemeRevision }
+      ...(options.expectedTemplateRevision !== undefined
+        ? { expectedTemplateRevision: options.expectedTemplateRevision }
         : {}),
       ...(options.confirmReplace !== undefined ? { confirmReplace: options.confirmReplace } : {}),
     })

@@ -69,7 +69,7 @@ test.group('website API contracts', () => {
       fromId: 'template-1',
       storeId: 'store-1',
       releaseId: 'release-1',
-      expectedThemeRevision: 'old-revision',
+      expectedTemplateRevision: 'old-revision',
       confirmReplace: true,
     })
     await ff.storeTemplates.purchase({
@@ -81,7 +81,7 @@ test.group('website API contracts', () => {
     assert.deepEqual(calls[0].data, {
       storeId: 'store-1',
       releaseId: 'release-1',
-      expectedThemeRevision: 'old-revision',
+      expectedTemplateRevision: 'old-revision',
       confirmReplace: true,
     })
     assert.deepEqual(calls[1].data, {
@@ -90,12 +90,12 @@ test.group('website API contracts', () => {
       expectedCurrency: 'DZD',
     })
   })
-  test('theme restore is store scoped and guarded by the displayed revision', async ({
+  test('template restore is store scoped and guarded by the displayed revision', async ({
     assert,
   }) => {
     const { ff, calls } = fixture()
-    await ff.storeTemplates.restoreTheme('store-1', 'backup-1', 'current-revision')
-    assert.equal(calls[0].url, '/stores/store-1/theme/backups/backup-1/restore')
+    await ff.storeTemplates.restoreTemplate('store-1', 'backup-1', 'current-revision')
+    assert.equal(calls[0].url, '/stores/store-1/template/backups/backup-1/restore')
     assert.deepEqual(calls[0].data, { expectedRevision: 'current-revision' })
   })
 })

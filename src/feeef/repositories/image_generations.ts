@@ -108,8 +108,3 @@ export class ImageGenerationsRepository {
     }
   }
 }
-
-/**
- * Backward-compatible alias with the Dart naming.
- */
-export type AiRepository = ImageGenerationsRepository
