@@ -67,6 +67,9 @@ export class ProjectClient {
   private root(id: string) {
     return `/template-projects/${e(id)}`
   }
+  installation(storeId: string): Promise<Installed['installation']> {
+    return this.request('GET', `/stores/${e(storeId)}/template-installation`)
+  }
   installed(storeId: string): Promise<Installed> {
     return this.request('GET', `/stores/${e(storeId)}/template-project`)
   }
