@@ -1,4 +1,3 @@
-import { ProjectClient } from './services/project-client.js'
 import axios, { type AxiosInstance } from 'axios'
 import { CloudAiApi } from '../ai/cloud_ai.js'
 // Repositories
@@ -22,17 +21,12 @@ import { ShippingMethodRepository } from './repositories/shipping_methods.js'
 import { FeedbackRepository } from './repositories/feedbacks.js'
 import { InventoryRepository } from './repositories/inventory.js'
 import { FinanceRepository } from './repositories/finance.js'
-// Product landing pages
-import { ProductLandingPageTemplatesRepository } from './repositories/product_landing_page_templates.js'
-import { ProductLandingPagesRepository } from './repositories/product_landing_pages.js'
 import { ImagePromptTemplatesRepository } from './repositories/image_prompt_templates.js'
+import { PackagesRepository } from './repositories/packages.js'
 import { ImageGenerationsRepository } from './repositories/image_generations.js'
 import { BrandStudiosRepository } from './repositories/brand_studios.js'
 import { PostStudiosRepository } from './repositories/post_studios.js'
 import { UiStudiosRepository } from './repositories/ui_studios.js'
-import { TemplateComponentsRepository } from './repositories/template_components.js'
-import { StoreTemplatesRepository } from './repositories/store_templates.js'
-import { StorePagesRepository } from './repositories/store_pages.js'
 import { ReviewsRepository } from './repositories/reviews.js'
 // Services
 import { CartService } from './services/cart.js'
@@ -94,16 +88,6 @@ export class FeeeF {
   products: ProductRepository
 
   /**
-   * The repository for managing product landing pages.
-   */
-  productLandingPages: ProductLandingPagesRepository
-
-  /**
-   * The repository for managing product landing page templates.
-   */
-  productLandingPageTemplates: ProductLandingPageTemplatesRepository
-
-  /**
    * The repository for managing image prompt templates.
    */
   imagePromptTemplates: ImagePromptTemplatesRepository
@@ -130,22 +114,8 @@ export class FeeeF {
    */
   uiStudios: UiStudiosRepository
 
-  /**
-   * The repository for the per-store **library of reusable custom
-   * components** + the cross-store **marketplace**. Components live in
-   * `template_components` and are referenced from store templateData by
-   * `refId` so a single source can power many placements.
-   *
-   * @see ResolveComponentsResponse for the storefront resolver path.
-   */
-  templateComponents: TemplateComponentsRepository
-
-  /**
-   * Full-site template library rows (`store_templates`) + marketplace.
-   */
-  templateProjects: ProjectClient
-  storeTemplates: StoreTemplatesRepository
-  storePages: StorePagesRepository
+  /** Templates, components and store pages (template system v3) + marketplace. */
+  packages: PackagesRepository
 
   /** Customer product reviews, the review page and merchant moderation. */
   reviews: ReviewsRepository
@@ -287,21 +257,13 @@ export class FeeeF {
     // Initialize repositories
     this.stores = new StoreRepository(this.client)
     this.products = new ProductRepository(this.client)
-    this.productLandingPages = new ProductLandingPagesRepository(this.client)
-    this.productLandingPageTemplates = new ProductLandingPageTemplatesRepository(this.client)
     this.imagePromptTemplates = new ImagePromptTemplatesRepository(this.client)
     this.imageGenerations = new ImageGenerationsRepository(this.client)
     this.ai = new CloudAiApi(this.client)
     this.brandStudios = new BrandStudiosRepository(this.client)
     this.postStudios = new PostStudiosRepository(this.client)
     this.uiStudios = new UiStudiosRepository(this.client)
-    this.templateComponents = new TemplateComponentsRepository(this.client)
-    this.templateProjects = new ProjectClient(async (method, url, data) => {
-      const request = { method, url, data, cache: false }
-      return (await this.client.request(request)).data
-    })
-    this.storeTemplates = new StoreTemplatesRepository(this.client)
-    this.storePages = new StorePagesRepository(this.client)
+    this.packages = new PackagesRepository(this.client)
     this.reviews = new ReviewsRepository(this.client)
     this.users = new UserRepository(this.client)
     this.apps = new AppRepository(this.client)

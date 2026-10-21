@@ -76,7 +76,7 @@ export class CartService extends NotifiableService {
   /**
    * Monotonic counter bumped in {@link CartService.notify} for React
    * `useSyncExternalStore` — lets storefront UI subscribe to cart changes
-   * without re-rendering unrelated provider subtrees (see Lithium FeeefCartProvider).
+   * without re-rendering unrelated provider subtrees.
    */
   private _reactSnapshotVersion = 0
 

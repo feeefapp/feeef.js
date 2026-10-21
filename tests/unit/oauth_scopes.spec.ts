@@ -10,7 +10,7 @@ test.group('feeef.js OAuth scope catalog', () => {
   test('member catalog includes integrations, templates, finance, inventory', ({ assert }) => {
     assert.includeMembers(
       [...MEMBER_SCOPES],
-      ['store.integrations', 'store_templates', 'template_components', 'finance', 'inventory']
+      ['store.integrations', 'packages', 'finance', 'inventory']
     )
   })
 

@@ -94,7 +94,7 @@ export interface OrderEntity {
     customStatus?: string | null
   } | null
   /**
-   * Attribution tokens: `product:…`, `product_landing_page:…`.
+   * Attribution tokens: `product:…`, `page:…`.
    * JSON / API field name is always **`references`** (never `orderReferences`).
    */
   references?: string[]

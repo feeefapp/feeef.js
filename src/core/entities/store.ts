@@ -74,8 +74,8 @@ export interface StoreEntity {
   // members
   members?: Record<string, StoreMember>
 
-  /** Active full-site template (`store_templates.id`) when set. */
-  templateId?: string | null
+  /** Live template version (`package_versions.id`). */
+  templateVersionId?: string | null
 
   /** Linked inventory project ID for stock management. */
   projectId?: string | null
