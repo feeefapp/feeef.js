@@ -1,12 +1,12 @@
 import type { AxiosInstance } from 'axios'
 
 /**
- * Template system v3 (templates, components, pages as packages): store packages, drafts,
- * versions, the live template, marketplace, licences, reviews and store pages.
+ * Template system v3.1 (docs/template-system/SPEC.md): store packages (templates and component
+ * packages), drafts, versions, the live template, marketplace, licences, reviews and store pages.
  * Errors are `{code, message, ...details}`; build errors carry `diagnostics`.
  */
 
-export type PackageKind = 'template' | 'component' | 'page'
+export type PackageKind = 'template' | 'component'
 
 export interface PackageEntity {
   id: string
@@ -39,6 +39,10 @@ export interface PackageVersionEntity {
   parentVersionId: string | null
   upstreamVersionId: string | null
   artifactHash: string
+  /** Hash of the compiled code (components, routes, layout); shared by stores on the same code. */
+  codeHash?: string
+  /** Hash of the content (theme, messages, slot content); a content-only edit keeps `codeHash`. */
+  contentHash?: string
   engine: string
   message: string | null
   published: boolean
@@ -77,13 +81,17 @@ export interface LiveTemplate {
   artifactUrl: string
 }
 
-export type PageNode = {
+/** A placed component: `use` is a component id (`hero`), `<dependency>/<component>` or `core/<id>`. */
+export type ContentNode = {
   id: string
   use: string
   props?: Record<string, unknown>
-  slots?: Record<string, PageNode[]>
-  hydrate?: string
+  slots?: Record<string, ContentNode[]>
+  hydrate?: 'never' | 'load' | 'idle' | 'visible' | 'interaction'
 }
+
+/** Slot content of a route, the layout or a store page (`content/*.json`). */
+export type SlotContent = { slots?: Record<string, ContentNode[]> }
 
 export interface StorePageEntity {
   id: string
@@ -91,10 +99,9 @@ export interface StorePageEntity {
   productId: string | null
   path: string
   title: string | null
-  /** Omitted in lists. */
-  root?: PageNode
+  /** Draft content, e.g. `{slots: {main: [...]}}`. Omitted in lists. */
+  content?: SlotContent
   seo: Record<string, unknown>
-  data: Record<string, unknown>
   status: 'draft' | 'published'
   version: number
   publishedAt: string | null
@@ -301,16 +308,16 @@ export class PackagesRepository {
   }
   createPage(
     storeId: string,
-    data: { path: string; title?: string; root?: PageNode; productId?: string }
+    data: { path: string; title?: string; content?: SlotContent; productId?: string }
   ) {
     return this.call<StorePageEntity>('post', `${store(storeId)}/pages`, data)
   }
-  /** Version-checked edit of any of `path, title, root, seo, data, productId`. */
+  /** Version-checked edit of any of `path, title, content, seo, productId`. */
   updatePage(
     storeId: string,
     pageId: string,
     data: { expectedVersion: number } & Partial<
-      Pick<StorePageEntity, 'path' | 'title' | 'root' | 'seo' | 'data' | 'productId'>
+      Pick<StorePageEntity, 'path' | 'title' | 'content' | 'seo' | 'productId'>
     >
   ) {
     return this.call<StorePageEntity>('patch', page(storeId, pageId), data)

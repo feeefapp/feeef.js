@@ -1,3 +1,8 @@
+# 0.16.0
+
+- Template system v3.1 (`docs/template-system/SPEC.md`): `PackageKind` is `'template' | 'component'` (the `page` kind is gone); versions carry optional `codeHash` / `contentHash`.
+- Store pages hold slot `content` (`SlotContent`, `{slots: {main: ContentNode[]}}`) instead of `root` and `data`; `PageNode` is now `ContentNode`.
+
 # 0.14.3
 
 - Export `customFields` order custom fields contract v2 helpers (`normalizeCustomFields`, `visibleCustomFields`, `validateOrderCustomFields`, `collectPricingAdjustments`, `coerceSubmittedCustomFields`).
