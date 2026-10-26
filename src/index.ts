@@ -15,6 +15,7 @@ export * from './delivery/delivery_carrier_client.js'
 // ============================================================================
 export * from './core/entities/order.js'
 export * from './core/entities/store.js'
+export * from './core/entities/pixel_events.js'
 /** Order custom fields contract v2 helpers (`customFields.visibleCustomFields`, …). */
 export * as customFields from './core/custom_fields.js'
 export * from './core/entities/product.js'

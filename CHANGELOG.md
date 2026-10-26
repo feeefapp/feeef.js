@@ -1,5 +1,6 @@
 # Unreleased
 
+- Ad pixels: Meta, TikTok and Snapchat share one list of event rules (`PixelEventRule`, `PixelEvents`, `DEFAULT_PIXEL_RULES`, `pixelCheckoutEvents`) in `StoreIntegrations.pixelEvents`, and a product may carry its own in `IntegrationsData.pixelEvents`. A rule sends each named platform its event when the order reaches a phase, a status of the store's catalog, or payment. The per-platform `objective`, `draftObjective` and `statusRules` fields and `PixelStatusRule` / `PixelStatusDimension` are removed; public pixel data keeps `objective` / `draftObjective`, now computed from the rules, and product pixel data gains `enabled` (false: the product's orders go to no pixel of that platform).
 - Checkout protection rules unified (feeef.all `docs/checkout-protection.md`): `SecurityOptions` is `phone` (order in progress, `match`), `fingerprint` (same browser, `ttl` + `match`), `ip`, `minTimeInPage`, `unverified`, `history`, `countries`, `sources`. `ads`, `frontend` and `doubleSend` are gone, and so are `PublicStoreIntegrations.security`, `PublicSecurityIntegration` and `generatePublicStoreIntegrationSecurity`: storefronts no longer receive any protection setting.
 
 # 0.16.0

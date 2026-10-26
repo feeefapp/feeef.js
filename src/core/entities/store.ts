@@ -1,3 +1,4 @@
+import { DEFAULT_PIXEL_RULES, pixelCheckoutEvents, type PixelEvents } from './pixel_events.js'
 import type { CustomFieldType, CustomFieldVisibility, FileKind } from '../custom_fields.js'
 import { type EmbaddedAddress } from '../embadded/address.js'
 import { type EmbaddedCategory } from '../embadded/category.js'
@@ -108,11 +109,23 @@ export const generatePublicStoreIntegrations = (
     connectors,
     inventory,
   } = integrations
+  // The checkout events every platform publishes come from the store's rules.
+  const pixelRules = integrations.pixelEvents?.rules ?? DEFAULT_PIXEL_RULES
   return {
     meta: generatePublicStoreIntegrationMeta(meta),
-    metaPixel: generatePublicStoreIntegrationMetaPixel(metaPixel) || null,
-    tiktokPixel: generatePublicStoreIntegrationTiktokPixel(tiktokPixel) || null,
-    snapchatPixel: generatePublicStoreIntegrationSnapchatPixel(snapchatPixel) || null,
+    metaPixel:
+      generatePublicStoreIntegrationMetaPixel(metaPixel, pixelCheckoutEvents(pixelRules, 'meta')) ||
+      null,
+    tiktokPixel:
+      generatePublicStoreIntegrationTiktokPixel(
+        tiktokPixel,
+        pixelCheckoutEvents(pixelRules, 'tiktok')
+      ) || null,
+    snapchatPixel:
+      generatePublicStoreIntegrationSnapchatPixel(
+        snapchatPixel,
+        pixelCheckoutEvents(pixelRules, 'snapchat')
+      ) || null,
     googleAnalytics: generatePublicStoreIntegrationGoogleAnalytics(googleAnalytics) || null,
     googleTags: generatePublicStoreIntegrationGoogleTags(googleTags) || null,
     clarity: generatePublicStoreIntegrationClarity(clarity) || null,
@@ -228,7 +241,8 @@ const hasSecret = (v: string | null | undefined): boolean => !!(v && String(v).t
  * Sensitive data like oauth2 tokens, pixel API keys, and metadata are NOT exposed.
  */
 export const generatePublicStoreIntegrationMetaPixel = (
-  metaPixel: MetaPixelIntegration | null | undefined
+  metaPixel: MetaPixelIntegration | null | undefined,
+  events: { draft: string; open: string } = pixelCheckoutEvents(DEFAULT_PIXEL_RULES, 'meta')
 ): PublicMetaPixelIntegration | null | undefined => {
   if (!metaPixel) return null
   // NOTE: oauth2, pixel.key, and metadata are intentionally excluded for security.
@@ -240,13 +254,14 @@ export const generatePublicStoreIntegrationMetaPixel = (
       capi: hasSecret(pixel.key),
     })),
     active: metaPixel.active,
-    objective: metaPixel.objective,
-    draftObjective: metaPixel.draftObjective,
+    objective: events.open as any,
+    draftObjective: events.draft as any,
     mode: metaPixel.mode,
   }
 }
 export const generatePublicStoreIntegrationTiktokPixel = (
-  tiktokPixel: TiktokPixelIntegration | null | undefined
+  tiktokPixel: TiktokPixelIntegration | null | undefined,
+  events: { draft: string; open: string } = pixelCheckoutEvents(DEFAULT_PIXEL_RULES, 'tiktok')
 ): PublicTiktokPixelIntegration | null | undefined => {
   if (!tiktokPixel) return null
   return {
@@ -255,8 +270,8 @@ export const generatePublicStoreIntegrationTiktokPixel = (
       capi: hasSecret(pixel.accessToken),
     })),
     active: tiktokPixel.active,
-    objective: tiktokPixel.objective,
-    draftObjective: tiktokPixel.draftObjective,
+    objective: events.open as any,
+    draftObjective: events.draft as any,
     mode: tiktokPixel.mode,
   }
 }
@@ -265,7 +280,8 @@ export const generatePublicStoreIntegrationTiktokPixel = (
  * Public Snap Pixel config. CAPI access tokens are never included.
  */
 export const generatePublicStoreIntegrationSnapchatPixel = (
-  snapchatPixel: SnapchatPixelIntegration | null | undefined
+  snapchatPixel: SnapchatPixelIntegration | null | undefined,
+  events: { draft: string; open: string } = pixelCheckoutEvents(DEFAULT_PIXEL_RULES, 'snapchat')
 ): PublicSnapchatPixelIntegration | null | undefined => {
   if (!snapchatPixel) return null
   return {
@@ -274,8 +290,8 @@ export const generatePublicStoreIntegrationSnapchatPixel = (
       capi: hasSecret(pixel.accessToken),
     })),
     active: snapchatPixel.active,
-    objective: snapchatPixel.objective,
-    draftObjective: snapchatPixel.draftObjective,
+    objective: events.open as any,
+    draftObjective: events.draft as any,
     mode: snapchatPixel.mode,
   }
 }
@@ -793,51 +809,6 @@ export enum PixelReportMode {
   both = 'both',
 }
 
-/** Which order field to compare for [PixelStatusRule] (server-side CAPI on transition). */
-export enum PixelStatusDimension {
-  /** Rooms-model phase: draft | open | pack | ship | done | fail. */
-  phase = 'phase',
-  /** Status catalog kind (or custom status slug). */
-  kind = 'kind',
-  paymentStatus = 'paymentStatus',
-  /** @deprecated Legacy — old saved rules only; the API rejects it on save. Use `phase`. */
-  orderStatus = 'orderStatus',
-  /** @deprecated Legacy — use `phase` / `kind`. */
-  deliveryStatus = 'deliveryStatus',
-  /** @deprecated Legacy — use `kind`. */
-  customStatus = 'customStatus',
-}
-
-/**
- * When the order transitions so `dimension` becomes `equals`, send configured Meta/TikTok server events.
- * `id` must be stable (UUID) — used for idempotency in `order.claims.pixelStatusEvents`.
- */
-export interface PixelStatusRule {
-  id: string
-  dimension: PixelStatusDimension | `${PixelStatusDimension}`
-  equals: string
-  metaEvent?: MetaPixelEvent | `${MetaPixelEvent}` | keyof typeof MetaPixelEvent | null
-  tiktokEvent?: TiktokPixelEvent | `${TiktokPixelEvent}` | keyof typeof TiktokPixelEvent | null
-  snapchatEvent?:
-    | SnapchatPixelEvent
-    | `${SnapchatPixelEvent}`
-    | keyof typeof SnapchatPixelEvent
-    | 'ADD_BILLING'
-    | 'SUBSCRIBE'
-    | 'CUSTOM_EVENT_1'
-    | 'CUSTOM_EVENT_2'
-    | 'CUSTOM_EVENT_3'
-    | 'CUSTOM_EVENT_4'
-    | 'CUSTOM_EVENT_5'
-    | 'addBilling'
-    | 'subscribe'
-    | null
-  /** When set, overrides `metaEvent` (Meta CAPI custom event name). */
-  metaCustomEvent?: string | null
-  tiktokCustomEvent?: string | null
-  /** Overrides `snapchatEvent`. Snap standard name, e.g. `CUSTOM_EVENT_1`. */
-  snapchatCustomEvent?: string | null
-}
 export interface MetaPixel {
   name?: string
   id: string
@@ -956,10 +927,6 @@ export const generatePublicStoreIntegrationMeta = (
 export interface MetaPixelIntegration {
   id: string
   pixels: MetaPixel[]
-  objective?: MetaPixelEvent | null
-  draftObjective?: MetaPixelEvent | null
-  /** Server-only lifecycle rules; never exposed on public storefront JSON. */
-  statusRules?: PixelStatusRule[]
   active: boolean
   metadata: Record<string, any>
   /** Facebook Marketing OAuth data - for accessing pixels via API */
@@ -971,10 +938,6 @@ export interface MetaPixelIntegration {
 export interface TiktokPixelIntegration {
   id: string
   pixels: TiktokPixel[]
-  objective?: TiktokPixelEvent | null
-  draftObjective?: TiktokPixelEvent | null
-  /** Server-only lifecycle rules; never exposed on public storefront JSON. */
-  statusRules?: PixelStatusRule[]
   active: boolean
   metadata: Record<string, any>
   /** Where to send events: server, client, or both. Omit for auto (prefer server if accessToken set). */
@@ -985,10 +948,6 @@ export interface TiktokPixelIntegration {
 export interface SnapchatPixelIntegration {
   id: string
   pixels: SnapchatPixel[]
-  objective?: SnapchatPixelEvent | null
-  draftObjective?: SnapchatPixelEvent | null
-  /** Server-only lifecycle rules; never exposed on public storefront JSON. */
-  statusRules?: PixelStatusRule[]
   active: boolean
   metadata: Record<string, any>
   /** Where to send events: server (CAPI), client (snaptr), or both. Omit for auto. */
@@ -1487,6 +1446,8 @@ export interface StoreIntegrations {
   metaPixel?: MetaPixelIntegration
   tiktokPixel?: TiktokPixelIntegration
   snapchatPixel?: SnapchatPixelIntegration
+  /** Ad pixel event rules for Meta, TikTok and Snapchat (absent = the defaults). */
+  pixelEvents?: PixelEvents | null
   googleAnalytics?: GoogleAnalyticsIntegration
   googleSheet?: GoogleSheetsIntegration
   googleTags?: GoogleTagsIntegration

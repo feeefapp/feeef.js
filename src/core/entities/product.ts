@@ -1,6 +1,7 @@
 import { type EmbaddedCategory } from '../embadded/category.js'
 import { type ShippingMethodEntity } from './shipping_method.js'
-import { type GoogleSheetsColumn, type PixelStatusRule, type StoreEntity } from './store.js'
+import { type GoogleSheetsColumn, type StoreEntity } from './store.js'
+import { pixelCheckoutEvents, type PixelEventPlatform, type PixelEvents } from './pixel_events.js'
 import { type CategoryEntity } from './category.js'
 
 export interface ProductEntity {
@@ -115,52 +116,57 @@ export function generatePublicIntegrationsData(data: IntegrationsData | null | n
     googleAnalyticsData,
     googleTagsData,
     paymentMethodData,
+    pixelEvents,
   } = data
   return {
-    metaPixelData: generatePublicIntegrationsDataMetaPixel(metaPixelData),
-    tiktokPixelData: generatePublicIntegrationsDataTiktokPixel(tiktokPixelData),
-    snapchatPixelData: generatePublicIntegrationsDataSnapchatPixel(snapchatPixelData),
+    metaPixelData: generatePublicIntegrationsDataMetaPixel(metaPixelData, pixelEvents?.rules),
+    tiktokPixelData: generatePublicIntegrationsDataTiktokPixel(tiktokPixelData, pixelEvents?.rules),
+    snapchatPixelData: generatePublicIntegrationsDataSnapchatPixel(
+      snapchatPixelData,
+      pixelEvents?.rules
+    ),
     googleAnalyticsData: generatePublicIntegrationsDataGoogleAnalytics(googleAnalyticsData),
     googleTagsData: generatePublicIntegrationsDataGoogleTag(googleTagsData),
     paymentMethodData: generatePublicIntegrationsDataPaymentMethod(paymentMethodData),
   }
 }
+
+/** A product's public pixel data: on/off, pixels, and its own checkout events (null = the store's). */
+function publicProductPixelData(
+  data: { enabled?: boolean | null; ids?: string[] | null } | null | undefined,
+  rules: PixelEvents['rules'] | null | undefined,
+  platform: PixelEventPlatform
+) {
+  const events = rules ? pixelCheckoutEvents(rules, platform) : null
+  if (!data && !events) return null
+  return {
+    enabled: data ? data.enabled !== false : true,
+    ids: data?.ids ?? null,
+    objective: events?.open ?? null,
+    draftObjective: events?.draft ?? null,
+  }
+}
 // function that generate public data from the meta pixel data
 export function generatePublicIntegrationsDataMetaPixel(
-  data: MetaPixelData | null | undefined
+  data: MetaPixelData | null | undefined,
+  rules?: PixelEvents['rules'] | null
 ): PublicMetaPixelData | null | undefined {
-  if (!data) return data
-  const { ids, objective, draftObjective } = data
-  return {
-    ids: ids,
-    objective,
-    draftObjective,
-  }
+  return publicProductPixelData(data, rules, 'meta')
 }
 // function that generate public data from the tiktok pixel data
 export function generatePublicIntegrationsDataTiktokPixel(
-  data: TiktokPixelData | null | undefined
+  data: TiktokPixelData | null | undefined,
+  rules?: PixelEvents['rules'] | null
 ): PublicTiktokPixelData | null | undefined {
-  if (!data) return data
-  const { ids, objective, draftObjective } = data
-  return {
-    ids: ids,
-    objective,
-    draftObjective,
-  }
+  return publicProductPixelData(data, rules, 'tiktok')
 }
 
 /** Public product Snap Pixel override. Status rules stay merchant-only. */
 export function generatePublicIntegrationsDataSnapchatPixel(
-  data: SnapchatPixelData | null | undefined
+  data: SnapchatPixelData | null | undefined,
+  rules?: PixelEvents['rules'] | null
 ): PublicSnapchatPixelData | null | undefined {
-  if (!data) return data
-  const { ids, objective, draftObjective } = data
-  return {
-    ids: ids,
-    objective,
-    draftObjective,
-  }
+  return publicProductPixelData(data, rules, 'snapchat')
 }
 // function that generate public data from the google analytics data
 export function generatePublicIntegrationsDataGoogleAnalytics(
@@ -188,6 +194,8 @@ export interface IntegrationsData {
   metaPixelData?: MetaPixelData | null
   tiktokPixelData?: TiktokPixelData | null
   snapchatPixelData?: SnapchatPixelData | null
+  /** This product's own ad pixel event rules (its single-product orders); null = the store's. */
+  pixelEvents?: PixelEvents | null
   googleAnalyticsData?: GoogleAnalyticsData | null
   googleTagsData?: GoogleTagData | null
   googleSheetsData?: GoogleSheetsData | null
@@ -224,20 +232,10 @@ export enum MetaPixelEvent {
   initiateCheckout = 'InitiateCheckout',
 }
 export interface MetaPixelData {
-  /** When false, ignore product override and use store defaults. */
+  /** When false, this product's orders go to none of the store's pixels on this platform. */
   enabled?: boolean | null
   // active meta pixel ids
   ids?: string[] | null
-  // main objective
-  objective?: string | null
-  // draft objective
-  draftObjective?: string | null
-  /**
-   * Optional product-level status transition rules (server CAPI).
-   * When non-empty on a single-product order, overrides store `statusRules`.
-   * Never exposed on public product JSON.
-   */
-  statusRules?: PixelStatusRule[] | null
 }
 
 export enum TiktokPixelEvent {
@@ -253,20 +251,10 @@ export enum TiktokPixelEvent {
   purchase = 'Purchase',
 }
 export interface TiktokPixelData {
-  /** When false, ignore product override and use store defaults. */
+  /** When false, this product's orders go to none of the store's pixels on this platform. */
   enabled?: boolean | null
   // active tiktok pixel ids
   ids?: string[] | null
-  // main objective
-  objective?: string | null
-  // draft objective
-  draftObjective?: string | null
-  /**
-   * Optional product-level status transition rules (server Events API).
-   * When non-empty on a single-product order, overrides store `statusRules`.
-   * Never exposed on public product JSON.
-   */
-  statusRules?: PixelStatusRule[] | null
 }
 
 /**
@@ -287,17 +275,9 @@ export enum SnapchatPixelEvent {
 }
 
 export interface SnapchatPixelData {
-  /** When false, ignore product override and use store defaults. */
+  /** When false, this product's orders go to none of the store's pixels on this platform. */
   enabled?: boolean | null
   ids?: string[] | null
-  objective?: string | null
-  draftObjective?: string | null
-  /**
-   * Optional product-level status transition rules (server CAPI).
-   * When non-empty on a single-product order, overrides store `statusRules`.
-   * Never exposed on public product JSON.
-   */
-  statusRules?: PixelStatusRule[] | null
 }
 export interface GoogleAnalyticsData {}
 export interface GoogleTagData {}
@@ -317,17 +297,23 @@ export interface GoogleSheetsData {
 
 // public meta pixel data
 export interface PublicMetaPixelData {
+  /** False: this product's orders go to none of the store's pixels on this platform. */
+  enabled?: boolean
   ids?: string[] | null
   objective?: string | null
   draftObjective?: string | null
 }
 // public tiktok pixel data
 export interface PublicTiktokPixelData {
+  /** False: this product's orders go to none of the store's pixels on this platform. */
+  enabled?: boolean
   ids?: string[] | null
   objective?: string | null
   draftObjective?: string | null
 }
 export interface PublicSnapchatPixelData {
+  /** False: this product's orders go to none of the store's pixels on this platform. */
+  enabled?: boolean
   ids?: string[] | null
   objective?: string | null
   draftObjective?: string | null
