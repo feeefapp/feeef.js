@@ -79,6 +79,8 @@ export interface LiveTemplate {
   engine: string
   artifactHash: string
   artifactUrl: string
+  /** What a page's `content.layout` may name: default (leave it out), blank, then named layouts. */
+  layouts: PageLayout[]
 }
 
 /** A placed component: `use` is a component id (`hero`), `<dependency>/<component>` or `core/<id>`. */
@@ -90,8 +92,14 @@ export type ContentNode = {
   hydrate?: 'never' | 'load' | 'idle' | 'visible' | 'interaction'
 }
 
-/** Slot content of a route, the layout or a store page (`content/*.json`). */
-export type SlotContent = { slots?: Record<string, ContentNode[]> }
+/**
+ * Slot content of a route, a layout or a store page (`content/*.json`). `layout` (pages only) picks
+ * the layout the page renders in: `blank` or a named layout; absent = the default layout.
+ */
+export type SlotContent = { layout?: string; slots?: Record<string, ContentNode[]> }
+
+/** A layout a page can pick (`id` = `default`, `blank` or a named `app/layouts/<name>.tsx`). */
+export type PageLayout = { id: string; title: string | null; description: string | null }
 
 export interface StorePageEntity {
   id: string
