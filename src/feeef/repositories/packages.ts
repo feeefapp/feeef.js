@@ -1,12 +1,12 @@
 import type { AxiosInstance } from 'axios'
 
 /**
- * Template system v3 (templates, components, pages as packages): store packages, drafts,
- * versions, the live template, marketplace, licences, reviews and store pages.
+ * Template system v3.1 (docs/template-system/SPEC.md): store packages (templates and component
+ * packages), drafts, versions, the live template, marketplace, licences, reviews and store pages.
  * Errors are `{code, message, ...details}`; build errors carry `diagnostics`.
  */
 
-export type PackageKind = 'template' | 'component' | 'page'
+export type PackageKind = 'template' | 'component'
 
 export interface PackageEntity {
   id: string
@@ -39,6 +39,10 @@ export interface PackageVersionEntity {
   parentVersionId: string | null
   upstreamVersionId: string | null
   artifactHash: string
+  /** Hash of the compiled code (components, routes, layout); shared by stores on the same code. */
+  codeHash?: string
+  /** Hash of the content (theme, messages, slot content); a content-only edit keeps `codeHash`. */
+  contentHash?: string
   engine: string
   message: string | null
   published: boolean
@@ -75,15 +79,27 @@ export interface LiveTemplate {
   engine: string
   artifactHash: string
   artifactUrl: string
+  /** What a page's `content.layout` may name: default (leave it out), blank, then named layouts. */
+  layouts: PageLayout[]
 }
 
-export type PageNode = {
+/** A placed component: `use` is a component id (`hero`), `<dependency>/<component>` or `core/<id>`. */
+export type ContentNode = {
   id: string
   use: string
   props?: Record<string, unknown>
-  slots?: Record<string, PageNode[]>
-  hydrate?: string
+  slots?: Record<string, ContentNode[]>
+  hydrate?: 'never' | 'load' | 'idle' | 'visible' | 'interaction'
 }
+
+/**
+ * Slot content of a route, a layout or a store page (`content/*.json`). `layout` (pages only) picks
+ * the layout the page renders in: `blank` or a named layout; absent = the default layout.
+ */
+export type SlotContent = { layout?: string; slots?: Record<string, ContentNode[]> }
+
+/** A layout a page can pick (`id` = `default`, `blank` or a named `app/layouts/<name>.tsx`). */
+export type PageLayout = { id: string; title: string | null; description: string | null }
 
 export interface StorePageEntity {
   id: string
@@ -91,10 +107,9 @@ export interface StorePageEntity {
   productId: string | null
   path: string
   title: string | null
-  /** Omitted in lists. */
-  root?: PageNode
+  /** Draft content, e.g. `{slots: {main: [...]}}`. Omitted in lists. */
+  content?: SlotContent
   seo: Record<string, unknown>
-  data: Record<string, unknown>
   status: 'draft' | 'published'
   version: number
   publishedAt: string | null
@@ -301,16 +316,16 @@ export class PackagesRepository {
   }
   createPage(
     storeId: string,
-    data: { path: string; title?: string; root?: PageNode; productId?: string }
+    data: { path: string; title?: string; content?: SlotContent; productId?: string }
   ) {
     return this.call<StorePageEntity>('post', `${store(storeId)}/pages`, data)
   }
-  /** Version-checked edit of any of `path, title, root, seo, data, productId`. */
+  /** Version-checked edit of any of `path, title, content, seo, productId`. */
   updatePage(
     storeId: string,
     pageId: string,
     data: { expectedVersion: number } & Partial<
-      Pick<StorePageEntity, 'path' | 'title' | 'root' | 'seo' | 'data' | 'productId'>
+      Pick<StorePageEntity, 'path' | 'title' | 'content' | 'seo' | 'productId'>
     >
   ) {
     return this.call<StorePageEntity>('patch', page(storeId, pageId), data)

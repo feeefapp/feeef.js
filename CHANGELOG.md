@@ -1,3 +1,12 @@
+# Unreleased
+
+- Checkout protection rules unified (feeef.all `docs/checkout-protection.md`): `SecurityOptions` is `phone` (order in progress, `match`), `fingerprint` (same browser, `ttl` + `match`), `ip`, `minTimeInPage`, `unverified`, `history`, `countries`, `sources`. `ads`, `frontend` and `doubleSend` are gone, and so are `PublicStoreIntegrations.security`, `PublicSecurityIntegration` and `generatePublicStoreIntegrationSecurity`: storefronts no longer receive any protection setting.
+
+# 0.16.0
+
+- Template system v3.1 (`docs/template-system/SPEC.md`): `PackageKind` is `'template' | 'component'` (the `page` kind is gone); versions carry optional `codeHash` / `contentHash`.
+- Store pages hold slot `content` (`SlotContent`, `{slots: {main: ContentNode[]}}`) instead of `root` and `data`; `PageNode` is now `ContentNode`.
+
 # 0.14.3
 
 - Export `customFields` order custom fields contract v2 helpers (`normalizeCustomFields`, `visibleCustomFields`, `validateOrderCustomFields`, `collectPricingAdjustments`, `coerceSubmittedCustomFields`).

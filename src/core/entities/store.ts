@@ -102,7 +102,6 @@ export const generatePublicStoreIntegrations = (
     orderdz,
     webhooks,
     ai,
-    security,
     customFields,
     reviews,
     payment,
@@ -121,7 +120,6 @@ export const generatePublicStoreIntegrations = (
     ai: generatePublicStoreIntegrationAi(ai) || null,
     orderdz: generatePublicStoreIntegrationOrderdz(orderdz) || null,
     webhooks: generatePublicStoreIntegrationWebhooks(webhooks) || null,
-    security: generatePublicStoreIntegrationSecurity(security) || null,
     customFields: generatePublicStoreIntegrationCustomFields(customFields) || null,
     reviews: generatePublicStoreIntegrationReviews(reviews),
     payment: generatePublicStoreIntegrationPayment(payment) || null,
@@ -372,50 +370,6 @@ export const generatePublicStoreIntegrationWebhooks = (
     webhookUrls: activeWebhooks.map((webhook) => webhook.url),
   }
 }
-const DUPLICATE_WINDOW_DEFAULT_S = 3600
-const COOLDOWN_DEFAULT_MS = 3_000
-/** The client lock is UX only; never publish the server cooldown itself. */
-const COOLDOWN_MAX_MS = 60_000
-
-const positiveSeconds = (v: unknown): number =>
-  typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0
-
-/**
- * Generates the public (storefront) security knobs from the private config.
- *
- * Only numbers the browser needs to run its own cheap checks; no rule names,
- * no outcomes, no lists. Everything else (countries, sources, fingerprint,
- * ip, phone, ads, and what happens when a check trips) stays on the API,
- * which enforces it on `POST /orders/send`. Null when security is off.
- */
-export const generatePublicStoreIntegrationSecurity = (
-  security: SecurityIntegration | null | undefined
-): PublicSecurityIntegration | null => {
-  if (!security || security.active !== true) return null
-
-  const opts = security.options
-  const minTime = opts?.minTimeInPage
-  const frontend = opts?.frontend
-  const doubleSend = opts?.doubleSend
-
-  return {
-    minTimeMs: minTime?.active === true ? Math.round(positiveSeconds(minTime.duration) * 1000) : 0,
-    duplicateWindowMs:
-      frontend?.active === true
-        ? Math.round((positiveSeconds(frontend.ttl) || DUPLICATE_WINDOW_DEFAULT_S) * 1000)
-        : 0,
-    submitCooldownMs:
-      doubleSend?.active === true
-        ? Math.min(
-            positiveSeconds(doubleSend.ttl)
-              ? Math.round(positiveSeconds(doubleSend.ttl) * 1000)
-              : COOLDOWN_DEFAULT_MS,
-            COOLDOWN_MAX_MS
-          )
-        : 0,
-  }
-}
-
 /**
  * Generates public payment integration data from private integration data.
  * Only exposes non-sensitive information (method IDs, names, active status).
@@ -600,7 +554,6 @@ export interface PublicStoreIntegrations {
   ai: PublicAiIntegration | null
   orderdz: PublicOrderdzIntegration | null
   webhooks: PublicWebhooksIntegration | null
-  security: PublicSecurityIntegration | null
   customFields: PublicCustomFieldsIntegration | null
   /** Product reviews: `active` and `storefrontForm` only (backend-owned, free). */
   reviews: PublicReviewsIntegration | null
@@ -1255,75 +1208,84 @@ export interface FeeefDeliveryIntegration {
   metadata?: Record<string, any> | null
 }
 
-// Security Treatment enum
+/**
+ * What happens to an order a checkout protection rule catches. `fake` (the visitor sees
+ * "order received", nothing is saved) is only accepted by the bot rules `minTimeInPage` and
+ * `unverified`.
+ */
 export enum SecurityTreatment {
   block = 'block',
   warning = 'warning',
   fake = 'fake',
 }
 
-// Base security option with TTL and treatment (TTL optional when inactive / unset)
-export interface SecurityOption {
+/** Which earlier orders a duplicate rule compares with. */
+export type SecurityMatch = 'sameProducts' | 'anyProduct'
+
+/** A rule with a switch and a treatment. */
+export interface SecurityRule {
   active: boolean
+  treatment: SecurityTreatment
+}
+
+/** "Same phone number": the phone already has an order in progress. */
+export interface SecurityPhoneOption extends SecurityRule {
+  match?: SecurityMatch
+}
+
+/** "Same browser": the storefront's browser id ordered within `ttl` seconds. */
+export interface SecurityBrowserOption extends SecurityRule {
   ttl?: number | null
-  treatment: SecurityTreatment
+  match?: SecurityMatch
 }
 
-// Min-time-on-page option
-export interface SecurityMinTimeOption {
-  active: boolean
-  duration: number // seconds
-  treatment: SecurityTreatment
+/** "Same connection": same IP + products + wilaya within `ttl` seconds. */
+export interface SecurityConnectionOption extends SecurityRule {
+  ttl?: number | null
 }
 
-// Country filtering option
-export interface SecurityCountriesOption {
-  active: boolean
-  treatment: SecurityTreatment
-  allowed: string[] | null // ISO codes; null = allow all
+/** "Too fast to be human": submitted less than `duration` seconds after the page opened. */
+export interface SecurityMinTimeOption extends SecurityRule {
+  duration: number
+}
+
+/** Visitor country allow / block lists (ISO codes; null allowed = all). */
+export interface SecurityCountriesOption extends SecurityRule {
+  allowed: string[] | null
   blocked: string[]
 }
 
-// Traffic source filtering option
-export interface SecuritySourcesOption {
-  active: boolean
-  treatment: SecurityTreatment
-  allowed: string[] | null // e.g., ["ads", "organic"]
+/** Traffic source allow / block lists (e.g. `['ads']`, `['direct']`). */
+export interface SecuritySourcesOption extends SecurityRule {
+  allowed: string[] | null
   blocked: string[]
 }
 
-// All security options (private). Keys match API / Vine: each block is optional.nullable.
+/**
+ * Checkout protection rules (contract: feeef.all `docs/checkout-protection.md`). Every rule is
+ * optional and nullable, like the API.
+ */
 export interface SecurityOptions {
-  fingerprint?: SecurityOption | null
-  ip?: SecurityOption | null
-  phone?: SecurityOption | null
-  ads?: SecurityOption | null
-  frontend?: SecurityOption | null
-  doubleSend?: SecurityOption | null
+  phone?: SecurityPhoneOption | null
+  fingerprint?: SecurityBrowserOption | null
+  ip?: SecurityConnectionOption | null
   minTimeInPage?: SecurityMinTimeOption | null
+  /** The order did not come from the store's page, or the page sent no checks. */
+  unverified?: SecurityRule | null
+  /** The phone refused a delivery before. */
+  history?: SecurityRule | null
   countries?: SecurityCountriesOption | null
   sources?: SecuritySourcesOption | null
 }
 
-// Private security integration (merchant app) — checkout fraud / abuse protection
-// (not account 2FA). Enforced on public `POST .../orders/send`.
+/**
+ * Checkout protection (merchant settings; not account 2FA). Enforced only by the API on
+ * `POST /orders/send`; storefronts never receive it.
+ */
 export interface SecurityIntegration {
   active: boolean
   options?: SecurityOptions | null
   metadata?: Record<string, any>
-}
-
-/**
- * Public security knobs (storefront). Numbers only, in milliseconds; 0 means
- * the check is off (for `minTimeMs`: the storefront default applies).
- */
-export interface PublicSecurityIntegration {
-  /** Minimum time the order form is open before a pending submit. */
-  minTimeMs: number
-  /** How long a repeat of the same order from one browser is held back. */
-  duplicateWindowMs: number
-  /** How long the browser keeps its in-flight submit lock after a success. */
-  submitCooldownMs: number
 }
 
 /**
