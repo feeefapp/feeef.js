@@ -1,12 +1,8 @@
 import { type AxiosInstance } from 'axios'
 
-/** Which ledger holds the user's money. Every wallet moves to `cloud` on first touch. */
-export type WalletAuthority = 'legacy' | 'frozen' | 'cloud'
-
 /** `GET /wallet/cloud` */
 export interface CloudWalletStatus {
-  authority: WalletAuthority
-  walletId?: string
+  walletId: string
   /** Spendable DZD. */
   balance: number
   /** DZD held by in-flight charges. */
@@ -46,12 +42,12 @@ export type CloudDepositReviewBasis =
  * Feeef Cloud wallet: balance + top-ups for the signed-in user, and the manager review
  * queue for manual top-ups (`manageCloudWallets`). Every gateway (Stripe, SATIM, SlickPay,
  * Chargily) and manual method (CCP, BaridiMob, RedotPay, Binance, USDT …) runs on the
- * Cloud hosted checkout; the legacy `deposits` create endpoints are gone.
+ * Cloud hosted checkout.
  */
 export class CloudWalletRepository {
   constructor(private readonly client: AxiosInstance) {}
 
-  /** Live balance. The first call moves a legacy wallet to Cloud. */
+  /** Live balance (the Cloud wallet is created on first call). */
   async get(): Promise<CloudWalletStatus> {
     const res = await this.client.get('/wallet/cloud')
     return res.data

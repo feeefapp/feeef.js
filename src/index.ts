@@ -46,7 +46,6 @@ export * from './core/batch.js'
 export * from './feeef/repositories/repository.js'
 export * from './feeef/repositories/apps.js'
 export * from './feeef/repositories/oauth.js'
-export * from './feeef/repositories/deposits.js'
 export * from './feeef/repositories/cloud_wallet.js'
 export * from './feeef/repositories/promos.js'
 export * from './feeef/repositories/transfers.js'
@@ -74,7 +73,7 @@ export * from './feeef/repositories/currencies.js'
 export * from './feeef/repositories/inventory.js'
 export * from './feeef/repositories/finance.js'
 
-// Transfer and Deposit entities are also exported from their repositories
+// Transfer entities are also exported from their repositories
 export type { AppEntity, AppCreateInput, AppUpdateInput } from './feeef/repositories/apps.js'
 export type {
   TransferEntity,
@@ -83,15 +82,6 @@ export type {
   TransferType,
   TransferListOptions,
 } from './feeef/repositories/transfers.js'
-export type {
-  DepositEntity,
-  DepositCreateInput,
-  DepositUpdateInput,
-  DepositStatus,
-  DepositListOptions,
-  PayPalOrderResponse,
-  PayPalCaptureResponse,
-} from './feeef/repositories/deposits.js'
 export type {
   PromoEntity,
   PromoValidationResult,
