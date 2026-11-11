@@ -74,8 +74,8 @@ export interface PlanCheckoutInput {
   plan: string
   months: number
   code?: string | null
-  /** `wallet` debits now; `gateway` / `manual` open the Cloud hosted checkout. */
-  payWith?: 'wallet' | 'gateway' | 'manual'
+  /** `wallet` debits now; `checkout` (default) opens the Cloud hosted checkout. */
+  payWith?: 'wallet' | 'checkout'
   /** Method the hosted checkout opens on first (every published method stays available). */
   paymentMethod?: string | null
   returnUrl?: string | null

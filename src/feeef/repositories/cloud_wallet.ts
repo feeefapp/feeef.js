@@ -35,6 +35,20 @@ export interface CloudTopUpResult {
   checkout: { id: string; clientSecret: string; url: string }
 }
 
+/** A top-up of the signed-in user (`GET /wallet/cloud/top-ups`). Amounts are DZD. */
+export interface CloudTopUp {
+  id: string
+  /** `awaiting_submission` · `awaiting_review` · `needs_information` · `credit_processing` ·
+   * `credited` · `rejected` · `canceled` · `expired` · `credit_failed` */
+  state: string
+  amount: number
+  currency: string
+  paymentReference: string | null
+  submittedAt: string | null
+  expiresAt: string | null
+  createdAt: string
+}
+
 export type CloudDepositReviewBasis =
   'bank_statement' | 'ccp_statement' | 'provider_portal' | 'cash_receipt' | 'other'
 
@@ -56,6 +70,21 @@ export class CloudWalletRepository {
   /** Starts a top-up and returns the hosted checkout to open. */
   async topUp(input: CloudTopUpInput): Promise<CloudTopUpResult> {
     const res = await this.client.post('/wallet/cloud/top-ups', input)
+    return res.data
+  }
+
+  /** The caller's top-ups, newest first. */
+  async topUps(options?: { cursor?: string }): Promise<{
+    data: CloudTopUp[]
+    nextCursor: string | null
+  }> {
+    const res = await this.client.get('/wallet/cloud/top-ups', { params: options })
+    return res.data
+  }
+
+  /** One of the caller's top-ups (poll it while the payer is on the hosted checkout). */
+  async getTopUp(id: string): Promise<CloudTopUp> {
+    const res = await this.client.get(`/wallet/cloud/top-ups/${id}`)
     return res.data
   }
 
@@ -95,12 +124,6 @@ export class CloudWalletRepository {
   /** Managers: reject a manual top-up with a reason the merchant sees. */
   async rejectDeposit(id: string, reason: string): Promise<Record<string, any>> {
     const res = await this.client.post(`/admins/cloud-wallet/deposits/${id}/reject`, { reason })
-    return res.data
-  }
-
-  /** Managers: move one user's wallet to Cloud now. */
-  async migrateUser(userId: string): Promise<Record<string, any>> {
-    const res = await this.client.post(`/admins/cloud-wallet/users/${userId}/migrate`)
     return res.data
   }
 }
