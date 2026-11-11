@@ -448,6 +448,7 @@ export interface PublicMetaPixelIntegration {
   objective?: MetaPixelEvent | null
   draftObjective?: MetaPixelEvent | null
   mode?: PixelReportMode | null
+  reportProfit?: boolean
 }
 export interface PublicTiktokPixelIntegration {
   pixels: PublicPixelEntry[]
@@ -455,6 +456,7 @@ export interface PublicTiktokPixelIntegration {
   objective?: TiktokPixelEvent | null
   draftObjective?: TiktokPixelEvent | null
   mode?: PixelReportMode | null
+  reportProfit?: boolean
 }
 export interface PublicSnapchatPixelIntegration {
   pixels: PublicPixelEntry[]
@@ -462,6 +464,7 @@ export interface PublicSnapchatPixelIntegration {
   objective?: SnapchatPixelEvent | null
   draftObjective?: SnapchatPixelEvent | null
   mode?: PixelReportMode | null
+  reportProfit?: boolean
 }
 export interface PublicGoogleAnalyticsIntegration {
   id: string
@@ -710,6 +713,26 @@ export interface StoreConfigs {
   confirmationQueue?: ConfirmationQueueConfig
   inventory_integration?: InventoryIntegration
   finance_integration?: FinanceIntegration
+  /** Store default delivery policy; courier accounts can override it. */
+  delivery?: DeliveryPolicy | null
+}
+
+/**
+ * What a commune without a pickup desk does at checkout:
+ * - `nearest`: pickup stays on; the parcel goes to the closest commune that has a desk.
+ * - `block`: pickup is not offered there (home delivery only).
+ */
+export type NoDeskCityPolicy = 'nearest' | 'block'
+
+/**
+ * Delivery policy: which types are offered, and the no-desk rule. Every field is optional:
+ * a courier account override inherits missing fields from the store, the store from the
+ * platform default (`{ home: true, pickup: true, noDeskCity: 'nearest' }`).
+ */
+export interface DeliveryPolicy {
+  home?: boolean
+  pickup?: boolean
+  noDeskCity?: NoDeskCityPolicy
 }
 
 /** Store-level confirmation queue settings. */
@@ -933,6 +956,8 @@ export interface MetaPixelIntegration {
   oauth2?: FacebookMarketingOAuth | null
   /** Where to send events: server (CAPI), client (store frontend), or both. Omit for auto (prefer server if key set). */
   mode?: PixelReportMode | null
+  /** Purchase value = sale − cost − shipping; forces server-only. */
+  reportProfit?: boolean
 }
 // tiktok pixel integration
 export interface TiktokPixelIntegration {
@@ -942,6 +967,8 @@ export interface TiktokPixelIntegration {
   metadata: Record<string, any>
   /** Where to send events: server, client, or both. Omit for auto (prefer server if accessToken set). */
   mode?: PixelReportMode | null
+  /** Purchase value = sale − cost − shipping; forces server-only. */
+  reportProfit?: boolean
 }
 
 /** Snap Pixel + Conversions API (`store.integrations.snapchatPixel`). */
@@ -952,6 +979,8 @@ export interface SnapchatPixelIntegration {
   metadata: Record<string, any>
   /** Where to send events: server (CAPI), client (snaptr), or both. Omit for auto. */
   mode?: PixelReportMode | null
+  /** Purchase value = sale − cost − shipping; forces server-only. */
+  reportProfit?: boolean
 }
 
 export interface GoogleAnalyticsIntegration {
