@@ -9,6 +9,7 @@ import { UserRepository } from './repositories/users.js'
 import { AppRepository } from './repositories/apps.js'
 import { OAuthRepository } from './repositories/oauth.js'
 import { DepositRepository } from './repositories/deposits.js'
+import { CloudWalletRepository } from './repositories/cloud_wallet.js'
 import { PromoRepository } from './repositories/promos.js'
 import { TransferRepository } from './repositories/transfers.js'
 import { CategoryRepository } from './repositories/categories.js'
@@ -151,6 +152,11 @@ export class FeeeF {
   deposits: DepositRepository
 
   /**
+   * Feeef Cloud wallet: balance, top-ups, manager review of manual top-ups.
+   */
+  cloudWallet: CloudWalletRepository
+
+  /**
    * The repository for managing transfers.
    */
   transfers: TransferRepository
@@ -271,6 +277,7 @@ export class FeeeF {
     this.orders = new OrderRepository(this.client)
     this.ordersV1 = new OrdersV1Repository(this.client)
     this.deposits = new DepositRepository(this.client)
+    this.cloudWallet = new CloudWalletRepository(this.client)
     this.transfers = new TransferRepository(this.client)
     this.promos = new PromoRepository(this.client)
     this.categories = new CategoryRepository(this.client)

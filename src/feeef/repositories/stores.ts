@@ -43,6 +43,68 @@ export interface PayDueResult {
   cost: number
 }
 
+export interface PayDueOptions {
+  /** `checkout` (Cloud billing only): pay on the Feeef Cloud hosted checkout. */
+  payWith?: 'wallet' | 'checkout'
+  /** Hosted checkout: where to send the payer back. */
+  returnUrl?: string
+  /** Stable per pay intent so a retried request never charges twice. */
+  idempotencyKey?: string
+}
+
+/** `payDue` with `payWith: 'checkout'`: open `checkoutUrl`, then poll `dueInvoice`. */
+export interface PayDueCheckoutStart {
+  success: true
+  payWith: 'cloud'
+  invoiceId: string
+  checkoutUrl: string | null
+  amount: number
+}
+
+export interface DueInvoiceStatus {
+  invoiceId: string
+  status: 'open' | 'payment_pending' | 'paid' | 'void' | 'uncollectible'
+  paid: boolean
+  points: number
+  amount: number
+  remainingDue: number
+}
+
+export interface PlanCheckoutInput {
+  plan: string
+  months: number
+  code?: string | null
+  /** `wallet` debits now; `gateway` / `manual` open the Cloud hosted checkout. */
+  payWith?: 'wallet' | 'gateway' | 'manual'
+  /** Method the hosted checkout opens on first (every published method stays available). */
+  paymentMethod?: string | null
+  returnUrl?: string | null
+  /** Stable per pay intent so a retried request never opens a second subscription. */
+  idempotencyKey?: string
+}
+
+/** `POST /stores/:id/subscription/checkout`. `payWith: 'cloud'` → open `checkoutUrl`, poll `planInvoice`. */
+export type PlanCheckoutResult =
+  | { success: true; payWith: 'wallet'; subscription: any; quote: Record<string, any> }
+  | {
+      success: true
+      payWith: 'cloud'
+      checkoutUrl: string | null
+      invoiceId: string
+      cloudSubscriptionId: string
+      amount: number
+      quote: Record<string, any>
+    }
+
+export interface PlanInvoiceStatus {
+  invoiceId: string
+  status: 'open' | 'payment_pending' | 'paid' | 'void' | 'uncollectible'
+  paid: boolean
+  amount: number
+  /** The store's subscription once the plan is applied. */
+  subscription: any
+}
+
 /**
  * Repository for managing Store entities.
  */
@@ -209,10 +271,52 @@ export class StoreRepository extends ModelRepository<
    * @param amount - The amount of due to pay (in points).
    * @returns A Promise that resolves to the payment result.
    */
-  async payDue(storeId: string, amount: number): Promise<PayDueResult> {
-    const res = await this.client.post(`/${this.resource}/${storeId}/subscription/payDue`, {
-      amount,
-    })
+  async payDue(
+    storeId: string,
+    amount: number,
+    options?: PayDueOptions
+  ): Promise<PayDueResult | PayDueCheckoutStart> {
+    const res = await this.client.post(
+      `/${this.resource}/${storeId}/subscription/payDue`,
+      {
+        amount,
+        ...(options?.payWith ? { payWith: options.payWith } : {}),
+        ...(options?.returnUrl ? { returnUrl: options.returnUrl } : {}),
+      },
+      options?.idempotencyKey
+        ? { headers: { 'Idempotency-Key': options.idempotencyKey } }
+        : undefined
+    )
+    return res.data
+  }
+
+  /**
+   * Status of a store-due Cloud invoice opened by `payDue` with `payWith: 'checkout'`.
+   * Poll it while the payer is on the hosted checkout.
+   */
+  async dueInvoice(storeId: string, invoiceId: string): Promise<DueInvoiceStatus> {
+    const res = await this.client.get(
+      `/${this.resource}/${storeId}/subscription/due-invoices/${invoiceId}`
+    )
+    return res.data
+  }
+
+  /** Buys / renews a plan through Feeef Cloud billing (wallet or hosted checkout). */
+  async planCheckout(storeId: string, input: PlanCheckoutInput): Promise<PlanCheckoutResult> {
+    const { idempotencyKey, ...body } = input
+    const res = await this.client.post(
+      `/${this.resource}/${storeId}/subscription/checkout`,
+      body,
+      idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined
+    )
+    return res.data
+  }
+
+  /** Status of a plan invoice opened by `planCheckout`; poll while the payer is on the checkout. */
+  async planInvoice(storeId: string, invoiceId: string): Promise<PlanInvoiceStatus> {
+    const res = await this.client.get(
+      `/${this.resource}/${storeId}/subscription/invoices/${invoiceId}`
+    )
     return res.data
   }
 }

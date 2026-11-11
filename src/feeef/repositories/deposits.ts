@@ -103,7 +103,10 @@ export interface PayPalCaptureResponse {
 }
 
 /**
- * Repository for managing deposit data and PayPal integration
+ * Legacy deposit history (read) + admin review of in-flight legacy deposits.
+ *
+ * Wallet top-ups are Feeef Cloud deposits: use `ff.cloudWallet.topUp()`. A merchant
+ * `create` returns `410 WALLET_ON_CLOUD`; only admins can still create rows here.
  */
 export class DepositRepository extends ModelRepository<
   DepositEntity,
@@ -156,50 +159,7 @@ export class DepositRepository extends ModelRepository<
   }
 
   /**
-   * Create a new deposit request (for anonymous/guest users)
-   * @param data - The deposit data
-   * @returns Promise that resolves to the created deposit
-   */
-  async send(data: DepositCreateInput): Promise<DepositEntity> {
-    const res = await this.client.post(`/${this.resource}/send`, data)
-    return res.data
-  }
-
-  /**
-   * Create a PayPal order for deposit
-   * @param params - PayPal order parameters
-   * @returns Promise that resolves to PayPal order details
-   */
-  async createPayPalOrder(params: {
-    amount: number
-    currency?: string
-    depositId?: string
-    returnUrl: string
-    cancelUrl: string
-  }): Promise<PayPalOrderResponse> {
-    const orderData = {
-      amount: params.amount,
-      currency: params.currency || 'USD',
-      depositId: params.depositId,
-      returnUrl: params.returnUrl,
-      cancelUrl: params.cancelUrl,
-    }
-
-    const res = await this.client.post(`/${this.resource}/paypal/create-order`, orderData)
-
-    // Extract approval URL from links
-    const approvalLink = res.data.links?.find((link: any) => link.rel === 'approve')
-
-    return {
-      id: res.data.id,
-      status: res.data.status,
-      approvalUrl: approvalLink?.href,
-      links: res.data.links || [],
-    }
-  }
-
-  /**
-   * Capture a PayPal order after user approval
+   * Capture a PayPal order after user approval (in-flight legacy orders only)
    * @param orderId - PayPal order ID
    * @returns Promise that resolves to capture details
    */
